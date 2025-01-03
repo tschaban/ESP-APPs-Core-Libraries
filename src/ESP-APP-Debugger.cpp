@@ -1,6 +1,6 @@
 #include "ESP-APP-Debugger.h"
 
-//#ifdef DEBUG
+#ifdef DEBUG
 
 ESP_APP_Debugger::ESP_APP_Debugger(){};
 
@@ -168,7 +168,7 @@ void ESP_APP_Debugger::printHeader(uint8_t newLineBefore, uint8_t newLineAfter,
 
 void ESP_APP_Debugger::getFreeMemorySize() {
   printInformation(F("Free: "), F("RAM"));
-#ifdef ESP_APP_ESP32
+#ifdef ESP32
   Serial << (esp_get_free_heap_size() / 1024) << F("kB");
 #else
   Serial << (system_get_free_heap_size() / 1024) << F("kB");
@@ -184,20 +184,20 @@ void ESP_APP_Debugger::getFileSystemDubugInformation() {
   Serial << fileSystem.usedBytes / 1024 << F("/")
          << fileSystem.totalBytes / 1024 << F("kB");
 #else
-  Serial << LITTLEFS.usedBytes() / 1024 << F("/")
-         << LITTLEFS.totalBytes() / 1024 << F("kB");
+  Serial << LittleFS.usedBytes() / 1024 << F("/")
+         << LittleFS.totalBytes() / 1024 << F("kB");
 #endif
 }
 
 void ESP_APP_Debugger::getESPHardwareInformation() {
   printInformation(F("Hardware information"), F("ESP"));
 
-#ifndef ESP_APP_ESP32
+#ifndef ESP32
   printBulletPoint(F("ID: "));
   Serial << ESP.getFlashChipId();
 #endif
 
-#ifdef ESP_APP_ESP32
+#ifdef ESP32
   printBulletPoint(F("Model: "));
   Serial << ESP.getChipModel();
 
@@ -206,7 +206,7 @@ void ESP_APP_Debugger::getESPHardwareInformation() {
 
 #endif
 
-#ifdef ESP_APP_ESP32
+#ifdef ESP32
   printBulletPoint(F("CPU: "));
   Serial << (ESP.getCpuFreqMHz() / 1000000) << F(" MHz");
 #endif
@@ -218,7 +218,7 @@ void ESP_APP_Debugger::getESPHardwareInformation() {
     Serial << (ESP.getFlashChipSize() / 1024) << F(" Kbits");
   }
 
-#ifndef ESP_APP_ESP32
+#ifndef ESP32
   printBulletPoint(F("Real Flash size: "));
   if (ESP.getFlashChipRealSize() >= 1048576) {
     Serial << (ESP.getFlashChipRealSize() / 1048576) << F(" Mbits");
@@ -233,7 +233,7 @@ void ESP_APP_Debugger::getESPHardwareInformation() {
   printBulletPoint(F("Flash Chip Mode: "));
   Serial << ESP.getFlashChipMode();
 
-#ifdef ESP_APP_ESP32
+#ifdef ESP32
   printBulletPoint(F("Firmware size: "));
   Serial << ESP.getSketchSize();
 
@@ -244,11 +244,11 @@ void ESP_APP_Debugger::getESPHardwareInformation() {
 
 void ESP_APP_Debugger::getFirmwareFlashInformation() {
 
-#ifdef ESP_APP_ESP32
+#ifdef ESP32
   uint32_t maxSketchSpace = UPDATE_SIZE_UNKNOWN;
 #else  // ESP8266
   uint32_t maxSketchSpace = (ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000;
-#endif // ESP_APP_ESP32
+#endif // ESP32
 
   printBulletPoint(F("Current: "));
   Serial << (ESP.getSketchSize() / 1024) << F("Kb");
@@ -257,7 +257,7 @@ void ESP_APP_Debugger::getFirmwareFlashInformation() {
   printBulletPoint(F("Max available space: "));
   Serial << (maxSketchSpace / 1024) << F("Kb");
 
-#ifdef ESP_APP_ESP32
+#ifdef ESP32
   printBulletPoint(F("Max size: "));
   Serial << (UPDATE_SIZE_UNKNOWN / 1024 / 1024) << F("KB");
 #endif // ESP32
@@ -273,9 +273,9 @@ void ESP_APP_Debugger::printProcessingRequest(
     const __FlashStringHelper *type) {
   printInformation(F("Processing: "), type);
   Serial << deviceItemName;
-  if (deviceId != ESP_APP_NONE) {
+  if (deviceId != ESP_APP_UNKNWON) {
     Serial << F(", Id: ") << deviceId;
   }
 }
 
-//#endif
+#endif

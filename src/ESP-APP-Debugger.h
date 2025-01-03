@@ -1,10 +1,17 @@
-/* ESP_APP Firmware for smarthome devices, More info: https://ESP_APP.smartnydom.pl/ */
+/* Class for streamlining Inforamtion, Warnings and Errors to Serial port
+* Requires 
+* - Streaming.h
+* - FS.h
+* - LITTLEFS.h
+* Following must be defined in your app
+* - DEBUG
+* - ESP_APP_FILE_SYSTEM = ESP_APP_FS_SPIFFS or ESP_APP_FS_LITTLEFS
+*/
 
 #ifndef _ESP_APP_Debugger_h
 #define _ESP_APP_Debugger_h
 
-//#include <ESP_APP-Configuration.h>
-//#ifdef DEBUG
+#ifdef DEBUG
 
 #ifndef ESP32
 extern "C" {
@@ -14,6 +21,18 @@ extern "C" {
 
 #include <Streaming.h>
 
+/* Define in you app if you diff thean LittleFS*/
+
+#define ESP_APP_FS_SPIFFS 0
+#define ESP_APP_FS_LITTLEFS 1
+
+
+#ifndef ESP_APP_FILE_SYSTEM
+#define ESP_APP_FILE_SYSTEM ESP_APP_FS_LITTLEFS
+// #define ESP_APP_FILE_SYSTEM ESP_APP_FS_SPIFFS
+#endif
+
+
 #ifdef ESP32
 #include <LITTLEFS.h>
 #else /* ESP8266 */
@@ -22,6 +41,9 @@ extern "C" {
 #include <LITTLEFS.h>
 #endif
 #endif // ESP32/ESP8266
+
+/* Unknown ID */
+#define ESP_APP_UNKNWON 255
 
 /* Type for messages */
 #define ESP_APP_DEBUG_TYPE_LINE 0
@@ -125,5 +147,5 @@ public:
                               uint8_t deviceId,
                               const __FlashStringHelper *type);
 };
-//#endif
+#endif
 #endif
