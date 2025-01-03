@@ -1,12 +1,12 @@
-/* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
+/* ESP_APP Firmware for smarthome devices, More info: https://ESP_APP.smartnydom.pl/ */
 
-#ifndef _AFE_Debugger_h
-#define _AFE_Debugger_h
+#ifndef _ESP_APP_Debugger_h
+#define _ESP_APP_Debugger_h
 
-#include <AFE-Configuration.h>
-#ifdef DEBUG
+//#include <ESP_APP-Configuration.h>
+//#ifdef DEBUG
 
-#ifndef AFE_ESP32
+#ifndef ESP32
 extern "C" {
 #include "user_interface.h"
 }
@@ -14,38 +14,38 @@ extern "C" {
 
 #include <Streaming.h>
 
-#ifdef AFE_ESP32
+#ifdef ESP32
 #include <LITTLEFS.h>
 #else /* ESP8266 */
 #include <FS.h>
-#if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
+#if ESP_APP_FILE_SYSTEM == ESP_APP_FS_LITTLEFS
 #include <LITTLEFS.h>
 #endif
 #endif // ESP32/ESP8266
 
 /* Type for messages */
-#define AFE_DEBUG_TYPE_LINE 0
-#define AFE_DEBUG_TYPE_BULLET_POINT 1
-#define AFE_DEBUG_TYPE_INFORMATION 7
-#define AFE_DEBUG_TYPE_WARNING 8
-#define AFE_DEBUG_TYPE_ERROR 9
+#define ESP_APP_DEBUG_TYPE_LINE 0
+#define ESP_APP_DEBUG_TYPE_BULLET_POINT 1
+#define ESP_APP_DEBUG_TYPE_INFORMATION 7
+#define ESP_APP_DEBUG_TYPE_WARNING 8
+#define ESP_APP_DEBUG_TYPE_ERROR 9
 
 /* Header char types */
-#define AFE_DEBUG_HEADER_TYPE_HASH 0
-#define AFE_DEBUG_HEADER_TYPE_DASH 1
-#define AFE_DEBUG_HEADER_TYPE_SPACE 2
+#define ESP_APP_DEBUG_HEADER_TYPE_HASH 0
+#define ESP_APP_DEBUG_HEADER_TYPE_DASH 1
+#define ESP_APP_DEBUG_HEADER_TYPE_SPACE 2
 
 /* Header default length */
-#define AFE_DEBUG_HEADER_DEFAULT_LENGTH 72
+#define ESP_APP_DEBUG_HEADER_DEFAULT_LENGTH 72
 
 #ifndef UPDATE_SIZE_UNKNOWN
 #define UPDATE_SIZE_UNKNOWN 0xFFFFFFFF
 #endif
 
-class AFEDebugger {
+class ESP_APP_Debugger {
 
 private:
-#if AFE_FILE_SYSTEM == AFE_FS_SPIFFS
+#if ESP_APP_FILE_SYSTEM == ESP_APP_FS_SPIFFS
   FSInfo fileSystem;
 #endif
 
@@ -62,7 +62,7 @@ private:
   void addAdditionalText(const __FlashStringHelper *text, uint8_t newLineAfter);
 
 public:
-  AFEDebugger();
+  ESP_APP_Debugger();
 
   void printInformation(const char *text,
                         const __FlashStringHelper *messageCategory,
@@ -111,8 +111,8 @@ public:
                   uint8_t newLineAfter = 0);
 
   void printHeader(uint8_t newLineBefore = 1, uint8_t newLineAfter = 1,
-                   uint8_t length = AFE_DEBUG_HEADER_DEFAULT_LENGTH,
-                   uint8_t type = AFE_DEBUG_HEADER_TYPE_HASH);
+                   uint8_t length = ESP_APP_DEBUG_HEADER_DEFAULT_LENGTH,
+                   uint8_t type = ESP_APP_DEBUG_HEADER_TYPE_HASH);
 
   void getFreeMemorySize();
   void getFileSystemDubugInformation();
@@ -125,5 +125,5 @@ public:
                               uint8_t deviceId,
                               const __FlashStringHelper *type);
 };
-#endif
+//#endif
 #endif
