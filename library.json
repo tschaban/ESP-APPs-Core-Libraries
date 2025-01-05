@@ -13,18 +13,14 @@
   },
   "export": {
     "include": [
-      "src","lib",
+      "src",
       "LICENSE"
     ]
   },
   "frameworks": "*",
   "platforms": "*",
   "build": {
-    "libArchive": false,
-    "includeDir": ".",
-    "flags": [
-      "-I lib"
-    ]
+    "libArchive": false
   },
   "dependencies": [
     {
