@@ -8,8 +8,8 @@
 * - ESP_APP_FILE_SYSTEM = ESP_APP_FS_SPIFFS or ESP_APP_FS_LITTLEFS
 */
 
-#ifndef _ESP_APP_Debugger_h
-#define _ESP_APP_Debugger_h
+#ifndef _ESPAPP_SerialMessages_h
+#define _ESPAPP_SerialMessages_h
 
 #ifdef DEBUG
 
@@ -27,8 +27,6 @@ extern "C" {
 #define ESP_APP_BLUE "\u001b[34m"
 #define ESP_APP_GREEN "\u001b[32m"
 #define ESP_APP_RESET_COLOR "\u001b[0m"
-
-
 
 
 /* Define in you app if you diff thean LittleFS*/
@@ -75,7 +73,7 @@ extern "C" {
 
 
 
-class ESP_APP_Debugger {
+class ESPAPP_SerialMessages {
 
 private:
 
@@ -97,7 +95,7 @@ private:
   void addAdditionalText(const __FlashStringHelper *text, uint8_t newLineAfter);
 
 public:
-  ESP_APP_Debugger();
+  ESPAPP_SerialMessages();
 
   void printInformation(const char *text,
                         const __FlashStringHelper *messageCategory,
