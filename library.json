@@ -1,35 +1,39 @@
 {
-    "name": "ESP-APPs-Core-Libraries",
-    "keywords": "esp32, esp8266, library",
-    "description": "Set of common libreries to support ESP-APPs development",
-    "repository": {
-      "type": "git",
-      "url": "https://github.com/tschaban/ESP-APPs-Core-Libraries.git"
-    },
-    "version": "0.1",
-    "authors": {
-      "name": "tschaban",
-      "url": "https://adrian.czabanowski.com"
-    },
-    "export": {
-      "include": ["src", "LICENSE"]
-    },
-    "frameworks": "*",
-    "platforms": "*",
-    "build": {
-      "libArchive": false
-    },
-    "dependencies":
-[
+  "name": "ESP-APPs-Core-Libraries",
+  "keywords": "esp32, esp8266, library",
+  "description": "Set of common libreries to support ESP-APPs development",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tschaban/ESP-APPs-Core-Libraries.git"
+  },
+  "version": "0.1",
+  "authors": {
+    "name": "tschaban",
+    "url": "https://adrian.czabanowski.com"
+  },
+  "export": {
+    "include": [
+      "src",
+      "LICENSE"
+    ]
+  },
+  "frameworks": "*",
+  "platforms": "*",
+  "build": {
+    "libArchive": false
+  },
+  "dependencies": [
     {
-        "name": "LITTLEFS"
+      "name": "LITTLEFS",
+      "frameworks": "arduino"
     },
     {
-      "name": "FS"
+      "name": "FS",
+      "frameworks": "arduino"
     },
     {
-        "name": "Streaming",
+      "name": "Streaming",
+      "frameworks": "arduino"
     }
-]
-  }
-  
+  ]
+}
