@@ -20,7 +20,8 @@
   "frameworks": "*",
   "platforms": "*",
   "build": {
-    "libArchive": false
+    "libArchive": false,
+    "includeDir": "lib"
   },
   "dependencies": [
     {
