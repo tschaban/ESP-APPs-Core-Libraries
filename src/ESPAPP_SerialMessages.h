@@ -44,19 +44,19 @@ extern "C" {
 #define ESP_APP_UNKNWON 255
 
 /* Type for messages */
-#define ESP_APP_DEBUG_TYPE_LINE 0
-#define ESP_APP_DEBUG_TYPE_BULLET_POINT 1
-#define ESP_APP_DEBUG_TYPE_INFORMATION 7
-#define ESP_APP_DEBUG_TYPE_WARNING 8
-#define ESP_APP_DEBUG_TYPE_ERROR 9
+#define ESP_APP_MSG_TYPE_LINE 0
+#define ESP_APP_MSG_TYPE_BULLET_POINT 1
+#define ESP_APP_MSG_TYPE_INFORMATION 7
+#define ESP_APP_MSG_TYPE_WARNING 8
+#define ESP_APP_MSG_TYPE_ERROR 9
 
 /* Header char types */
-#define ESP_APP_DEBUG_HEADER_TYPE_HASH 0
-#define ESP_APP_DEBUG_HEADER_TYPE_DASH 1
-#define ESP_APP_DEBUG_HEADER_TYPE_SPACE 2
+#define ESP_APP_MSG_HEADER_TYPE_HASH 0
+#define ESP_APP_MSG_HEADER_TYPE_DASH 1
+#define ESP_APP_MSG_HEADER_TYPE_SPACE 2
 
 /* Header default length */
-#define ESP_APP_DEBUG_HEADER_DEFAULT_LENGTH 72
+#define ESP_APP_MSG_HEADER_DEFAULT_LENGTH 72
 
 #ifndef UPDATE_SIZE_UNKNOWN
 #define UPDATE_SIZE_UNKNOWN 0xFFFFFFFF
@@ -144,8 +144,8 @@ public:
                   uint8_t newLineAfter = 0);
 
   void printHeader(uint8_t newLineBefore = 1, uint8_t newLineAfter = 1,
-                   uint8_t length = ESP_APP_DEBUG_HEADER_DEFAULT_LENGTH,
-                   uint8_t type = ESP_APP_DEBUG_HEADER_TYPE_HASH);
+                   uint8_t length = ESP_APP_MSG_HEADER_DEFAULT_LENGTH,
+                   uint8_t type = ESP_APP_MSG_HEADER_TYPE_HASH);
 
   void getFreeMemorySize();
   void getFileSystemDubugInformation();
