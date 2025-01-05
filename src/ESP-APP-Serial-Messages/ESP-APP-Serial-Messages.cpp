@@ -1,10 +1,10 @@
-#include "ESP-APP-Debugger.h"
+#include "ESP-APP-Serial-Messages.h"
 
 #ifdef DEBUG
 
-ESP_APP_Debugger::ESP_APP_Debugger(){};
+ESP_APP_Serial_Messages::ESP_APP_Serial_Messages(){};
 
-void ESP_APP_Debugger::print(const char *text,
+void ESP_APP_Serial_Messages::print(const char *text,
                         const __FlashStringHelper *messageCategory,
                         uint8_t type, uint8_t newLineBefore,
                         uint8_t newLineAfter, uint8_t intent) {
@@ -13,7 +13,7 @@ void ESP_APP_Debugger::print(const char *text,
   addNewLines(newLineAfter);
 }
 
-void ESP_APP_Debugger::print(const __FlashStringHelper *text,
+void ESP_APP_Serial_Messages::print(const __FlashStringHelper *text,
                         const __FlashStringHelper *messageCategory,
                         uint8_t type, uint8_t newLineBefore,
                         uint8_t newLineAfter, uint8_t intent) {
@@ -22,54 +22,54 @@ void ESP_APP_Debugger::print(const __FlashStringHelper *text,
   addNewLines(newLineAfter);
 }
 
-void ESP_APP_Debugger::printValue(uint8_t number, const __FlashStringHelper *text,
+void ESP_APP_Serial_Messages::printValue(uint8_t number, const __FlashStringHelper *text,
                              uint8_t newLineAfter) {
   Serial << number;
   addAdditionalText(text, newLineAfter);
 }
 
-void ESP_APP_Debugger::printValue(uint8_t number, uint8_t newLineAfter) {
+void ESP_APP_Serial_Messages::printValue(uint8_t number, uint8_t newLineAfter) {
   printValue(number, F(""), newLineAfter);
 }
 
-void ESP_APP_Debugger::printValue(unsigned long number,
+void ESP_APP_Serial_Messages::printValue(unsigned long number,
                              const __FlashStringHelper *text,
                              uint8_t newLineAfter) {
   Serial << number;
   addAdditionalText(text, newLineAfter);
 }
 
-void ESP_APP_Debugger::printValue(unsigned long number, uint8_t newLineAfter) {
+void ESP_APP_Serial_Messages::printValue(unsigned long number, uint8_t newLineAfter) {
   printValue(number, F(""), newLineAfter);
 }
 
-void ESP_APP_Debugger::printValue(const char *text, uint8_t newLineBefore,
+void ESP_APP_Serial_Messages::printValue(const char *text, uint8_t newLineBefore,
                              uint8_t newLineAfter) {
   print(text, F(""), ESP_APP_DEBUG_TYPE_LINE, newLineBefore, newLineAfter, 0);
 }
 
-void ESP_APP_Debugger::printValue(const __FlashStringHelper *text,
+void ESP_APP_Serial_Messages::printValue(const __FlashStringHelper *text,
                              uint8_t newLineBefore, uint8_t newLineAfter) {
   print(text, F(""), ESP_APP_DEBUG_TYPE_LINE, newLineBefore, newLineAfter, 0);
 }
 
-void ESP_APP_Debugger::printValue(float number, const __FlashStringHelper *text,
+void ESP_APP_Serial_Messages::printValue(float number, const __FlashStringHelper *text,
                              uint8_t newLineAfter) {
   Serial << number;
   addAdditionalText(text, newLineAfter);
 }
 
-void ESP_APP_Debugger::printValue(float number, uint8_t newLineAfter) {
+void ESP_APP_Serial_Messages::printValue(float number, uint8_t newLineAfter) {
   printValue(number, F(""), newLineAfter);
 }
 
-void ESP_APP_Debugger::addNewLines(uint8_t noOfLines) {
+void ESP_APP_Serial_Messages::addNewLines(uint8_t noOfLines) {
   for (uint8_t i = 0; i < noOfLines; i++) {
     Serial << endl;
   }
 }
 
-void ESP_APP_Debugger::addMessageHeader(uint8_t type,
+void ESP_APP_Serial_Messages::addMessageHeader(uint8_t type,
                                    const __FlashStringHelper *messageCategory,
                                    uint8_t newLineBefore, uint8_t noOfIntents) {
   addNewLines(newLineBefore);
@@ -106,7 +106,7 @@ void ESP_APP_Debugger::addMessageHeader(uint8_t type,
   }
 }
 
-void ESP_APP_Debugger::addAdditionalText(const __FlashStringHelper *text,
+void ESP_APP_Serial_Messages::addAdditionalText(const __FlashStringHelper *text,
                                     uint8_t newLineAfter) {
   if (text) {
     Serial << F(" ") << text;
@@ -115,7 +115,7 @@ void ESP_APP_Debugger::addAdditionalText(const __FlashStringHelper *text,
   addNewLines(newLineAfter);
 }
 
-void ESP_APP_Debugger::printInformation(const char *text,
+void ESP_APP_Serial_Messages::printInformation(const char *text,
                                    const __FlashStringHelper *messageCategory,
                                    uint8_t newLineBefore,
                                    uint8_t newLineAfter) {
@@ -123,7 +123,7 @@ void ESP_APP_Debugger::printInformation(const char *text,
         newLineAfter, 0);
 }
 
-void ESP_APP_Debugger::printInformation(const __FlashStringHelper *text,
+void ESP_APP_Serial_Messages::printInformation(const __FlashStringHelper *text,
                                    const __FlashStringHelper *messageCategory,
                                    uint8_t newLineBefore,
                                    uint8_t newLineAfter) {
@@ -131,43 +131,43 @@ void ESP_APP_Debugger::printInformation(const __FlashStringHelper *text,
         newLineAfter, 0);
 }
 
-void ESP_APP_Debugger::printWarning(const char *text,
+void ESP_APP_Serial_Messages::printWarning(const char *text,
                                const __FlashStringHelper *messageCategory,
                                uint8_t newLineBefore, uint8_t newLineAfter) {
   print(text, messageCategory, ESP_APP_DEBUG_TYPE_WARNING, newLineBefore,
         newLineAfter, 0);
 }
 
-void ESP_APP_Debugger::printWarning(const __FlashStringHelper *text,
+void ESP_APP_Serial_Messages::printWarning(const __FlashStringHelper *text,
                                const __FlashStringHelper *messageCategory,
                                uint8_t newLineBefore, uint8_t newLineAfter) {
   print(text, messageCategory, ESP_APP_DEBUG_TYPE_WARNING, newLineBefore,
         newLineAfter, 0);
 }
 
-void ESP_APP_Debugger::printError(const char *text,
+void ESP_APP_Serial_Messages::printError(const char *text,
                              const __FlashStringHelper *messageCategory,
                              uint8_t newLineBefore, uint8_t newLineAfter) {
   print(text, messageCategory, ESP_APP_DEBUG_TYPE_ERROR, newLineBefore,
         newLineAfter, 0);
 }
 
-void ESP_APP_Debugger::printError(const __FlashStringHelper *text,
+void ESP_APP_Serial_Messages::printError(const __FlashStringHelper *text,
                              const __FlashStringHelper *messageCategory,
                              uint8_t newLineBefore, uint8_t newLineAfter) {
   print(text, messageCategory, ESP_APP_DEBUG_TYPE_ERROR, newLineBefore,
         newLineAfter, 0);
 }
 
-void ESP_APP_Debugger::printBulletPoint(const char *text, uint8_t newLineAfter) {
+void ESP_APP_Serial_Messages::printBulletPoint(const char *text, uint8_t newLineAfter) {
   print(text, F(""), ESP_APP_DEBUG_TYPE_BULLET_POINT, 1, newLineAfter, 2);
 }
 
-void ESP_APP_Debugger::printBulletPoint(const __FlashStringHelper *text,
+void ESP_APP_Serial_Messages::printBulletPoint(const __FlashStringHelper *text,
                                    uint8_t newLineAfter) {
   print(text, F(""), ESP_APP_DEBUG_TYPE_BULLET_POINT, 1, newLineAfter, 2);
 }
-void ESP_APP_Debugger::printHeader(uint8_t newLineBefore, uint8_t newLineAfter,
+void ESP_APP_Serial_Messages::printHeader(uint8_t newLineBefore, uint8_t newLineAfter,
                               uint8_t length, uint8_t type) {
   addNewLines(newLineBefore);
   for (uint8_t i = 0; i < length; i++) {
@@ -178,7 +178,7 @@ void ESP_APP_Debugger::printHeader(uint8_t newLineBefore, uint8_t newLineAfter,
   addNewLines(newLineAfter);
 }
 
-void ESP_APP_Debugger::getFreeMemorySize() {
+void ESP_APP_Serial_Messages::getFreeMemorySize() {
   printInformation(F("Free: "), F("RAM"));
 #ifdef ESP32
   Serial << (esp_get_free_heap_size() / 1024) << F("kB");
@@ -187,7 +187,7 @@ void ESP_APP_Debugger::getFreeMemorySize() {
 #endif
 }
 
-void ESP_APP_Debugger::getFileSystemDubugInformation() {
+void ESP_APP_Serial_Messages::getFileSystemDubugInformation() {
   printInformation(F("Summary: "), F("FS"));
   printBulletPoint(F("Used: "));
 
@@ -201,7 +201,7 @@ void ESP_APP_Debugger::getFileSystemDubugInformation() {
 #endif
 }
 
-void ESP_APP_Debugger::getESPHardwareInformation() {
+void ESP_APP_Serial_Messages::getESPHardwareInformation() {
   printInformation(F("Hardware information"), F("ESP"));
 
 #ifndef ESP32
@@ -254,7 +254,7 @@ void ESP_APP_Debugger::getESPHardwareInformation() {
 #endif
 }
 
-void ESP_APP_Debugger::getFirmwareFlashInformation() {
+void ESP_APP_Serial_Messages::getFirmwareFlashInformation() {
 
 #ifdef ESP32
   uint32_t maxSketchSpace = UPDATE_SIZE_UNKNOWN;
@@ -275,12 +275,12 @@ void ESP_APP_Debugger::getFirmwareFlashInformation() {
 #endif // ESP32
 }
 
-void ESP_APP_Debugger::getFirmwareAllDebugInformation() {
+void ESP_APP_Serial_Messages::getFirmwareAllDebugInformation() {
   getFreeMemorySize();
   getFileSystemDubugInformation();
 }
 
-void ESP_APP_Debugger::printProcessingRequest(
+void ESP_APP_Serial_Messages::printProcessingRequest(
     const __FlashStringHelper *deviceItemName, uint8_t deviceId,
     const __FlashStringHelper *type) {
   printInformation(F("Processing: "), type);
