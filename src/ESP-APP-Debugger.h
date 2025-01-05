@@ -21,6 +21,16 @@ extern "C" {
 
 #include <Streaming.h>
 
+/* Colors */
+
+#define ESP_APP_RED "\u001b[31m"
+#define ESP_APP_BLUE "\u001b[34m"
+#define ESP_APP_GREEN "\u001b[32m"
+#define ESP_APP_RESET_COLOR "\u001b[0m"
+
+
+
+
 /* Define in you app if you diff thean LittleFS*/
 
 #define ESP_APP_FS_SPIFFS 0
@@ -31,16 +41,6 @@ extern "C" {
 #define ESP_APP_FILE_SYSTEM ESP_APP_FS_LITTLEFS
 // #define ESP_APP_FILE_SYSTEM ESP_APP_FS_SPIFFS
 #endif
-
-
-#ifdef ESP32
-#include <LITTLEFS.h>
-#else /* ESP8266 */
-#include <FS.h>
-#if ESP_APP_FILE_SYSTEM == ESP_APP_FS_LITTLEFS
-#include <LITTLEFS.h>
-#endif
-#endif // ESP32/ESP8266
 
 /* Unknown ID */
 #define ESP_APP_UNKNWON 255
@@ -64,9 +64,22 @@ extern "C" {
 #define UPDATE_SIZE_UNKNOWN 0xFFFFFFFF
 #endif
 
+#ifdef ESP32
+#include <LITTLEFS.h>
+#else /* ESP8266 */
+#include <FS.h>
+#if ESP_APP_FILE_SYSTEM == ESP_APP_FS_LITTLEFS
+#include <LITTLEFS.h>
+#endif
+#endif // ESP32/ESP8266
+
+
+
 class ESP_APP_Debugger {
 
 private:
+
+
 #if ESP_APP_FILE_SYSTEM == ESP_APP_FS_SPIFFS
   FSInfo fileSystem;
 #endif

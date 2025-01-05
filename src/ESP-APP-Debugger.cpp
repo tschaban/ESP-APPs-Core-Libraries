@@ -79,6 +79,15 @@ void ESP_APP_Debugger::addMessageHeader(uint8_t type,
   }
 
   Serial << (type == ESP_APP_DEBUG_TYPE_INFORMATION
+                 ? F(ESP_APP_GREEN)
+                 : (type == ESP_APP_DEBUG_TYPE_WARNING
+                        ? F(ESP_APP_BLUE)
+                        : (type == ESP_APP_DEBUG_TYPE_ERROR
+                               ?  F(ESP_APP_RED)
+                               : F(""))));
+  
+
+  Serial << (type == ESP_APP_DEBUG_TYPE_INFORMATION
                  ? F("INFO")
                  : (type == ESP_APP_DEBUG_TYPE_WARNING
                         ? F("WARN")
@@ -88,6 +97,9 @@ void ESP_APP_Debugger::addMessageHeader(uint8_t type,
                                       ? F("* ")
                                       : F("")))));
 
+
+  Serial << F(ESP_APP_RESET_COLOR); 
+  
   if (type == ESP_APP_DEBUG_TYPE_ERROR || type == ESP_APP_DEBUG_TYPE_INFORMATION ||
       type == ESP_APP_DEBUG_TYPE_WARNING) {
     Serial << F(": ") << messageCategory << F(": ");
@@ -184,8 +196,8 @@ void ESP_APP_Debugger::getFileSystemDubugInformation() {
   Serial << fileSystem.usedBytes / 1024 << F("/")
          << fileSystem.totalBytes / 1024 << F("kB");
 #else
-  Serial << LittleFS.usedBytes() / 1024 << F("/")
-         << LittleFS.totalBytes() / 1024 << F("kB");
+  Serial << LITTLEFS.usedBytes() / 1024 << F("/")
+         << LITTLEFS.totalBytes() / 1024 << F("kB");
 #endif
 }
 
