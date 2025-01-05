@@ -13,7 +13,7 @@
   },
   "export": {
     "include": [
-      "src","lib"
+      "src","lib",
       "LICENSE"
     ]
   },
