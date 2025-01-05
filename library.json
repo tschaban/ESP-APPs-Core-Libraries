@@ -21,7 +21,10 @@
   "platforms": "*",
   "build": {
     "libArchive": false,
-    "includeDir": "lib"
+    "includeDir": ".",
+    "flags": [
+      "-I lib"
+    ]
   },
   "dependencies": [
     {
