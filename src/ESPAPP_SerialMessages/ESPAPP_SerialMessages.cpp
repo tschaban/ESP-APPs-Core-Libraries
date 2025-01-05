@@ -2,7 +2,7 @@
 
 #ifdef DEBUG
 
-ESPAPP_SerialMessages::ESP_APP_Serial_Messages(){};
+ESPAPP_SerialMessages::ESPAPP_SerialMessages(){};
 
 void ESPAPP_SerialMessages::print(const char *text,
                         const __FlashStringHelper *messageCategory,
@@ -196,8 +196,8 @@ void ESPAPP_SerialMessages::getFileSystemDubugInformation() {
   Serial << fileSystem.usedBytes / 1024 << F("/")
          << fileSystem.totalBytes / 1024 << F("kB");
 #else
-  Serial << LITTLEFS.usedBytes() / 1024 << F("/")
-         << LITTLEFS.totalBytes() / 1024 << F("kB");
+  Serial << LittleFS.usedBytes() / 1024 << F("/")
+         << LittleFS.totalBytes() / 1024 << F("kB");
 #endif
 }
 
