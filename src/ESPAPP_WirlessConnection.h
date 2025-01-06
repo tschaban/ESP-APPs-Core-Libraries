@@ -1,16 +1,46 @@
 /* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
 
-#ifndef _AFE_WiFi_h
-#define _AFE_WiFi_h
+#ifndef _ESPAPP_WirlessConnection_h
+#define _ESPAPP_WirlessConnection_h
 
-#include <AFE-Data-Access.h>
-#include <AFE-Device.h>
+
+#include <ESPAPP_Parameters.h>
+#include <ArduinoJson.h>
+#include <ESPAPP_API_Flash.h>
+
+struct NETWORK_SETTING {
+  char ssid[33];
+  char password[33];
+  uint8_t isDHCP;
+  char ip[16];
+  char gateway[16];
+  char subnet[16];
+  char dns1[16];
+  char dns2[16];
+};
+
+struct NETWORK {
+  NETWORK_SETTING primary;
+  NETWORK_SETTING secondary;
+  uint8_t noConnectionAttempts;
+  uint8_t waitTimeConnections;
+  uint8_t waitTimeSeries;
+  uint8_t noFailuresToSwitchNetwork;
+#if !defined(ESP32)
+  uint8_t radioMode;
+  float outputPower;
+#endif
+};
+
+
+//#include <AFE-Data-Access.h>
+//#include <AFE-Device.h>
 
 #ifdef AFE_CONFIG_HARDWARE_LED
 #include <AFE-LED.h>
 #endif // AFE_CONFIG_HARDWARE_LED
 
-#ifdef AFE_ESP32
+#ifdef ESP32
 #include <WiFi.h>
 #include <ESPmDNS.h>
 #else // ESP8266
@@ -19,14 +49,15 @@
 #endif // ESP32/ESP8266
 
 #ifdef DEBUG
-#include <AFE-Debugger.h>
+#include <ESPAPP_SerialMessages.h>
 #endif
 
-class AFEWiFi {
+class ESPAPP_WirlessConnection {
 
 private:
-  AFEDevice *Device;
-  AFEDataAccess *Data;
+ // AFEDevice *Device;
+  //AFEDataAccess *Data;
+  ESPAPP_API_Flash *Flash = new ESPAPP_API_Flash();
   unsigned long delayStartTime = 0;
 
 #ifdef AFE_CONFIG_HARDWARE_LED
@@ -95,11 +126,12 @@ private:
   void switchConfiguration();
 
 #ifdef DEBUG
-  AFEDebugger *Debugger;
+  ESPAPP_SerialMessages *Msg;
+  ESPAPP_WirlessConnection();
 #endif
 
 public:
-#ifndef AFE_ESP32
+#ifndef ESP32
   /**
    * @brief Handlders for WiFi connected and disconmected events
    *
@@ -110,11 +142,19 @@ public:
 
 #endif
 
-  /* Constructor: no actions */
-  AFEWiFi();
+  /* Constructor */
+
+
+  #ifdef DEBUG
+  ESPAPP_WirlessConnection(ESPAPP_SerialMessages *);
+  #else
+  ESPAPP_WirlessConnection();
+  #endif 
+
+
   NETWORK *configuration = new NETWORK;
 
-#ifdef AFE_ESP32
+#ifdef ESP32
   WiFiClass WirelessNetwork;
 #else  // ESP8266
   ESP8266WiFiClass WirelessNetwork;
@@ -127,7 +167,8 @@ public:
    *
    * @param
    */
-  void begin(AFEDevice *, AFEDataAccess *);
+  //void begin(AFEDevice *, AFEDataAccess *);
+  void begin();
 
 
   /**
@@ -163,7 +204,7 @@ public:
    */
   void listener();
 
-#ifdef AFE_ESP32
+#ifdef ESP32
   /**
    * @brief triggered on each WiFi event
    *
@@ -191,13 +232,7 @@ public:
 
 #endif
 
-#ifdef DEBUG
-  void addReference(AFEDebugger *_Debugger);
-#endif
 
-#ifdef AFE_CONFIG_HARDWARE_LED
-  void addReference(AFELED *_Led);
-#endif
 };
 
-#endif // _AFE_WiFi_h
+#endif // _ESPAPP_WirlessConnection_h

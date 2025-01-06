@@ -49,6 +49,11 @@ void ESPAPP_Firmware::begin() {
 //API->Flash->getConfiguration(Configuration->Pro);
  // API->Flash->getConfiguration(Configuration->Version);
 }
+
+uint8_t ESPAPP_Firmware::getBootMode(void) {
+  return ESPAPP_BOOT_MODE_NORMAL;
+}
+
 /*
 void ESPAPP_Firmware::initializeNetwork(void) {
 

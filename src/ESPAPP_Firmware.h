@@ -3,6 +3,8 @@
 #ifndef _ESPAPP_Firmware_h
 #define _ESPAPP_Firmware_h
 
+#include <ESPAPP_Parameters.h>
+#include <ArduinoJson.h>
 //#include <ESPAPP-API-JSONRPC.h>
 //#include <ESPAPP-Data-Access.h>
 //#include <ESPAPP-Device.h>
@@ -64,6 +66,7 @@ public:
   ESPAPP_Firmware();
 
   void begin();
+  uint8_t getBootMode(void);
 
   //boolean initializeFS(void);
 

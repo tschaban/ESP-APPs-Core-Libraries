@@ -1,63 +1,73 @@
 /* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
 
-#include "AFE-WiFi.h"
+#include "ESPAPP_WirlessConnection.h"
 
-boolean AFEWiFi::eventConnectionEstablished = false;
-boolean AFEWiFi::isConnected = false;
-boolean AFEWiFi::eventConnectionLost = true;
+boolean ESPAPP_WirlessConnection::eventConnectionEstablished = false;
+boolean ESPAPP_WirlessConnection::isConnected = false;
+boolean ESPAPP_WirlessConnection::eventConnectionLost = true;
 
-AFEWiFi::AFEWiFi() {}
+#ifdef DEBUG
+ESPAPP_WirlessConnection::ESPAPP_WirlessConnection(ESPAPP_SerialMessages *_Msg) {
+  Msg = _Msg;
+}
+#endif
 
-void AFEWiFi::begin(AFEDevice *_Device, AFEDataAccess *_Data) {
-  Device = _Device;
-  Data = _Data;
+ESPAPP_WirlessConnection::ESPAPP_WirlessConnection() {}
 
-#ifdef AFE_ESP32
-  WirelessNetwork.onEvent(AFEWiFi::onWiFiEvent);
+void ESPAPP_WirlessConnection::begin() {
+
+
+#ifdef ESP32
+  WirelessNetwork.onEvent(ESPAPP_WirlessConnection::onWiFiEvent);
 #else
   wifiConnectHandler =
-      WirelessNetwork.onStationModeGotIP(AFEWiFi::onWifiConnect);
+      WirelessNetwork.onStationModeGotIP(ESPAPP_WirlessConnection::onWifiConnect);
   wifiDisconnectHandler =
-      WirelessNetwork.onStationModeDisconnected(AFEWiFi::onWifiDisconnect);
+      WirelessNetwork.onStationModeDisconnected(ESPAPP_WirlessConnection::onWifiDisconnect);
 #ifdef DEBUG
   wifiAPStationConnectedHandler = WirelessNetwork.onSoftAPModeStationConnected(
-      AFEWiFi::onWiFiAPStationConnected);
+      ESPAPP_WirlessConnection::onWiFiAPStationConnected);
 #endif
 #endif
 
   // if (Device->getMode() == AFE_MODE_NORMAL || Device->getMode() ==
   // AFE_MODE_CONFIGURATION) {
-  _Data->getConfiguration(configuration);
+
+   JsonDocument doc;
+   Flash->getJSON("network", doc);
+   configuration->noConnectionAttempts = doc["noConnectionAttempts"];
+
+  //_Data->getConfiguration(configuration);
 //}
 
 #ifdef DEBUG
-  Debugger->printInformation(F("Primary Network settings:"), F("WIFI"));
-  Debugger->printBulletPoint(F("SSID: "));
-  Debugger->printValue(configuration->primary.ssid);
-  Debugger->printBulletPoint(F("IP: "));
-  Debugger->printValue(configuration->primary.ip);
-  Debugger->printBulletPoint(F("Gateway: "));
-  Debugger->printValue(configuration->primary.gateway);
-  Debugger->printBulletPoint(F("Subnet: "));
-  Debugger->printValue(configuration->primary.subnet);
-  Debugger->printBulletPoint(F("DNS1: "));
-  Debugger->printValue(configuration->primary.dns1);
-  Debugger->printBulletPoint(F("DNS2: "));
-  Debugger->printValue(configuration->primary.dns2);
+  Msg->printInformation(F("Primary Network settings:"), F("WIFI"));
+  Msg->printBulletPoint(F("SSID: "));
+  //Msg->printValue(configuration->primary.ssid);
+  Msg->printBulletPoint(F("IP: "));
+ // Msg->printValue(configuration->primary.ip);
+  Msg->printBulletPoint(F("Gateway: "));
+  //Msg->printValue(configuration->primary.gateway);
+  Msg->printBulletPoint(F("Subnet: "));
+  //Msg->printValue(configuration->primary.subnet);
+  Msg->printBulletPoint(F("DNS1: "));
+  //Msg->printValue(configuration->primary.dns1);
+  Msg->printBulletPoint(F("DNS2: "));
+  //Msg->printValue(configuration->primary.dns2);
 
-  Debugger->printInformation(F("Secondary Network Settings:"), F("WIFI"));
-  Debugger->printBulletPoint(F("SSID: "));
-  Debugger->printValue(configuration->secondary.ssid);
-  Debugger->printBulletPoint(F("IP: "));
-  Debugger->printValue(configuration->secondary.ip);
-  Debugger->printBulletPoint(F("Gateway: "));
-  Debugger->printValue(configuration->secondary.gateway);
-  Debugger->printBulletPoint(F("Subnet: "));
-  Debugger->printValue(configuration->secondary.subnet);
-  Debugger->printBulletPoint(F("DNS1: "));
-  Debugger->printValue(configuration->secondary.dns1);
-  Debugger->printBulletPoint(F("DNS2: "));
-  Debugger->printValue(configuration->secondary.dns2);
+  Msg->printInformation(F("Secondary Network Settings:"), F("WIFI"));
+  Msg->printBulletPoint(F("SSID: "));
+  //Msg->printValue(configuration->secondary.ssid);
+  Msg->printBulletPoint(F("IP: "));
+  //Msg->printValue(configuration->secondary.ip);
+  Msg->printBulletPoint(F("Gateway: "));
+  //Msg->printValue(configuration->secondary.gateway);
+  Msg->printBulletPoint(F("Subnet: "));
+ // Msg->printValue(configuration->secondary.subnet);
+  Msg->printBulletPoint(F("DNS1: "));
+ // Msg->printValue(configuration->secondary.dns1);
+  Msg->printBulletPoint(F("DNS2: "));
+  //Msg->printValue(configuration->secondary.dns2);
 
 #endif
 
@@ -71,17 +81,17 @@ void AFEWiFi::begin(AFEDevice *_Device, AFEDataAccess *_Data) {
       strlen(configuration->secondary.password) > 0) {
     isBackupConfigurationSet = true;
 #ifdef DEBUG
-    Debugger->printInformation(F("Bakcup configuration exist"), F("WIFI"));
+    Msg->printInformation(F("Bakcup configuration exist"), F("WIFI"));
   } else {
-    Debugger->printInformation(F("Bakcup configuration does NOT exist"),
+    Msg->printInformation(F("Bakcup configuration does NOT exist"),
                                F("WIFI"));
 
 #endif
   } /* Endif: Checking if backup configuration exists and setting a flag */
 
 #ifdef DEBUG
-  Debugger->printInformation(F("Device is in mode: "), F("WIFI"));
-  Debugger->printValue(Device->getMode());
+  Msg->printInformation(F("Device is in mode: "), F("WIFI"));
+ // Msg->printValue(Device->getMode());
 #endif
 
 /**
@@ -98,9 +108,9 @@ void AFEWiFi::begin(AFEDevice *_Device, AFEDataAccess *_Data) {
                                          ? WIFI_PHY_MODE_11G
                                          : WIFI_PHY_MODE_11N);
 #ifdef DEBUG
-    Debugger->printInformation(F("Setting Radio mode (1:B 2:G 3:N) to: "),
+    Msg->printInformation(F("Setting Radio mode (1:B 2:G 3:N) to: "),
                                F("WIFI"));
-    Debugger->printValue(configuration->radioMode);
+    Msg->printValue(configuration->radioMode);
 #endif
   }
 
@@ -111,8 +121,8 @@ void AFEWiFi::begin(AFEDevice *_Device, AFEDataAccess *_Data) {
           AFE_CONFIG_NETWORK_DEFAULT_OUTPUT_POWER_MAX) {
     WirelessNetwork.setOutputPower(configuration->outputPower);
 #ifdef DEBUG
-    Debugger->printInformation(F("Setting TX Output power to: "), F("WIFI"));
-    Debugger->printValue(configuration->outputPower, F("dBm"));
+    Msg->printInformation(F("Setting TX Output power to: "), F("WIFI"));
+    Msg->printValue(configuration->outputPower, F("dBm"));
 #endif
   }
 
@@ -121,7 +131,7 @@ void AFEWiFi::begin(AFEDevice *_Device, AFEDataAccess *_Data) {
   if (Device->getMode() == AFE_MODE_ACCESS_POINT ||
       Device->getMode() == AFE_MODE_NETWORK_NOT_SET) {
 #ifdef DEBUG
-    Debugger->printInformation(F("Starting..."), F("HotSpot"));
+    Msg->printInformation(F("Starting..."), F("HotSpot"));
 #endif
 
     WirelessNetwork.mode(WIFI_AP_STA);
@@ -132,9 +142,9 @@ void AFEWiFi::begin(AFEDevice *_Device, AFEDataAccess *_Data) {
 
       WirelessNetwork.softAP("AFE Device");
 #ifdef DEBUG
-      Debugger->printValue(F("Ready"));
+      Msg->printValue(F("Ready"));
     } else {
-      Debugger->printValue(F("Failed"));
+      Msg->printValue(F("Failed"));
 #endif
     }
   } else {
@@ -142,17 +152,17 @@ void AFEWiFi::begin(AFEDevice *_Device, AFEDataAccess *_Data) {
     switchConfiguration();
   }
 #ifdef DEBUG
-  Debugger->printInformation(F("Network initialized..."), F("BOOT"));
+  Msg->printInformation(F("Network initialized..."), F("BOOT"));
 #endif
 }
 
-void AFEWiFi::switchConfiguration() {
+void ESPAPP_WirlessConnection::switchConfiguration() {
   isPrimaryConfiguration = isPrimaryConfiguration ? false : true;
   noOfFailures = 0;
   WirelessNetwork.persistent(false);
   WirelessNetwork.disconnect(true);
 
-#ifndef AFE_ESP32
+#ifndef ESP32
   WirelessNetwork.setSleepMode(WIFI_NONE_SLEEP);
 #else
   WiFi.setSleep(false);
@@ -167,43 +177,43 @@ void AFEWiFi::switchConfiguration() {
     IPAddress dns1;
     if (!dns1.fromString(configuration->primary.dns1)) {
 #ifdef DEBUG
-      Debugger->printError(F("Problem with DNS1: "), F("WIFI"));
-      Debugger->printValue(configuration->primary.dns1);
+      Msg->printError(F("Problem with DNS1: "), F("WIFI"));
+      Msg->printValue(configuration->primary.dns1);
 #endif
     }
     IPAddress dns2;
     if (!dns2.fromString(configuration->primary.dns2)) {
 #ifdef DEBUG
-      Debugger->printError(F("Problem with DNS2: "), F("WIFI"));
-      Debugger->printValue(configuration->primary.dns2);
+      Msg->printError(F("Problem with DNS2: "), F("WIFI"));
+      Msg->printValue(configuration->primary.dns2);
 #endif
     }
 
     IPAddress ip;
     if (!ip.fromString(configuration->primary.ip)) {
 #ifdef DEBUG
-      Debugger->printError(F("Problem with WIFI IP: "), F("WIFI"));
-      Debugger->printValue(configuration->primary.ip);
+      Msg->printError(F("Problem with WIFI IP: "), F("WIFI"));
+      Msg->printValue(configuration->primary.ip);
 #endif
     }
     IPAddress gateway;
     if (!gateway.fromString(configuration->primary.gateway)) {
 #ifdef DEBUG
-      Debugger->printError(F("Problem with WIFI gateway: "), F("WIFI"));
-      Debugger->printValue(configuration->primary.gateway);
+      Msg->printError(F("Problem with WIFI gateway: "), F("WIFI"));
+      Msg->printValue(configuration->primary.gateway);
 #endif
     }
     IPAddress subnet;
     if (!subnet.fromString(configuration->primary.subnet)) {
 #ifdef DEBUG
-      Debugger->printError(F("Problem with WIFI subnet: "), F("WIFI"));
-      Debugger->printValue(configuration->primary.subnet);
+      Msg->printError(F("Problem with WIFI subnet: "), F("WIFI"));
+      Msg->printValue(configuration->primary.subnet);
 #endif
     }
 
     WirelessNetwork.config(ip, gateway, subnet, dns1, dns2);
 #ifdef DEBUG
-    Debugger->printInformation(F("Fixed IP set"), F("WIFI"));
+    Msg->printInformation(F("Fixed IP set"), F("WIFI"));
 #endif
   }
   /**
@@ -223,64 +233,64 @@ void AFEWiFi::switchConfiguration() {
    */
   else if (!isPrimaryConfiguration && !configuration->secondary.isDHCP) {
 #ifdef DEBUG
-    Debugger->printInformation(F("Setting fixed IP ("), F("WIFI"));
-    Debugger->printValue(configuration->secondary.ip);
-    Debugger->printValue(F(") address for backup WiFi configuration"));
+    Msg->printInformation(F("Setting fixed IP ("), F("WIFI"));
+    Msg->printValue(configuration->secondary.ip);
+    Msg->printValue(F(") address for backup WiFi configuration"));
 #endif
 
     IPAddress dns1;
     if (!dns1.fromString(configuration->secondary.dns1)) {
 #ifdef DEBUG
-      Debugger->printError(F("Problem with WIFI DNS1: "), F("WIFI"));
-      Debugger->printValue(configuration->secondary.dns1);
+      Msg->printError(F("Problem with WIFI DNS1: "), F("WIFI"));
+      Msg->printValue(configuration->secondary.dns1);
 #endif
     }
     IPAddress dns2;
     if (!dns2.fromString(configuration->secondary.dns2)) {
 #ifdef DEBUG
-      Debugger->printError(F("Problem with WIFI DNS2: "), F("WIFI"));
-      Debugger->printValue(configuration->secondary.dns2);
+      Msg->printError(F("Problem with WIFI DNS2: "), F("WIFI"));
+      Msg->printValue(configuration->secondary.dns2);
 #endif
     }
 
     IPAddress ip;
     if (!ip.fromString(configuration->secondary.ip)) {
 #ifdef DEBUG
-      Debugger->printError(F("Problem with WIFI IP: "), F("WIFI"));
-      Debugger->printValue(configuration->secondary.ip);
+      Msg->printError(F("Problem with WIFI IP: "), F("WIFI"));
+      Msg->printValue(configuration->secondary.ip);
 #endif
     }
     IPAddress gateway;
     if (!gateway.fromString(configuration->secondary.gateway)) {
 #ifdef DEBUG
-      Debugger->printError(F("Problem with WIFI gateway: "), F("WIFI"));
-      Debugger->printValue(configuration->secondary.gateway);
+      Msg->printError(F("Problem with WIFI gateway: "), F("WIFI"));
+      Msg->printValue(configuration->secondary.gateway);
 #endif
     }
     IPAddress subnet;
     if (!subnet.fromString(configuration->secondary.subnet)) {
 #ifdef DEBUG
-      Debugger->printError(F("Problem with WIFI subnet: "), F("WIFI"));
-      Debugger->printValue(configuration->secondary.subnet);
+      Msg->printError(F("Problem with WIFI subnet: "), F("WIFI"));
+      Msg->printValue(configuration->secondary.subnet);
 #endif
     }
 
     WirelessNetwork.config(ip, gateway, subnet, dns1, dns2);
 #ifdef DEBUG
-    Debugger->printInformation(F("Fixed IP set"), F("WIFI"));
+    Msg->printInformation(F("Fixed IP set"), F("WIFI"));
 #endif
   } /* Endif: Setting Fixed IP for Primary Configuration if set */
 
   WirelessNetwork.mode(WIFI_STA);
 
 #ifdef DEBUG
-  Debugger->printInformation(
+  Msg->printInformation(
       (isPrimaryConfiguration ? F("Primary") : F("Backup")), F("WIFI"));
-  Debugger->printValue(F(" configuration set"));
+  Msg->printValue(F(" configuration set"));
 #endif
 }
 
-void AFEWiFi::listener() {
+void ESPAPP_WirlessConnection::listener() {
   if (!(Device->getMode() == AFE_MODE_ACCESS_POINT ||
         Device->getMode() == AFE_MODE_NETWORK_NOT_SET)) {
     if (!connected()) {
@@ -297,7 +307,7 @@ void AFEWiFi::listener() {
             if (strlen(configuration->primary.ssid) == 0 ||
                 strlen(configuration->primary.password) == 0) {
 #ifdef DEBUG
-              Debugger->printError(
+              Msg->printError(
                   F("is not configured. Going to configuration mode"),
                   F("WIFI"));
 #endif
@@ -314,32 +324,32 @@ void AFEWiFi::listener() {
 
 #ifdef DEBUG
 
-            Debugger->printInformation(
+            Msg->printInformation(
                 F("Starting establishing WiFi connection"), F("WIFI"));
-            Debugger->printBulletPoint(F("SSID: "));
+            Msg->printBulletPoint(F("SSID: "));
             Serial << (isPrimaryConfiguration ? configuration->primary.ssid
                                               : configuration->secondary.ssid);
 
-            Debugger->printBulletPoint(F("Auto Connected: "));
+            Msg->printBulletPoint(F("Auto Connected: "));
             Serial << WirelessNetwork.getAutoConnect();
 
-            Debugger->printBulletPoint(F("Auto ReConnected: "));
+            Msg->printBulletPoint(F("Auto ReConnected: "));
             Serial << WirelessNetwork.getAutoReconnect();
 
-            Debugger->printBulletPoint(F("Mode: "));
+            Msg->printBulletPoint(F("Mode: "));
             Serial << WirelessNetwork.getMode();
 
 #ifndef ESP32
-            Debugger->printBulletPoint(F("Listen interval: "));
+            Msg->printBulletPoint(F("Listen interval: "));
             Serial << WirelessNetwork.getListenInterval();
 
-            Debugger->printBulletPoint(F("Persistent: "));
+            Msg->printBulletPoint(F("Persistent: "));
             Serial << WirelessNetwork.getPersistent();
 
-            Debugger->printBulletPoint(F("PhyMode: "));
+            Msg->printBulletPoint(F("PhyMode: "));
             Serial << WirelessNetwork.getPhyMode();
 
-            Debugger->printBulletPoint(F("Sleep Mode: "));
+            Msg->printBulletPoint(F("Sleep Mode: "));
             Serial << WirelessNetwork.getSleepMode();
 #endif // !ESP32
 #endif
@@ -364,7 +374,7 @@ void AFEWiFi::listener() {
 // yield();
 // delay(10);
 #ifdef DEBUG
-          Debugger->printInformation(F("Connecting to: "), F("WIFI"));
+          Msg->printInformation(F("Connecting to: "), F("WIFI"));
 
           Serial << (isPrimaryConfiguration ? F("primary") : F("backup"))
                  << F(" router. Attempt: ") << connections << F("/")
@@ -392,9 +402,9 @@ void AFEWiFi::listener() {
 
           connections = 0;
 #ifdef DEBUG
-          Debugger->printWarning(
+          Msg->printWarning(
               F("Not able to connect.Going to sleep mode for "), F("WIFI"));
-          Debugger->printValue(configuration->waitTimeSeries, F("sec."));
+          Msg->printValue(configuration->waitTimeSeries, F("sec."));
 #endif
 
           /**
@@ -421,8 +431,8 @@ void AFEWiFi::listener() {
 #endif
 
 #ifdef DEBUG
-        Debugger->printInformation(F("Setting hostname to: "), F("WIFI"));
-        Debugger->printValue(Device->configuration.name);
+        Msg->printInformation(F("Setting hostname to: "), F("WIFI"));
+        Msg->printValue(Device->configuration.name);
 #endif
 
         // yield();
@@ -431,88 +441,89 @@ void AFEWiFi::listener() {
 // yield();
 #ifdef DEBUG
 
-          Debugger->printValue(F(" ... Success"));
+          Msg->printValue(F(" ... Success"));
         } else {
-          Debugger->printValue(F(" ... Error"));
+          Msg->printValue(F(" ... Error"));
 #endif
         }
 
 #ifdef DEBUG
 
-        Debugger->printHeader(2, 1, 40, AFE_DEBUG_HEADER_TYPE_DASH);
-        Debugger->printValue(F("Connection established"));
-        Debugger->printBulletPoint(F("MAC: "));
+        Msg->printHeader(2, 1, 40, AFE_DEBUG_HEADER_TYPE_DASH);
+        Msg->printValue(F("Connection established"));
+        Msg->printBulletPoint(F("MAC: "));
         Serial << WirelessNetwork.macAddress();
-        Debugger->printBulletPoint(F("IP: "));
+        Msg->printBulletPoint(F("IP: "));
         Serial << WirelessNetwork.localIP();
-#ifdef AFE_ESP32
-        Debugger->printBulletPoint(F("IPv6: "));
+#ifdef ESP32
+        Msg->printBulletPoint(F("IPv6: "));
         Serial << WirelessNetwork.localIPv6();
 #endif
-        Debugger->printBulletPoint(F("Subnet: "));
+        Msg->printBulletPoint(F("Subnet: "));
         Serial << WirelessNetwork.subnetMask();
-#ifdef AFE_ESP32
+#ifdef ESP32
         Serial << F("/") << WirelessNetwork.subnetCIDR();
 #endif
-        Debugger->printBulletPoint(F("Gateway: "));
+        Msg->printBulletPoint(F("Gateway: "));
         Serial << WirelessNetwork.gatewayIP();
-#ifdef AFE_ESP32
-        Debugger->printBulletPoint(F("Broadcast: "));
+#ifdef ESP32
+        Msg->printBulletPoint(F("Broadcast: "));
         Serial << WirelessNetwork.broadcastIP();
 #endif
-        Debugger->printBulletPoint(F("DNS1: "));
+        Msg->printBulletPoint(F("DNS1: "));
         Serial << WirelessNetwork.dnsIP(0);
-        Debugger->printBulletPoint(F("DNS2: "));
+        Msg->printBulletPoint(F("DNS2: "));
         Serial << WirelessNetwork.dnsIP(1);
-#ifdef AFE_ESP32
-        Debugger->printBulletPoint(F("Network ID: "));
+#ifdef ESP32
+        Msg->printBulletPoint(F("Network ID: "));
         Serial << WirelessNetwork.networkID();
 #endif
-        Debugger->printBulletPoint(F("RSSI: "));
+        Msg->printBulletPoint(F("RSSI: "));
         Serial << WirelessNetwork.RSSI();
-#ifdef AFE_ESP32
-        Debugger->printBulletPoint(F("Hostname: "));
+#ifdef ESP32
+        Msg->printBulletPoint(F("Hostname: "));
         Serial << WirelessNetwork.getHostname();
 #else
-        Debugger->printBulletPoint(F("Hostname: "));
+        Msg->printBulletPoint(F("Hostname: "));
         Serial << WirelessNetwork.hostname();
 #endif
 
-        Debugger->printBulletPoint(F("LAN HTTP: http://"));
+        Msg->printBulletPoint(F("LAN HTTP: http://"));
         char deviceIdExtended[AFE_CONFIG_DEVICE_ID_SIZE];
         Data->getDeviceID(deviceIdExtended, true);
         Serial << deviceIdExtended << F(".local");
 
-        Debugger->printHeader(1, 1, 40, AFE_DEBUG_HEADER_TYPE_DASH);
+        Msg->printHeader(1, 1, 40, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
       }
     }
   }
 }
 
-boolean AFEWiFi::connected() {
+boolean ESPAPP_WirlessConnection::connected() {
   if (configuration->mDNSActive == AFE_CONFIG_NETWORK_MDNS_ACTIVE) {
 
-#ifndef AFE_ESP32
+#ifndef ESP32
     MDNS.update();
 #else
 // @TODO 3.8.0 what is ESP32 equivalent ESP32
 #endif
   }
 
-  return AFEWiFi::isConnected;
+  return ESPAPP_WirlessConnection::isConnected;
 }
 
-boolean AFEWiFi::eventConnected() {
-  boolean returnValue = AFEWiFi::eventConnectionEstablished;
+boolean ESPAPP_WirlessConnection::eventConnected() {
+  boolean returnValue = ESPAPP_WirlessConnection::eventConnectionEstablished;
 
-  if (AFEWiFi::eventConnectionEstablished == true) {
+  if (ESPAPP_WirlessConnection::eventConnectionEstablished == true) {
     if (configuration->mDNSActive == AFE_CONFIG_NETWORK_MDNS_ACTIVE) {
       char _mDNSDeviceID[AFE_CONFIG_DEVICE_ID_SIZE +
                          4]; // extended deviceId "afe-1234-5678"
-      Data->getDeviceID(_mDNSDeviceID, true);
+    //  Data->getDeviceID(_mDNSDeviceID, true);
 
-      if (MDNS.begin(_mDNSDeviceID)) {
+    //  if (MDNS.begin(_mDNSDeviceID)) {
+    if (MDNS.begin("_mDNSDeviceID")) {
 #ifdef DEBUG
         Serial << endl << F("INFO: mDNS: Responder started: ") << _mDNSDeviceID;
 #endif
@@ -525,62 +536,62 @@ boolean AFEWiFi::eventConnected() {
 #endif
       }
     }
-    Data->addLog(F("wifi:connected"));
-    AFEWiFi::eventConnectionEstablished = false;
+  //  Data->addLog(F("wifi:connected"));
+    ESPAPP_WirlessConnection::eventConnectionEstablished = false;
   }
 
   return returnValue;
 }
 
-boolean AFEWiFi::eventDisconnected() {
-  boolean returnValue = AFEWiFi::eventConnectionLost;
+boolean ESPAPP_WirlessConnection::eventDisconnected() {
+  boolean returnValue = ESPAPP_WirlessConnection::eventConnectionLost;
 
   if (returnValue) {
-    Data->addLog(F("wifi:disconnected"));
+   // Data->addLog(F("wifi:disconnected"));
   }
 
-  AFEWiFi::eventConnectionLost = false;
+  ESPAPP_WirlessConnection::eventConnectionLost = false;
 
   return returnValue;
 }
 
-#ifdef AFE_ESP32
-void AFEWiFi::onWiFiEvent(WiFiEvent_t event) {
+#ifdef ESP32
+void ESPAPP_WirlessConnection::onWiFiEvent(WiFiEvent_t event) {
   switch (event) {
   case SYSTEM_EVENT_STA_GOT_IP:
 #ifdef DEBUG
     Serial << endl << F("INFO: WIFI: STA Got IP");
 #endif
-    AFEWiFi::eventConnectionEstablished = true;
-    AFEWiFi::isConnected = true;
+    ESPAPP_WirlessConnection::eventConnectionEstablished = true;
+    ESPAPP_WirlessConnection::isConnected = true;
     break;
   case SYSTEM_EVENT_STA_DISCONNECTED:
 #ifdef DEBUG
-//  Debugger->printInformation(F("Disconnected from Wi-Fi"), F("WIFI"));
+//  Msg->printInformation(F("Disconnected from Wi-Fi"), F("WIFI"));
 #endif
-    AFEWiFi::eventConnectionLost = true;
-    AFEWiFi::isConnected = false;
+    ESPAPP_WirlessConnection::eventConnectionLost = true;
+    ESPAPP_WirlessConnection::isConnected = false;
     break;
   }
 }
 
 #else // ESP8266
-void AFEWiFi::onWifiConnect(const WiFiEventStationModeGotIP &event) {
-  AFEWiFi::eventConnectionEstablished = true;
-  AFEWiFi::isConnected = true;
+void ESPAPP_WirlessConnection::onWifiConnect(const WiFiEventStationModeGotIP &event) {
+  ESPAPP_WirlessConnection::eventConnectionEstablished = true;
+  ESPAPP_WirlessConnection::isConnected = true;
 }
 
-void AFEWiFi::onWifiDisconnect(const WiFiEventStationModeDisconnected &event) {
+void ESPAPP_WirlessConnection::onWifiDisconnect(const WiFiEventStationModeDisconnected &event) {
 #ifdef DEBUG
   Serial << endl << F("WARN: WIFI: Disconnected");
 #endif
-  AFEWiFi::eventConnectionLost = true;
-  AFEWiFi::isConnected = false;
+  ESPAPP_WirlessConnection::eventConnectionLost = true;
+  ESPAPP_WirlessConnection::isConnected = false;
 }
 
 #ifdef DEBUG
 
-void AFEWiFi::onWiFiAPStationConnected(
+void ESPAPP_WirlessConnection::onWiFiAPStationConnected(
     const WiFiEventSoftAPModeStationConnected &event) {
 
   Serial << endl
@@ -591,10 +602,3 @@ void AFEWiFi::onWiFiAPStationConnected(
 
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_LED
-void AFEWiFi::addReference(AFELED *_Led) { Led = _Led; }
-#endif
-
-#ifdef DEBUG
-void AFEWiFi::addReference(AFEDebugger *_Debugger) { Debugger = _Debugger; }
-#endif
