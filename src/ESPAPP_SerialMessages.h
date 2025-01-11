@@ -19,15 +19,8 @@ extern "C" {
 }
 #endif 
 
+#include <ESPAPP_Parameters.h>
 #include <Streaming.h>
-
-/* Colors */
-
-#define ESP_APP_RED "\u001b[31m"
-#define ESP_APP_BLUE "\u001b[34m"
-#define ESP_APP_GREEN "\u001b[32m"
-#define ESP_APP_RESET_COLOR "\u001b[0m"
-
 
 /* Define in you app if you diff thean LittleFS*/
 
@@ -49,11 +42,6 @@ extern "C" {
 #define ESP_APP_MSG_TYPE_INFORMATION 7
 #define ESP_APP_MSG_TYPE_WARNING 8
 #define ESP_APP_MSG_TYPE_ERROR 9
-
-/* Header char types */
-#define ESP_APP_MSG_HEADER_TYPE_HASH 0
-#define ESP_APP_MSG_HEADER_TYPE_DASH 1
-#define ESP_APP_MSG_HEADER_TYPE_SPACE 2
 
 /* Header default length */
 #define ESP_APP_MSG_HEADER_DEFAULT_LENGTH 72
@@ -136,6 +124,7 @@ public:
   void printValue(uint8_t number, uint8_t newLineAfter = 0);
   void printValue(uint8_t number, const __FlashStringHelper *text,
                   uint8_t newLineAfter = 0);
+  void printValue(bool number, uint8_t newLineAfter = 0);
   void printValue(unsigned long number, uint8_t newLineAfter = 0);
   void printValue(unsigned long number, const __FlashStringHelper *text,
                   uint8_t newLineAfter = 0);

@@ -4,14 +4,46 @@
 #define _ESPAPP_API_FLASH_h
 
 #include <ArduinoJson.h>
+#include <ESPAPP_Parameters.h>
+#include <LITTLEFS.h>
 
-class ESPAPP_API_Flash 
+#ifdef DEBUG
+#include <ESPAPP_SerialMessages.h>
+#endif
+
+/* File openig modes */
+#define ESP_APP_OPEN_FILE_READING "r"
+#define ESP_APP_OPEN_FILE_WRITING "w"
+#define ESP_APP_OPEN_FILE_APPEND "a"
+
+class ESPAPP_API_Flash
 {
-  public:
+private:
+#ifdef DEBUG
+  ESPAPP_SerialMessages *Msg;
+#endif
+
+  bool mountFileSystem(void);
+  bool formatFileSystem(void);
+  bool fileExist(const char *path);
+  bool createFile(const char *path);
+
+  bool openFile(File &openedFile, const char *mode,
+                const __FlashStringHelper *path, uint8_t id = ESP_APP_NONE,
+                boolean createIfNotExists = true);
+
+  bool openFile(File &openedFile, const char *mode, const char *path, uint8_t id,
+                boolean createIfNotExists = true);
+
+public:
+#ifdef DEBUG
+  ESPAPP_API_Flash(ESPAPP_SerialMessages *_Msg);
+#else
   ESPAPP_API_Flash();
-  bool getJSON(const char *fileName, JsonDocument &doc);
+#endif
+
+  bool init(void);
+  bool getJSON(const __FlashStringHelper *fileName, JsonDocument &doc);
 };
-
-
 
 #endif // _ESPAPP_API_FLASH_h

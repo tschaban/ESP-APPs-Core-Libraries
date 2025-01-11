@@ -3,16 +3,12 @@
 #ifndef _ESPAPP_Firmware_h
 #define _ESPAPP_Firmware_h
 
-#include <ESPAPP_Parameters.h>
-#include <ArduinoJson.h>
-//#include <ESPAPP-API-JSONRPC.h>
-//#include <ESPAPP-Data-Access.h>
-//#include <ESPAPP-Device.h>
-//#include <ESPAPP_WirlessConnection.h>
 
-#ifdef DEBUG
-#include <ESPAPP_SerialMessages.h>
-#endif
+#include <ESPAPP_Parameters.h>
+#include <ESPAPP_Core.h>
+// #include <ESPAPP-API-JSONRPC.h>
+// #include <ESPAPP-Data-Access.h>
+#include <ESPAPP_WirlessConnection.h>
 
 class ESPAPP_Firmware //: public ESPAPPCoreHardware
 {
@@ -25,26 +21,26 @@ private:
    * default configuration
    *
    */
-  //void firstBooting(void);
+  // void firstBooting(void);
 
 public:
-
-#ifdef DEBUG
-  ESPAPP_SerialMessages *Msg = new ESPAPP_SerialMessages();
-#endif
-
-  struct GLOBAL_API_OBJECTS {
-   // ESPAPP_WirlessConnection *Network = new ESPAPP_WirlessConnection();
-   // ESPAPPJSONRPC *REST = new ESPAPPJSONRPC();
-    //ESPAPPDataAccess *Flash = new ESPAPPDataAccess();
+  
+  ESPAPP_Core *System = new ESPAPP_Core();
+   
+  struct GLOBAL_API_OBJECTS
+  {
+    ESPAPP_WirlessConnection *Network;
+    // ESPAPPJSONRPC *REST = new ESPAPPJSONRPC();
   };
 
-  struct GLOBAL_CONFIGURATION_OBJECTS {
-  //  PRO_VERSION *Pro = new PRO_VERSION;
-  //  FIRMWARE *Version = new FIRMWARE;
+  struct GLOBAL_CONFIGURATION_OBJECTS
+  {
+    //  PRO_VERSION *Pro = new PRO_VERSION;
+    //  FIRMWARE *Version = new FIRMWARE;
   };
 
-  struct TIMER_OBJECT {
+  struct TIMER_OBJECT
+  {
     unsigned long milliseconds;
     uint8_t minutes;
     uint8_t hours;
@@ -54,28 +50,30 @@ public:
   };
 
   TIMER_OBJECT *timer = new TIMER_OBJECT{0, 0, 0, 0, 0};
-
   GLOBAL_API_OBJECTS *API = new GLOBAL_API_OBJECTS;
-  
   GLOBAL_CONFIGURATION_OBJECTS *Configuration =
       new GLOBAL_CONFIGURATION_OBJECTS;
 
-  //ESPAPPDevice *Device = new ESPAPPDevice();
+  // ESPAPPDevice *Device = new ESPAPPDevice();
 
   /* Constructor */
   ESPAPP_Firmware();
 
+  void init(void);
+
   void begin();
   uint8_t getBootMode(void);
 
-  //boolean initializeFS(void);
+  // boolean initializeFS(void);
 
-  //void initializeNetwork(void);
-  //void checkFirmwareVersion(void);
-  //void validateProVersion(void);
-  //void synchronizeTime(void);
+  void initializeNetwork(void);
+  void listenerNetwork(void);
+
+  // void checkFirmwareVersion(void);
+  // void validateProVersion(void);
+  // void synchronizeTime(void);
   /* Currently not used. If needed uncomment it */
-  //void getCurrentTime(char *timestamp);
+  // void getCurrentTime(char *timestamp);
 };
 
 #endif

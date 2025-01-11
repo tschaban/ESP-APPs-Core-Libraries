@@ -34,6 +34,10 @@
     {
       "name": "Streaming",
       "frameworks": "arduino"
+    },
+    {
+      "name": "ESPmDNS",
+      "frameworks": "arduino"
     }
   ]
 }

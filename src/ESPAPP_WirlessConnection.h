@@ -3,38 +3,9 @@
 #ifndef _ESPAPP_WirlessConnection_h
 #define _ESPAPP_WirlessConnection_h
 
-
-#include <ESPAPP_Parameters.h>
+//#include <ESPAPP_Parameters.h>
 #include <ArduinoJson.h>
-#include <ESPAPP_API_Flash.h>
-
-struct NETWORK_SETTING {
-  char ssid[33];
-  char password[33];
-  uint8_t isDHCP;
-  char ip[16];
-  char gateway[16];
-  char subnet[16];
-  char dns1[16];
-  char dns2[16];
-};
-
-struct NETWORK {
-  NETWORK_SETTING primary;
-  NETWORK_SETTING secondary;
-  uint8_t noConnectionAttempts;
-  uint8_t waitTimeConnections;
-  uint8_t waitTimeSeries;
-  uint8_t noFailuresToSwitchNetwork;
-#if !defined(ESP32)
-  uint8_t radioMode;
-  float outputPower;
-#endif
-};
-
-
-//#include <AFE-Data-Access.h>
-//#include <AFE-Device.h>
+#include <ESPAPP_Core.h>
 
 #ifdef AFE_CONFIG_HARDWARE_LED
 #include <AFE-LED.h>
@@ -48,16 +19,12 @@ struct NETWORK {
 #include <ESP8266mDNS.h>
 #endif // ESP32/ESP8266
 
-#ifdef DEBUG
-#include <ESPAPP_SerialMessages.h>
-#endif
 
-class ESPAPP_WirlessConnection {
+class ESPAPP_WirlessConnection
+{
 
 private:
- // AFEDevice *Device;
-  //AFEDataAccess *Data;
-  ESPAPP_API_Flash *Flash = new ESPAPP_API_Flash();
+  ESPAPP_Core *System;
   unsigned long delayStartTime = 0;
 
 #ifdef AFE_CONFIG_HARDWARE_LED
@@ -114,9 +81,9 @@ private:
   boolean isBackupConfigurationSet = false;
 
   /**
-*@brief Indicates on to which router the device is connected
-*
-*/
+   *@brief Indicates on to which router the device is connected
+   *
+   */
   boolean isPrimaryConfiguration = false;
 
   /**
@@ -125,10 +92,8 @@ private:
    */
   void switchConfiguration();
 
-#ifdef DEBUG
-  ESPAPP_SerialMessages *Msg;
-  ESPAPP_WirlessConnection();
-#endif
+  bool readConfiguration(void);
+
 
 public:
 #ifndef ESP32
@@ -143,14 +108,9 @@ public:
 #endif
 
   /* Constructor */
+  ESPAPP_WirlessConnection(ESPAPP_Core *_System);
 
-
-  #ifdef DEBUG
-  ESPAPP_WirlessConnection(ESPAPP_SerialMessages *);
-  #else
-  ESPAPP_WirlessConnection();
-  #endif 
-
+  void init();
 
   NETWORK *configuration = new NETWORK;
 
@@ -160,16 +120,14 @@ public:
   ESP8266WiFiClass WirelessNetwork;
 #endif // ESP32/ESP8266
 
-
   /**
    * @brief Sets connection parameters and host name. Must be invoked before
    * connect method
    *
    * @param
    */
-  //void begin(AFEDevice *, AFEDataAccess *);
+  // void begin(AFEDevice *, AFEDataAccess *);
   void begin();
-
 
   /**
    * @brief Return TRUE if device is connected to WiFi Access Point
@@ -181,7 +139,7 @@ public:
   /**
    * @brief Returns true if device just connected to the network. It's set to
    * true each
-     * time it connects
+   * time it connects
    *
    * @return boolean
    */
@@ -199,7 +157,7 @@ public:
   /**
    * @brief Method checks if device is connected to WiFi - if it's not then it
    * connects
-     * to it
+   * to it
    *
    */
   void listener();
@@ -231,8 +189,6 @@ public:
 #endif
 
 #endif
-
-
 };
 
 #endif // _ESPAPP_WirlessConnection_h

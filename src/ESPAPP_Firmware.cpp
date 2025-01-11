@@ -1,8 +1,17 @@
 #include "ESPAPP_Firmware.h"
 
-ESPAPP_Firmware::ESPAPP_Firmware(){};
+ESPAPP_Firmware::ESPAPP_Firmware() {
+  API->Network = new ESPAPP_WirlessConnection(System);
+};
 
-void ESPAPP_Firmware::begin() {
+void ESPAPP_Firmware::init(void) {
+  System->Flash->init();
+  initializeNetwork();
+}
+
+
+void ESPAPP_Firmware::begin()
+{
 
   timer->milliseconds = millis();
   timer->minutes = 0;
@@ -12,31 +21,25 @@ void ESPAPP_Firmware::begin() {
 
 #ifdef DEBUG
 //  API->Flash->addReference(Debugger);
- // API->REST->addReference(Debugger);
+// API->REST->addReference(Debugger);
 #endif
 
-  //API->Flash->initializeFileSystem();
+  // API->Flash->initializeFileSystem();
 
-#ifdef DEBUG
-  //Device->begin(API->Flash, Debugger);
-#else
- // Device->begin(API->Flash);
-#endif
-
-  //firstBooting();
+  // firstBooting();
 
   /**
    * @brief saving information how many times firmare has been rebooted. For
    * debug purpose
    *
    */
-  //unsigned long _counter = API->Flash->getRebootCounter();
-  //API->Flash->addLog(F("restarted:%dx"), _counter);
+  // unsigned long _counter = API->Flash->getRebootCounter();
+  // API->Flash->addLog(F("restarted:%dx"), _counter);
 
 #ifdef DEBUG
 
-  //Debugger->printInformation(F("Firmware rebooted: "), F("BOOT"));
- // Debugger->printValue(_counter, F("x"));
+  // Debugger->printInformation(F("Firmware rebooted: "), F("BOOT"));
+  // Debugger->printValue(_counter, F("x"));
 
 #endif
 
@@ -45,27 +48,28 @@ void ESPAPP_Firmware::begin() {
    *
    */
 
- // API->REST->begin(API->Flash, Device);
-//API->Flash->getConfiguration(Configuration->Pro);
- // API->Flash->getConfiguration(Configuration->Version);
+  // API->REST->begin(API->Flash, Device);
+  // API->Flash->getConfiguration(Configuration->Pro);
+  //  API->Flash->getConfiguration(Configuration->Version);
 }
 
-uint8_t ESPAPP_Firmware::getBootMode(void) {
-  return ESPAPP_BOOT_MODE_NORMAL;
+uint8_t ESPAPP_Firmware::getBootMode(void)
+{
+  return ESP_APP_BOOT_MODE_NORMAL;
 }
 
-/*
-void ESPAPP_Firmware::initializeNetwork(void) {
+void ESPAPP_Firmware::initializeNetwork(void)
+{
 
 #ifdef DEBUG
-  Debugger->printInformation(F("Starting network"), F("BOOT"));
-  API->Network->addReference(Debugger);
+  System->Msg->printInformation(F("Starting network"), F("BOOT"));
 #endif
 
-  API->Network->begin(Device, API->Flash);
+  API->Network->init();
   API->Network->listener();
 }
 
+/*
 void ESPAPP_Firmware::validateProVersion(void) {
 
 #ifdef DEBUG

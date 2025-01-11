@@ -63,6 +63,10 @@ void ESPAPP_SerialMessages::printValue(float number, uint8_t newLineAfter) {
   printValue(number, F(""), newLineAfter);
 }
 
+void ESPAPP_SerialMessages::printValue(bool number, uint8_t newLineAfter) {
+  printValue((number?F("Yes"):F("No")), newLineAfter);
+}
+
 void ESPAPP_SerialMessages::addNewLines(uint8_t noOfLines) {
   for (uint8_t i = 0; i < noOfLines; i++) {
     Serial << endl;
@@ -79,11 +83,11 @@ void ESPAPP_SerialMessages::addMessageHeader(uint8_t type,
   }
 
   Serial << (type == ESP_APP_MSG_TYPE_INFORMATION
-                 ? F(ESP_APP_GREEN)
+                 ? F(ESP_APP_TERMINAL_FONT_GREEN)
                  : (type == ESP_APP_MSG_TYPE_WARNING
-                        ? F(ESP_APP_BLUE)
+                        ? F(ESP_APP_TERMINAL_FONT_BLUE)
                         : (type == ESP_APP_MSG_TYPE_ERROR
-                               ?  F(ESP_APP_RED)
+                               ?  F(ESP_APP_TERMINAL_FONT_RED)
                                : F(""))));
   
 
@@ -98,7 +102,7 @@ void ESPAPP_SerialMessages::addMessageHeader(uint8_t type,
                                       : F("")))));
 
 
-  Serial << F(ESP_APP_RESET_COLOR); 
+  Serial << F(ESP_APP_TERMINAL_FONT_RESET_COLOR); 
   
   if (type == ESP_APP_MSG_TYPE_ERROR || type == ESP_APP_MSG_TYPE_INFORMATION ||
       type == ESP_APP_MSG_TYPE_WARNING) {
