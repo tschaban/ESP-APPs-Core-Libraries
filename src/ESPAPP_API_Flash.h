@@ -16,6 +16,14 @@
 #define ESP_APP_OPEN_FILE_WRITING "w"
 #define ESP_APP_OPEN_FILE_APPEND "a"
 
+/* Directories */
+#define ESP_APP_DIRECTORY_CONFIG "/cfg"
+#define ESP_APP_DIRECTORY_DATA "/data"
+
+
+/* File informing that system file is read */
+#define ESP_APP_FILE_SYSTEM_INITIALIZED "/.token"
+
 class ESPAPP_API_Flash
 {
 private:
@@ -35,6 +43,8 @@ private:
   bool openFile(File &openedFile, const char *mode, const char *path, uint8_t id,
                 boolean createIfNotExists = true);
 
+
+
 public:
 #ifdef DEBUG
   ESPAPP_API_Flash(ESPAPP_SerialMessages *_Msg);
@@ -44,6 +54,8 @@ public:
 
   bool init(void);
   bool getJSON(const __FlashStringHelper *fileName, JsonDocument &doc);
+
+  
 };
 
 #endif // _ESPAPP_API_FLASH_h

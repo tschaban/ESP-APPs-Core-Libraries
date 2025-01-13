@@ -28,7 +28,6 @@ bool ESPAPP_API_Flash::getJSON(const __FlashStringHelper *fileName, JsonDocument
     size_t size = configFile.size();
     std::unique_ptr<char[]> buf(new char[size]);
     configFile.readBytes(buf.get(), size);
-
     DeserializationError error = deserializeJson(doc, buf.get());
 
     configFile.close();
@@ -38,9 +37,9 @@ bool ESPAPP_API_Flash::getJSON(const __FlashStringHelper *fileName, JsonDocument
       success = true;
     }
 #ifdef DEBUG
-else 
+    else
       Msg->printError(F("Deserialisation error: "), F("JSON"));
-      Msg->printValue(error.c_str());
+    Msg->printValue(error.c_str());
   }
 #endif
 
@@ -48,11 +47,39 @@ else
   // const char *input = "{\"p\":{\"s\":\"IoT World\",\"p\":\"iotiotiot\",\"d\":1,\"i\":\"\",\"g\":\"\",\"b\":\"\",\"d1\":\"8.8.8.8\",\"d2\":\"8.8.4.4\"},\"s\":{\"s\":\"\",\"p\":\"\",\"d\":1,\"i\":\"\",\"g\":\"\",\"b\":\"\",\"d1\":\"\",\"d2\":\"\"},\"n\":20,\"w\":1,\"ws\":1,\"nf\":2,\"m\":1}";
 };
 
+
 bool ESPAPP_API_Flash::init(void)
 {
   bool success = false;
+#ifdef DEBUG
+  Msg->printInformation(F("Initializing file system"), F("FS"));
+#endif
   success = mountFileSystem();
-  success = formatFileSystem();
+
+  if (success)
+  {
+    success = fileExist(ESP_APP_FILE_SYSTEM_INITIALIZED);
+#ifdef DEBUG
+    Msg->printBulletPoint(F("Files structure exists"));
+#endif
+  }
+
+  if (!success)
+  {
+    success = formatFileSystem();
+  }
+
+#ifdef DEBUG
+  if (success)
+  {
+    Msg->printBulletPoint(F("File system is ready"));
+  }
+  else
+  {
+    Msg->printError(F("File system is NOT ready"), F("FS"));
+  }
+#endif
+
   return success;
 }
 
@@ -77,17 +104,40 @@ bool ESPAPP_API_Flash::mountFileSystem(void)
 
 bool ESPAPP_API_Flash::formatFileSystem(void)
 {
+  bool success = false;
 #ifdef DEBUG
-  Msg->printInformation(F("Formatting"), F("FS"), 2);
+  Msg->printBulletPoint(F("Formatting File System"));
 #endif
-  return LittleFS.format();
+
+  success = LittleFS.format();
+
+  if (success)
+  {
+#ifdef DEBUG
+    Msg->printBulletPoint(F("Creating directories structure"));
+#endif
+    LittleFS.mkdir(F(ESP_APP_DIRECTORY_CONFIG));
+    LittleFS.mkdir(F(ESP_APP_DIRECTORY_DATA));
+    LittleFS.open(F(ESP_APP_FILE_SYSTEM_INITIALIZED), ESP_APP_OPEN_FILE_WRITING).close();
+#ifdef DEBUG
+    Msg->printBulletPoint(F("Completed"));
+  }
+  else
+  {
+    Msg->printError(F("Formatting failed"), F("FS"));
+#endif
+  }
+
+  return success;
 }
 
 bool ESPAPP_API_Flash::fileExist(const char *path)
 {
   bool _ret = LittleFS.exists(path);
 #ifdef DEBUG
-  Msg->printBulletPoint(F("Found: "));
+  Msg->printBulletPoint(F("File: "));
+  Msg->printValue(path);
+  Msg->printValue(F(" - Found: "));
   Msg->printValue(_ret);
 #endif
   return _ret;
@@ -95,24 +145,26 @@ bool ESPAPP_API_Flash::fileExist(const char *path)
 
 bool ESPAPP_API_Flash::createFile(const char *path)
 {
-  boolean _ret = false;
+  boolean success = false;
 #ifdef DEBUG
-  Msg->printBulletPoint(F("Created: "));
+  Msg->printBulletPoint(F("File: "));
+  Msg->printValue(path);
+  Msg->printValue(F(" - Created: "));
 #endif
 
   File createFile = LittleFS.open(path, ESP_APP_OPEN_FILE_WRITING);
 
   if (createFile)
   {
-    _ret = true;
+    success = true;
     createFile.close();
   }
 
 #ifdef DEBUG
-  Msg->printValue(_ret);
+  Msg->printValue(success);
 #endif
 
-  return _ret;
+  return success;
 }
 
 bool ESPAPP_API_Flash::openFile(File &openedFile, const char *mode,
@@ -123,33 +175,33 @@ bool ESPAPP_API_Flash::openFile(File &openedFile, const char *mode,
   Msg->printHeader(1, 0, 72, ESP_APP_MSG_HEADER_TYPE_DASH);
 #endif
 
-  bool _status = false;
+  bool success = false;
 
 #ifdef DEBUG
   Msg->printBulletPoint(F("Opening file: "));
   Msg->printValue(path);
 #endif
 
-  _status = fileExist(path);
+  success = fileExist(path);
 
-  if (!_status && createIfNotExists)
+  if (!success && createIfNotExists)
   {
-    _status = createFile(path);
+    success = createFile(path);
   }
 
-  if (_status)
+  if (success)
   {
     openedFile = LittleFS.open(path, mode);
   }
 
-  _status = openedFile ? true : false;
+  success = openedFile ? true : false;
 
 #ifdef DEBUG
-  Msg->printBulletPoint(F("Opened: "));
-  Msg->printValue(_status);
+  Msg->printValue(F(" - Opened: "));
+  Msg->printValue(success);
 #endif
 
-  return _status;
+  return success;
 }
 
 bool ESPAPP_API_Flash::openFile(File &openedFile, const char *mode,

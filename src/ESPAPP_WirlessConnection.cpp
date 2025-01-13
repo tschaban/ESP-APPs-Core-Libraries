@@ -649,7 +649,7 @@ bool ESPAPP_WirlessConnection::readConfiguration(void)
   /* Read configuration */
   StaticJsonDocument<1000> doc;
   // JsonDocument doc;
-  successs = System->Flash->getJSON(F("/network.json"), doc);
+  successs = System->Flash->getJSON(F("/cfg/network.json"), doc);
 
   if (successs)
   {
