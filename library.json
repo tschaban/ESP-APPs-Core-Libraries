@@ -38,6 +38,11 @@
     {
       "name": "ESPmDNS",
       "frameworks": "arduino"
-    }
+    },
+    {
+      "name": "ESP32Ping",
+      "version": "https://github.com/tschaban/ESP32Ping.git",
+      "platforms": ["espressif32"]
+  }
   ]
 }

@@ -8,7 +8,8 @@
 #include <ESPAPP_Core.h>
 // #include <ESPAPP-API-JSONRPC.h>
 // #include <ESPAPP-Data-Access.h>
-#include <ESPAPP_WirlessConnection.h>
+#include <ESPAPP_WirelessConnection.h>
+#include <ESPAPP_AccessToWAN.h>
 
 class ESPAPP_Firmware //: public ESPAPPCoreHardware
 {
@@ -29,7 +30,8 @@ public:
    
   struct GLOBAL_API_OBJECTS
   {
-    ESPAPP_WirlessConnection *Network;
+    ESPAPP_WirelessConnection *Network;
+    ESPAPP_AccessToWAN *WAN;
     // ESPAPPJSONRPC *REST = new ESPAPPJSONRPC();
   };
 
@@ -59,14 +61,14 @@ public:
   /* Constructor */
   ESPAPP_Firmware();
 
-  void init(void);
+  bool init(void);
 
   void begin();
   uint8_t getBootMode(void);
 
   // boolean initializeFS(void);
 
-  void initializeNetwork(void);
+  bool initializeNetwork(void);
   void listenerNetwork(void);
 
   // void checkFirmwareVersion(void);

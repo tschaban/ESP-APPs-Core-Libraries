@@ -1,18 +1,23 @@
 /* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
 
-#include "ESPAPP_WirlessConnection.h"
+#include "ESPAPP_WirelessConnection.h"
 
-boolean ESPAPP_WirlessConnection::eventConnectionEstablished = false;
-boolean ESPAPP_WirlessConnection::isConnected = false;
-boolean ESPAPP_WirlessConnection::eventConnectionLost = true;
+boolean ESPAPP_WirelessConnection::eventConnectionEstablished = false;
+boolean ESPAPP_WirelessConnection::isConnected = false;
+boolean ESPAPP_WirelessConnection::eventConnectionLost = true;
 
-ESPAPP_WirlessConnection::ESPAPP_WirlessConnection(ESPAPP_Core *_System)
+ESPAPP_WirelessConnection::ESPAPP_WirelessConnection(ESPAPP_Core *_System)
 {
   System = _System;
 }
 
-void ESPAPP_WirlessConnection::init()
+bool ESPAPP_WirelessConnection::init(void)
 {
+
+#ifdef DEBUG
+  System->Msg->printInformation(F("Starting network"), F("WIFI"));
+#endif
+
   bool success = readConfiguration();
 
   if (success)
@@ -20,19 +25,96 @@ void ESPAPP_WirlessConnection::init()
 
 // Setting handlers for WiFi events
 #ifdef ESP32
-    WirelessNetwork.onEvent(ESPAPP_WirlessConnection::onWiFiEvent);
+    WirelessNetwork.onEvent(ESPAPP_WirelessConnection::onWiFiEvent);
 #else
     wifiConnectHandler =
-        WirelessNetwork.onStationModeGotIP(ESPAPP_WirlessConnection::onWifiConnect);
+        WirelessNetwork.onStationModeGotIP(ESPAPP_WirelessConnection::onWifiConnect);
     wifiDisconnectHandler =
-        WirelessNetwork.onStationModeDisconnected(ESPAPP_WirlessConnection::onWifiDisconnect);
+        WirelessNetwork.onStationModeDisconnected(ESPAPP_WirelessConnection::onWifiDisconnect);
 #ifdef DEBUG
     wifiAPStationConnectedHandler = WirelessNetwork.onSoftAPModeStationConnected(
-        ESPAPP_WirlessConnection::onWiFiAPStationConnected);
+        ESPAPP_WirelessConnection::onWiFiAPStationConnected);
 #endif
 #endif
 
-    begin();
+#ifdef DEBUG
+    System->Msg->printInformation(F("Secondary WiFi configuration exist: "), F("WIFI"));
+#endif
+
+    if (strlen(configuration->secondary.ssid) > 0 &&
+        strcmp(configuration->secondary.ssid,
+               ESP_APP_NETWORK_DEFAULT_NONE_SSID) != 0 &&
+        strlen(configuration->secondary.password) > 0)
+    {
+      isBackupConfigurationSet = true;
+    }
+
+#ifdef DEBUG
+    System->Msg->printValue(isBackupConfigurationSet);
+#endif
+
+#if !defined(ESP32)
+    if (configuration->radioMode != AFE_NONE)
+    {
+      // wifi_set_phy_mode(configuration->radioMode);
+      WirelessNetwork.setPhyMode(configuration->radioMode == 1
+                                     ? WIFI_PHY_MODE_11B
+                                 : configuration->radioMode == 2
+                                     ? WIFI_PHY_MODE_11G
+                                     : WIFI_PHY_MODE_11N);
+#ifdef DEBUG
+      System->Msg->printInformation(F("Setting Radio mode (1:B 2:G 3:N) to: "),
+                                    F("WIFI"));
+      System->Msg->printValue(configuration->radioMode);
+#endif
+    }
+
+    if (configuration->outputPower != AFE_NONE &&
+        configuration->outputPower >=
+            AFE_CONFIG_NETWORK_DEFAULT_OUTPUT_POWER_MIN &&
+        configuration->outputPower <=
+            AFE_CONFIG_NETWORK_DEFAULT_OUTPUT_POWER_MAX)
+    {
+      WirelessNetwork.setOutputPower(configuration->outputPower);
+#ifdef DEBUG
+      System->Msg->printInformation(F("Setting TX Output power to: "), F("WIFI"));
+      System->Msg->printValue(configuration->outputPower, F("dBm"));
+#endif
+    }
+
+#endif
+    if (System->connectionMode() == ESP_APP_NETWORK_CONNECTION_MODE_HOTSPOT)
+    {
+#ifdef DEBUG
+      System->Msg->printInformation(F("Starting Hotspot..."), F("WIFI"));
+#endif
+
+      WirelessNetwork.mode(WIFI_AP_STA);
+
+      success = WirelessNetwork.softAPConfig(IPAddress(192, 168, 5, 1),
+                                             IPAddress(192, 168, 5, 200),
+                                             IPAddress(255, 255, 255, 0));
+
+      if (success)
+      {
+        WirelessNetwork.softAP(System->configuration->deviceName);
+#ifdef DEBUG
+        System->Msg->printValue(F("Ready"));
+      }
+      else
+      {
+        System->Msg->printValue(F("Failed"));
+#endif
+      }
+    }
+    else
+    {
+      /* Add additional configuration parameters */
+      switchConfiguration();
+    }
+#ifdef DEBUG
+    System->Msg->printInformation(F("Network initialized..."), F("BOOT"));
+#endif
   }
 #ifdef DEBUG
   else
@@ -40,103 +122,11 @@ void ESPAPP_WirlessConnection::init()
     System->Msg->printError(F("Network cannot be initialized"), F("WIFI"));
   }
 #endif
+
+  return success;
 }
 
-void ESPAPP_WirlessConnection::begin()
-{
-
-  /**
-   * @brief Checking if backup configuration exists and setting a flag
-   *
-   */
-
-#ifdef DEBUG
-  System->Msg->printInformation(F("Secondary WiFi configuration exist: "), F("WIFI"), 1, 0);
-
-#endif
-
-  if (strlen(configuration->secondary.ssid) > 0 &&
-      strcmp(configuration->secondary.ssid,
-             ESP_APP_NETWORK_DEFAULT_NONE_SSID) != 0 &&
-      strlen(configuration->secondary.password) > 0)
-  {
-    isBackupConfigurationSet = true;
-  } /* Endif: Checking if backup configuration exists and setting a flag */
-
-#ifdef DEBUG
-  System->Msg->printValue(isBackupConfigurationSet);
-#endif
-
-  /**
-   * @brief Setting WiFi Radio mode for ESP32 and the TX output power
-   *
-   */
-
-#if !defined(ESP32)
-  if (configuration->radioMode != AFE_NONE)
-  {
-    // wifi_set_phy_mode(configuration->radioMode);
-    WirelessNetwork.setPhyMode(configuration->radioMode == 1
-                                   ? WIFI_PHY_MODE_11B
-                               : configuration->radioMode == 2
-                                   ? WIFI_PHY_MODE_11G
-                                   : WIFI_PHY_MODE_11N);
-#ifdef DEBUG
-    System->Msg->printInformation(F("Setting Radio mode (1:B 2:G 3:N) to: "),
-                                  F("WIFI"));
-    System->Msg->printValue(configuration->radioMode);
-#endif
-  }
-
-  if (configuration->outputPower != AFE_NONE &&
-      configuration->outputPower >=
-          AFE_CONFIG_NETWORK_DEFAULT_OUTPUT_POWER_MIN &&
-      configuration->outputPower <=
-          AFE_CONFIG_NETWORK_DEFAULT_OUTPUT_POWER_MAX)
-  {
-    WirelessNetwork.setOutputPower(configuration->outputPower);
-#ifdef DEBUG
-    System->Msg->printInformation(F("Setting TX Output power to: "), F("WIFI"));
-    System->Msg->printValue(configuration->outputPower, F("dBm"));
-#endif
-  }
-
-#endif
-
-  if (System->connectionMode() == ESP_APP_NETWORK_CONNECTION_MODE_HOTSPOT)
-  {
-#ifdef DEBUG
-    System->Msg->printInformation(F("Starting..."), F("HotSpot"));
-#endif
-
-    WirelessNetwork.mode(WIFI_AP_STA);
-
-    if (WirelessNetwork.softAPConfig(IPAddress(192, 168, 5, 1),
-                                     IPAddress(192, 168, 5, 200),
-                                     IPAddress(255, 255, 255, 0)))
-    {
-
-      WirelessNetwork.softAP(System->configuration->deviceName);
-#ifdef DEBUG
-      System->Msg->printValue(F("Ready"));
-    }
-    else
-    {
-      System->Msg->printValue(F("Failed"));
-#endif
-    }
-  }
-  else
-  {
-    /* Add additional configuration parameters */
-    switchConfiguration();
-  }
-#ifdef DEBUG
-  System->Msg->printInformation(F("Network initialized..."), F("BOOT"));
-#endif
-}
-
-void ESPAPP_WirlessConnection::switchConfiguration()
+void ESPAPP_WirelessConnection::switchConfiguration()
 {
   isPrimaryConfiguration = isPrimaryConfiguration ? false : true;
   noOfFailures = 0;
@@ -284,7 +274,7 @@ void ESPAPP_WirlessConnection::switchConfiguration()
 #endif
 }
 
-void ESPAPP_WirlessConnection::listener()
+void ESPAPP_WirelessConnection::listener()
 {
   if (!System->connectionMode() == ESP_APP_NETWORK_CONNECTION_MODE_NO_CONNECTION)
   {
@@ -448,8 +438,7 @@ void ESPAPP_WirlessConnection::listener()
 
 #ifdef DEBUG
         System->Msg->printInformation(F("Setting hostname to: "), F("WIFI"));
-        // @todo implement this
-        //  System->Msg->printValue(System->configuration.name);
+        System->Msg->printValue(System->configuration->deviceName);
 #endif
 
         // yield();
@@ -520,7 +509,7 @@ void ESPAPP_WirlessConnection::listener()
   }
 }
 
-boolean ESPAPP_WirlessConnection::connected()
+boolean ESPAPP_WirelessConnection::connected()
 {
   if (configuration->mDNS)
   {
@@ -532,14 +521,14 @@ boolean ESPAPP_WirlessConnection::connected()
 #endif
   }
 
-  return ESPAPP_WirlessConnection::isConnected;
+  return ESPAPP_WirelessConnection::isConnected;
 }
 
-boolean ESPAPP_WirlessConnection::eventConnected()
+boolean ESPAPP_WirelessConnection::eventConnected()
 {
-  boolean returnValue = ESPAPP_WirlessConnection::eventConnectionEstablished;
+  boolean returnValue = ESPAPP_WirelessConnection::eventConnectionEstablished;
 
-  if (ESPAPP_WirlessConnection::eventConnectionEstablished == true)
+  if (ESPAPP_WirelessConnection::eventConnectionEstablished == true)
   {
     if (configuration->mDNS)
     {
@@ -569,28 +558,28 @@ boolean ESPAPP_WirlessConnection::eventConnected()
       }
     }
     //  Data->addLog(F("wifi:connected"));
-    ESPAPP_WirlessConnection::eventConnectionEstablished = false;
+    ESPAPP_WirelessConnection::eventConnectionEstablished = false;
   }
 
   return returnValue;
 }
 
-boolean ESPAPP_WirlessConnection::eventDisconnected()
+boolean ESPAPP_WirelessConnection::eventDisconnected()
 {
-  boolean returnValue = ESPAPP_WirlessConnection::eventConnectionLost;
+  boolean returnValue = ESPAPP_WirelessConnection::eventConnectionLost;
 
   if (returnValue)
   {
     // Data->addLog(F("wifi:disconnected"));
   }
 
-  ESPAPP_WirlessConnection::eventConnectionLost = false;
+  ESPAPP_WirelessConnection::eventConnectionLost = false;
 
   return returnValue;
 }
 
 #ifdef ESP32
-void ESPAPP_WirlessConnection::onWiFiEvent(WiFiEvent_t event)
+void ESPAPP_WirelessConnection::onWiFiEvent(WiFiEvent_t event)
 {
   switch (event)
   {
@@ -599,39 +588,39 @@ void ESPAPP_WirlessConnection::onWiFiEvent(WiFiEvent_t event)
     Serial << endl
            << F("INFO: WIFI: STA Got IP");
 #endif
-    ESPAPP_WirlessConnection::eventConnectionEstablished = true;
-    ESPAPP_WirlessConnection::isConnected = true;
+    ESPAPP_WirelessConnection::eventConnectionEstablished = true;
+    ESPAPP_WirelessConnection::isConnected = true;
     break;
   case SYSTEM_EVENT_STA_DISCONNECTED:
 #ifdef DEBUG
 //  System->Msg->printInformation(F("Disconnected from Wi-Fi"), F("WIFI"));
 #endif
-    ESPAPP_WirlessConnection::eventConnectionLost = true;
-    ESPAPP_WirlessConnection::isConnected = false;
+    ESPAPP_WirelessConnection::eventConnectionLost = true;
+    ESPAPP_WirelessConnection::isConnected = false;
     break;
   }
 }
 
 #else // ESP8266
-void ESPAPP_WirlessConnection::onWifiConnect(const WiFiEventStationModeGotIP &event)
+void ESPAPP_WirelessConnection::onWifiConnect(const WiFiEventStationModeGotIP &event)
 {
-  ESPAPP_WirlessConnection::eventConnectionEstablished = true;
-  ESPAPP_WirlessConnection::isConnected = true;
+  ESPAPP_WirelessConnection::eventConnectionEstablished = true;
+  ESPAPP_WirelessConnection::isConnected = true;
 }
 
-void ESPAPP_WirlessConnection::onWifiDisconnect(const WiFiEventStationModeDisconnected &event)
+void ESPAPP_WirelessConnection::onWifiDisconnect(const WiFiEventStationModeDisconnected &event)
 {
 #ifdef DEBUG
   Serial << endl
          << F("WARN: WIFI: Disconnected");
 #endif
-  ESPAPP_WirlessConnection::eventConnectionLost = true;
-  ESPAPP_WirlessConnection::isConnected = false;
+  ESPAPP_WirelessConnection::eventConnectionLost = true;
+  ESPAPP_WirelessConnection::isConnected = false;
 }
 
 #ifdef DEBUG
 
-void ESPAPP_WirlessConnection::onWiFiAPStationConnected(
+void ESPAPP_WirelessConnection::onWiFiAPStationConnected(
     const WiFiEventSoftAPModeStationConnected &event)
 {
 
@@ -642,7 +631,7 @@ void ESPAPP_WirlessConnection::onWiFiAPStationConnected(
 #endif
 #endif
 
-bool ESPAPP_WirlessConnection::readConfiguration(void)
+bool ESPAPP_WirelessConnection::readConfiguration(void)
 {
 
   bool successs = false;

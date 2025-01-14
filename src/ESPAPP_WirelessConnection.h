@@ -1,7 +1,7 @@
 /* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
 
-#ifndef _ESPAPP_WirlessConnection_h
-#define _ESPAPP_WirlessConnection_h
+#ifndef _ESPAPP_WirelessConnection_h
+#define _ESPAPP_WirelessConnection_h
 
 //#include <ESPAPP_Parameters.h>
 #include <ArduinoJson.h>
@@ -20,7 +20,7 @@
 #endif // ESP32/ESP8266
 
 
-class ESPAPP_WirlessConnection
+class ESPAPP_WirelessConnection
 {
 
 private:
@@ -108,9 +108,9 @@ public:
 #endif
 
   /* Constructor */
-  ESPAPP_WirlessConnection(ESPAPP_Core *_System);
+  ESPAPP_WirelessConnection(ESPAPP_Core *_System);
 
-  void init();
+  bool init(void);
 
   NETWORK *configuration = new NETWORK;
 
@@ -120,14 +120,6 @@ public:
   ESP8266WiFiClass WirelessNetwork;
 #endif // ESP32/ESP8266
 
-  /**
-   * @brief Sets connection parameters and host name. Must be invoked before
-   * connect method
-   *
-   * @param
-   */
-  // void begin(AFEDevice *, AFEDataAccess *);
-  void begin();
 
   /**
    * @brief Return TRUE if device is connected to WiFi Access Point
@@ -191,4 +183,4 @@ public:
 #endif
 };
 
-#endif // _ESPAPP_WirlessConnection_h
+#endif // _ESPAPP_WirelessConnection_h
