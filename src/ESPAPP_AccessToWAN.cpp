@@ -11,7 +11,11 @@ ESPAPP_AccessToWAN::~ESPAPP_AccessToWAN()
 
 bool ESPAPP_AccessToWAN::connected(void)
 {
-    return connected;
+    return connectedToWAN;
+}
+
+void ESPAPP_AccessToWAN::setDisconnected(void) {
+    connectedToWAN = false;
 }
 
 void ESPAPP_AccessToWAN::checkAccessToWAN(void)
@@ -23,7 +27,7 @@ void ESPAPP_AccessToWAN::checkAccessToWAN(void)
 #endif
     IPAddress ip;
     ip.fromString(ESPAPP_WAN_ACCSSS_IP);
-    connectedToWAN = Ping->ping(ip, 5);
+    connectedToWAN = Ping->ping(ip, ESPAPP_WAN_ACCSSS_NO_OF_PING_ATTEMPTS);
 #ifdef DEBUG
     if (connectedToWAN)
     {

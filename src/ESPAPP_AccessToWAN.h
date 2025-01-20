@@ -5,6 +5,7 @@
 #include <ESPAPP_Core.h>
 
 #define ESPAPP_WAN_ACCSSS_IP "1.1.1.1"
+#define ESPAPP_WAN_ACCSSS_NO_OF_PING_ATTEMPTS 1
 
 class ESPAPP_AccessToWAN
 {
@@ -19,6 +20,7 @@ public:
     PingClass *Ping = new PingClass();
 
     bool connected(void);
+    void setDisconnected(void);
     void checkAccessToWAN(void);
     
 

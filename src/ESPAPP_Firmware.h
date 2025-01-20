@@ -32,6 +32,7 @@ public:
   {
     ESPAPP_WirelessConnection *Network;
     ESPAPP_AccessToWAN *WAN;
+    
     // ESPAPPJSONRPC *REST = new ESPAPPJSONRPC();
   };
 
