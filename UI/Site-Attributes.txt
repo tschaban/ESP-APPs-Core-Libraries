@@ -1,0 +1,17 @@
+{{s.lang}}          <html lang="pl"> pl, en 
+{{s.title}}         Site Title
+{{s.l}}             Sie Logo: URL
+{{f.n}}             Firmware name
+{{f.v}}             Firmware version
+{{s.css}}           CSS
+{{s.refresh}}       <meta http-equiv="refresh" content="610; url=/">
+
+{{f.logo}}          http://api.smartnydom.pl/images/afe-logo.png
+{{f.subtitle-1}}    Subtitle Line 1 
+{{f.subtitle-2}}    Subtitle Line 2
+{{f.url}}           Firmware URL
+{{f.logo-url}}      Firmware URL Footer
+
+
+{{menu}}            Menu
+{{body}}            Body

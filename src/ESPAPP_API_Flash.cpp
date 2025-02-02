@@ -15,6 +15,13 @@ ESPAPP_API_Flash::ESPAPP_API_Flash()
 
 bool ESPAPP_API_Flash::getJSON(const __FlashStringHelper *fileName, JsonDocument &doc)
 {
+ 
+  // Hardcoded JSON string for testing
+  const char *input = "{\"p\":{\"s\":\"IoT World\",\"p\":\"iotiotiot\",\"d\":1,\"i\":\"\",\"g\":\"\",\"b\":\"\",\"d1\":\"8.8.8.8\",\"d2\":\"8.8.4.4\"},\"s\":{\"s\":\"\",\"p\":\"\",\"d\":1,\"i\":\"\",\"g\":\"\",\"b\":\"\",\"d1\":\"\",\"d2\":\"\"},\"n\":20,\"w\":1,\"ws\":1,\"nf\":2,\"m\":1}";
+  DeserializationError error = deserializeJson(doc, input);
+  return true;
+
+ 
   boolean success = false;
   File configFile;
   if (openFile(configFile, ESP_APP_OPEN_FILE_READING,
@@ -44,9 +51,20 @@ bool ESPAPP_API_Flash::getJSON(const __FlashStringHelper *fileName, JsonDocument
 #endif
 
   return success;
-  // const char *input = "{\"p\":{\"s\":\"IoT World\",\"p\":\"iotiotiot\",\"d\":1,\"i\":\"\",\"g\":\"\",\"b\":\"\",\"d1\":\"8.8.8.8\",\"d2\":\"8.8.4.4\"},\"s\":{\"s\":\"\",\"p\":\"\",\"d\":1,\"i\":\"\",\"g\":\"\",\"b\":\"\",\"d1\":\"\",\"d2\":\"\"},\"n\":20,\"w\":1,\"ws\":1,\"nf\":2,\"m\":1}";
-};
+ };
 
+bool ESPAPP_API_Flash::saveJSON(const __FlashStringHelper *fileName, JsonDocument &doc) {
+  boolean success = false;
+  File configFile;
+  if (openFile(configFile, ESP_APP_OPEN_FILE_WRITING,
+               fileName, ESP_APP_NONE, true))
+  {
+    serializeJson(doc, configFile);
+    configFile.close();
+    success = true;
+  }
+  return success;
+}
 
 bool ESPAPP_API_Flash::init(void)
 {

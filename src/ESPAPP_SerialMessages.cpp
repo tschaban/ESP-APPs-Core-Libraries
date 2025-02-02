@@ -32,6 +32,29 @@ void ESPAPP_SerialMessages::printValue(uint8_t number, uint8_t newLineAfter) {
   printValue(number, F(""), newLineAfter);
 }
 
+void ESPAPP_SerialMessages::printValue(unsigned int number,
+                             const __FlashStringHelper *text,
+                             uint8_t newLineAfter) {
+  Serial << number;
+  addAdditionalText(text, newLineAfter);
+}
+
+void ESPAPP_SerialMessages::printValue(unsigned int number, uint8_t newLineAfter) {
+  printValue(number, F(""), newLineAfter);
+}
+
+void ESPAPP_SerialMessages::printValue(int number,
+                             const __FlashStringHelper *text,
+                             uint8_t newLineAfter) {
+  Serial << number;
+  addAdditionalText(text, newLineAfter);
+}
+
+void ESPAPP_SerialMessages::printValue(int number, uint8_t newLineAfter) {
+  printValue(number, F(""), newLineAfter);
+}
+
+
 void ESPAPP_SerialMessages::printValue(unsigned long number,
                              const __FlashStringHelper *text,
                              uint8_t newLineAfter) {
@@ -81,7 +104,7 @@ void ESPAPP_SerialMessages::addMessageHeader(uint8_t type,
   for (uint8_t i = 0; i < noOfIntents; i++) {
     Serial << F(" ");
   }
-
+  
   Serial << (type == ESP_APP_MSG_TYPE_INFORMATION
                  ? F(ESP_APP_TERMINAL_FONT_GREEN)
                  : (type == ESP_APP_MSG_TYPE_WARNING
@@ -98,7 +121,7 @@ void ESPAPP_SerialMessages::addMessageHeader(uint8_t type,
                         : (type == ESP_APP_MSG_TYPE_ERROR
                                ? F("ERROR")
                                : (type == ESP_APP_MSG_TYPE_BULLET_POINT
-                                      ? F("* ")
+                                      ? F("• ")
                                       : F("")))));
 
 

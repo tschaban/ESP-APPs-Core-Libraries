@@ -54,7 +54,7 @@ public:
 
   bool init(void);
   bool getJSON(const __FlashStringHelper *fileName, JsonDocument &doc);
-
+  bool saveJSON(const __FlashStringHelper *fileName, JsonDocument &doc);
   
 };
 

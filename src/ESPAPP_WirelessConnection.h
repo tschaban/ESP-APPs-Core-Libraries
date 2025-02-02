@@ -26,6 +26,7 @@ class ESPAPP_WirelessConnection
 private:
   ESPAPP_Core *System;
   unsigned long delayStartTime = 0;
+  bool ready = false; // is set to true when device is ready to connect to WiFi
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   unsigned long ledStartTime = 0;
@@ -93,6 +94,7 @@ private:
   void switchConfiguration();
 
   bool readConfiguration(void);
+  bool createdDefaultConfiguration(void);
 
 
 public:

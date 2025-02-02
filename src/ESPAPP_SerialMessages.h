@@ -121,16 +121,31 @@ public:
                   uint8_t newLineAfter = 0);
   void printValue(const __FlashStringHelper *text, uint8_t newLineBefore = 0,
                   uint8_t newLineAfter = 0);
+ 
   void printValue(uint8_t number, uint8_t newLineAfter = 0);
   void printValue(uint8_t number, const __FlashStringHelper *text,
                   uint8_t newLineAfter = 0);
-  void printValue(bool number, uint8_t newLineAfter = 0);
+ 
+  void printValue(unsigned int number, uint8_t newLineAfter = 0);
+  void printValue(unsigned int number, const __FlashStringHelper *text,
+                  uint8_t newLineAfter = 0);
+
+  void printValue(int number, uint8_t newLineAfter = 0);
+  void printValue(int number, const __FlashStringHelper *text,
+                  uint8_t newLineAfter = 0);
+
+
   void printValue(unsigned long number, uint8_t newLineAfter = 0);
   void printValue(unsigned long number, const __FlashStringHelper *text,
                   uint8_t newLineAfter = 0);
+ 
   void printValue(float number, uint8_t newLineAfter = 0);
   void printValue(float number, const __FlashStringHelper *text,
                   uint8_t newLineAfter = 0);
+
+
+  void printValue(bool number, uint8_t newLineAfter = 0);
+
 
   void printHeader(uint8_t newLineBefore = 1, uint8_t newLineAfter = 1,
                    uint8_t length = ESP_APP_MSG_HEADER_DEFAULT_LENGTH,

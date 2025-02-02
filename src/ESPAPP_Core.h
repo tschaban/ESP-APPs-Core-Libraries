@@ -25,7 +25,6 @@ public:
     ~ESPAPP_Core();
 
 
- 
 #ifdef DEBUG
     ESPAPP_SerialMessages *Msg = new ESPAPP_SerialMessages();
     ESPAPP_API_Flash *Flash = new ESPAPP_API_Flash(Msg);

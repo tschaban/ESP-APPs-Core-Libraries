@@ -1,23 +1,33 @@
 #include "ESPAPP_Firmware.h"
 
-ESPAPP_Firmware::ESPAPP_Firmware() {
+ESPAPP_Firmware::ESPAPP_Firmware()
+{
   API->Network = new ESPAPP_WirelessConnection(System);
+  Web = new ESPAPP_HTTPServerContainer(System); 
+  
 };
 
-bool ESPAPP_Firmware::init(void) {
+bool ESPAPP_Firmware::init(void)
+{
   bool success = System->Flash->init();
-  
-  if (success) {
+
+  if (success)
+  {
     success = initializeNetwork();
 
-    if (success) {
+    if (success)
+    {
       API->WAN = new ESPAPP_AccessToWAN(System);
     }
+
+    if (success)
+    {
+      success = Web->init();
+    }
   }
-  
+
   return success;
 }
-
 
 void ESPAPP_Firmware::begin()
 {
@@ -62,16 +72,13 @@ uint8_t ESPAPP_Firmware::getBootMode(void)
 
 bool ESPAPP_Firmware::initializeNetwork(void)
 {
-bool success = false;
-#ifdef DEBUG
-  System->Msg->printInformation(F("Starting network"), F("BOOT"));
-#endif
-
+  bool success = false;
   success = API->Network->init();
   API->Network->listener();
 
   return success;
 }
+
 
 /*
 void ESPAPP_Firmware::validateProVersion(void) {

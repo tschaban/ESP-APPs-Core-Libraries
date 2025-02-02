@@ -3,6 +3,8 @@
 
 #include <Arduino.h>
 
+#include <ESPAPP_Parameters_HTML_UI.h>
+
 #define ESP_APP_NONE 255
 #define ESP_APP_DEFAULT_DEVICE_NAME "ESP Device"
 
@@ -52,6 +54,13 @@
 #define ESP_APP_NETWORK_DEFAULT_OUTPUT_POWER_MAX 20.5
 #endif
 
+
+/* HTTP Server */
+#define ESP_APP_HTTP_HTML_MAX_RESPONSE_SIZE 2048
+#define ESP_APP_HTTP_RESPONSE_CODE_OK 200
+#define ESP_APP_HTTP_RESPONSE_CODE_NOT_FOUND 404
+
+
 /* Data structures */
 
 struct NETWORK_SETTING
@@ -79,6 +88,15 @@ struct NETWORK
   uint8_t radioMod ESP_APP_NETWORK_DEFAULT_RADIO_MODE;
   float outputPower = ESP_APP_NETWORK_DEFAULT_OUTPUT_POWER_MAX;
 #endif
+};
+
+struct ESPAPP_HTTP_REQUEST
+{
+  uint8_t siteId = ESP_APP_NONE;
+  uint8_t command = ESP_APP_NONE;
+  uint8_t action = ESP_APP_NONE;
+  uint8_t option = ESP_APP_NONE;
+  int HTTPResponseCode = ESP_APP_HTTP_RESPONSE_CODE_OK;
 };
 
 

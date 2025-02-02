@@ -3,13 +3,15 @@
 #ifndef _ESPAPP_Firmware_h
 #define _ESPAPP_Firmware_h
 
-
 #include <ESPAPP_Parameters.h>
 #include <ESPAPP_Core.h>
 // #include <ESPAPP-API-JSONRPC.h>
 // #include <ESPAPP-Data-Access.h>
 #include <ESPAPP_WirelessConnection.h>
 #include <ESPAPP_AccessToWAN.h>
+#include <ESPAPP_HTTP_Server_Container.h>
+
+//#include <ESPAPP_HTML_SitesGenerator.h>
 
 class ESPAPP_Firmware //: public ESPAPPCoreHardware
 {
@@ -17,26 +19,23 @@ class ESPAPP_Firmware //: public ESPAPPCoreHardware
 private:
   unsigned long milliseconds = 0;
   unsigned long minutes = 0;
-  /**
-   * @brief Checking if the device is launched for a first time. If so it loads
-   * default configuration
-   *
-   */
+
+  bool initializeNetwork(void);
   // void firstBooting(void);
 
 public:
-  
   ESPAPP_Core *System = new ESPAPP_Core();
-   
+  ESPAPP_HTTPServerContainer *Web;
+
   struct GLOBAL_API_OBJECTS
   {
     ESPAPP_WirelessConnection *Network;
     ESPAPP_AccessToWAN *WAN;
-    
+
     // ESPAPPJSONRPC *REST = new ESPAPPJSONRPC();
   };
 
-  struct GLOBAL_CONFIGURATION_OBJECTS
+    struct GLOBAL_CONFIGURATION_OBJECTS
   {
     //  PRO_VERSION *Pro = new PRO_VERSION;
     //  FIRMWARE *Version = new FIRMWARE;
@@ -54,6 +53,7 @@ public:
 
   TIMER_OBJECT *timer = new TIMER_OBJECT{0, 0, 0, 0, 0};
   GLOBAL_API_OBJECTS *API = new GLOBAL_API_OBJECTS;
+
   GLOBAL_CONFIGURATION_OBJECTS *Configuration =
       new GLOBAL_CONFIGURATION_OBJECTS;
 
@@ -69,9 +69,9 @@ public:
 
   // boolean initializeFS(void);
 
-  bool initializeNetwork(void);
-  void listenerNetwork(void);
 
+  void listenerNetwork(void);
+  
   // void checkFirmwareVersion(void);
   // void validateProVersion(void);
   // void synchronizeTime(void);
