@@ -239,3 +239,54 @@ bool ESPAPP_API_Flash::openFile(File &openedFile, const char *mode,
 
   return openFile(openedFile, mode, fileName, id, createIfNotExists);
 }
+
+boolean ESPAPP_API_Flash::listAllFiles(String files[], size_t capacity, size_t &count)
+{
+  count = 0;
+  File root = LittleFS.open("/");
+  if (!root || !root.isDirectory()) {
+    return false;
+  }
+
+  File file = root.openNextFile();
+  while (file && count < capacity) {
+    files[count++] = file.name();
+    file = root.openNextFile();
+  }
+  root.close();
+  return true;
+}
+
+boolean ESPAPP_API_Flash::listAllFiles(const char* directory, String files[], size_t capacity, size_t &count)
+{
+  count = 0;
+  File root = LittleFS.open(directory);
+  if (!root || !root.isDirectory()) {
+    return false;
+  }
+
+  File file = root.openNextFile();
+  while (file && count < capacity) {
+    files[count++] = file.name();
+    file = root.openNextFile();
+  }
+  root.close();
+  return true;
+}
+
+boolean ESPAPP_API_Flash::uploadFile(const char *directory, const char *filename, const uint8_t *data, size_t length)
+{
+  // Ensure directory exists
+  if (!LittleFS.exists(directory)) {
+    LittleFS.mkdir(directory);
+  }
+  
+  String path = String(directory) + "/" + String(filename);
+  File file = LittleFS.open(path, ESP_APP_OPEN_FILE_WRITING);
+  if (!file) {
+    return false;
+  }
+  file.write(data, length);
+  file.close();
+  return true;
+}

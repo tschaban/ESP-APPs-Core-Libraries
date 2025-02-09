@@ -3,8 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta http-equiv="refresh" content="610; url=/">
-    <title>AFE : LampaBiuro-1</title>
+    <title>AFE : JadalniaKinkiet</title>
     <link href="https://fonts.googleapis.com/css2?family=Titillium+Web&display=swap" rel="stylesheet">
     <style>
         html {
@@ -235,116 +234,49 @@
 <body>
     <div class="c">
         <div class="l"><img style="opacity:.4" src="http://api.smartnydom.pl/images/afe-logo.png"><br><small
-                style="opacity:.3">Wersja T0-3.8.0.B12 ESP8285 (Build:3188)<br>RAM wykorzystany w 66.0%</small>
-                
-            <ul class="lst"></ul>
-            <h4>&#10150; Menu</h4>
-            <ul class="lst">
-                <li class="itm"><a href="/?o=1">Urządzenie</a></li>
-            </ul>
-            <h4>&#10150; Połączenia</h4>
-            <ul class="lst">
-                <li class="itm"><a href="/?o=2">Sieć WiFi</a></li>
-                <li class="itm"><a href="/?o=3">MQTT Broker</a></li>
-                <li class="itm"><a href="/?o=46">Integracja z Home Assistant</a></li>
-            </ul>
-            <h4>&#10150; Sprzęt</h4>
-            <ul class="lst">
-                <li class="itm"><i>LEDy</i></li>
-                <li class="itm"><a href="/?o=6&i=0">&#8227; LED: 1</a></li>
-                <li class="itm"><i>Konfiguracja przekaźników</i></li>
-                <li class="itm"><a href="/?o=8&i=0">&#8227; Przekaźnik: 1</a></li>
-                <li class="itm"><i>Przyciski</i></li>
-                <li class="itm"><a href="/?o=9&i=0">&#8227; Przycisk: 1</a></li>
-            </ul>
-            <h4>&#10150; Funkcje</h4>
-            <ul class="lst">
-                <li class="itm"><a href="/?o=7">LED systemowy</a></li>
-            </ul>
-            <h4>&#10150; Firmware</h4>
-            <ul class="lst">
-                <li class="itm"><a href="/?o=45">Wersja</a></li>
-                <li class="itm"><a href="/?o=10">Ustaw hasło</a></li>
-                <li class="itm"><a href="/?o=20">Aktualizacja oprogramowania</a></li>
-                <li class="itm"><a href="/?o=16">Ustawienia początkowe</a></li>
-                <li class="itm"><a href="/?o=11">Wersja PRO</a></li>
-                <li class="itm"><a href="https://afe.smartnydom.pl">Dokumentacja</a></li>
-                <li class="itm"><a href="https://www.smartnydom.pl/forum/afe-firmware/">Pomoc</a></li>
-                <li class="itm"><a href="https://afe.yt.pl.smartnydom.pl">YouTube</a></li>
-            </ul>
-            <h4></h4>
-            <ul class="lst">
-                <li class="itm"><a href="/?o=15">&#10004; Zakończ konfigurację</a></li>
-            </ul>
-        </div>
+                style="opacity:.3">Wersja T0-3.8.0.B12 ESP8285 (Build:3118)<br>RAM wykorzystany w 64.5%</small></div>
         <div class="r">
-            <form method="post" action="/?c=1&o=1">
-                <div class="ci">
-                    <h1>Firmware</h1>
-                    <p class="cd"></p>
-                    <fieldset>
-                        <ul class="lst">
-                            <li class="m">Testujesz wersj&#281; Beta AFE Firmware. Prosz&#281; zg&#322;aszaj problemy <a
-                                    style="color:#0475b6"
-                                    href="https://www.smartnydom.pl/forum/afe-firmware/">tutaj</a>. Dzi&#281;kuj&#281;!
-                            </li>
-                            <li class="m">AFE Pro: Jest aktywne</li>
-                        </ul>
-                    </fieldset>
-                </div>
-                <div class="ci">
-                    <h1>Urządzenie</h1>
-                    <p class="cd">Nazwa jest wykorzystywana jako nazwa urządzenia w Twojej lokalnej sieci WiFi oraz jako
-                        nazwa hotspot'a urządzenia</p>
-                    <fieldset>
-                        <div class="cf"><label>Nazwa urządzenia</label><input name="n" type="text" maxlength="16"
-                                value="LampaBiuro-1"><span class="hint">Max 16 znaków</span></div>
-                    </fieldset>
-                </div>
-                <div class="ci">
-                    <h1>Konfiguracja urządzenia</h1>
-                    <p class="cd">Wybierz podłączone elementy do urządzenia</p>
-                    <fieldset>
-                        <div class="cf"><label>Ilość Led'ów</label><select name="l">
-                                <option value="0">Brak</option>
-                                <option value="1" selected="selected">1</option>
-                                <option value="2">2</option>
-                            </select></div>
-                        <div class="cf"><label>Ilość przekaźników</label><select name="r">
-                                <option value="0">Brak</option>
-                                <option value="1" selected="selected">1</option>
-                            </select></div>
-                        <div class="cf"><label>Ilość przycisków</label><select name="s">
-                                <option value="0">Brak</option>
-                                <option value="1" selected="selected">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                            </select></div>
-                        <div class="cc"><label><input name="ad" type="checkbox" value="1" disabled="disabled">Pomiary z
-                                wejścia analogowego</label><span class="hint">(Wersja PRO)</span></div>
-                    </fieldset>
-                </div>
-                <div class="ci">
-                    <h1>Sterowanie urządzeniem</h1>
-                    <p class="cd">Włączanie / Wyłączanie mechanizmów sterowania urządzeniem</p>
-                    <fieldset>
-                        <div class="cc"><label><input name="h" type="checkbox" value="1" checked="checked">HTTP
-                                API</label></div>
-                        <div class="cc"><label><input name="m" type="checkbox" value="1" checked="checked">MQTT
-                                API</label></div>
-                    </fieldset>
-                </div>
-                <div class="ci">
-                    <h1>Automatyczne zakończenie konfiguracji</h1>
-                    <p class="cd">Konfiguracja urządzenia zostanie automatycznie wyłączona po 10min. braku akcji w
-                        panelu konfiguracyjnym</p>
-                    <fieldset>
-                        <div class="cc"><label><input name="al" type="checkbox" value="1"
-                                    checked="checked">włączone</label></div>
-                    </fieldset>
-                </div><input type="submit" class="b bs" value="Zapisz">
-            </form>
+            <div class="ci">
+                <h1>JadalniaKinkiet</h1>
+                <p class="cd"></p>
+                <fieldset>
+                    <ul class="lst">
+                        <li class="m">Multicast DNS jest włączony</li>
+                        <li class="m">Jeśli LAN wspiera mDNS urządzenie będzie dostępne pod <a target="_blank"
+                                href="http://afe-4C4eEB3b-D69d9Dd6.local">adresem</a></li>
+                        <li class="m">Testujesz wersj&#281; Beta AFE Firmware. Prosz&#281; zg&#322;aszaj problemy <a
+                                style="color:#0475b6" href="https://www.smartnydom.pl/forum/afe-firmware/">tutaj</a>.
+                            Dzi&#281;kuj&#281;!</li>
+                        <li class="m">AFE Pro: Jest aktywne</li>
+                        <li class="m"><a style="color:#0475b6" href="/?o=47">Więcej</a> informacji o urządzeniu</li>
+                        <li class="m"><a style="color:#0475b6" href="/?o=50">Logi</a> systemowe</li>
+                    </ul>
+                </fieldset>
+            </div>
+            <div class="ci">
+                <h1>Konfiguracja</h1>
+                <p class="cd">Aby uruchomić panel konfiguracyjny użyj jednego z poniższych przycisków</p>
+                <fieldset>
+                    <form method="post">
+                        <div class="cf"><input name="p" type="password" placeholder="Hasło"> <input type="submit"
+                                class="b bs" value="Tryb normalny" formaction="/?o=0&i=1" /> <input type="submit"
+                                class="b be" value="Tryb HotSpot" formaction="/?o=0&i=2" /></div>
+                    </form>
+                </fieldset>
+            </div>
+            <div class="ci">
+                <h1>Informacje dodatkowe</h1>
+                <p class="cd"></p>
+                <fieldset>
+                    <p style="color:#aaa;font-size:.9em;margin:0 0 2em 0">Oprogramowanie aktywnie u&#380;ywane z
+                        HomeAssistant, OpenHab oraz Domoticz<br>Oprogramowanie pobrane: 4363x</p>
+                    <p style="color:#aaa;font-size:.9em;margin:0">Dzia&#322;a &#128077; ? <a style="color:#0475b6"
+                            href="https://s.smartnydom.pl/r/wsparcie">Rozwa&#380; wsparcie</a> N-setek godzin mojej
+                        pracy. Dzi&#281;ki <a style="color:#0475b6"
+                            href="https://afe.smartnydom.pl/pl/postawowe-informacje/o-autorze">adrian</a><br><br><strong>Wspierajacy
+                            w 2k24</strong>: wojtek_gtx, Rafa&#322; Jankiii</p>
+                </fieldset>
+            </div>
         </div>
     </div>
     <div style="text-align: right;"><a href="https://smartnydom.pl"><img style="opacity:.8;"

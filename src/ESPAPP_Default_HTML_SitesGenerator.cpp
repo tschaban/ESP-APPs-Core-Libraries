@@ -24,6 +24,25 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
 
     switch (this->HTTPRequest->siteId)
     {
+    case ESPAPP_HTTP_SITE_UPLOAD:
+        this->UI->startHeaderSection(this->HTMLResponse);
+        this->UI->startMenuSection(this->HTMLResponse, F("Menu"), FPSTR(HTML_UI_ICON_RIGHTWARDS_ARROW));
+        this->UI->endMenuSection(this->HTMLResponse);
+        this->UI->startBodySection(this->HTMLResponse);
+        this->UI->openSection(this->HTMLResponse, F("Upload file"), F("Upload file to the server"));
+        this->UI->closeSection(this->HTMLResponse);
+        /** Site configuration */
+        this->UI->setLang(this->HTMLResponse, F("pl"));
+        this->UI->setLogo(this->HTMLResponse, F("https://s.smartnydom.pl/i/esp32-firmware"));
+        this->UI->setSubtitle1(this->HTMLResponse, F("ESPAPP"));
+        this->UI->setSubtitle2(this->HTMLResponse, F("Version"));
+        this->UI->setURL(this->HTMLResponse, F("https://www.smartnydom.pl"));
+        this->UI->setLogoURL(this->HTMLResponse, F("https://s.smartnydom.pl/i/SD00-0000-0001"));
+
+        /** Site closure  */
+        this->UI->siteEnd(this->HTMLResponse);
+        setHTTPResponseCode(ESP_APP_HTTP_RESPONSE_CODE_OK);
+        break;
     default:
         /** Header */
         this->UI->startHeaderSection(this->HTMLResponse);
@@ -32,7 +51,7 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
 
         ESPAPP_HTTP_REQUEST *urlParams = new ESPAPP_HTTP_REQUEST;
 
-        this->UI->startMenuSection(this->HTMLResponse, F("Menu"),FPSTR(HTML_UI_ICON_RIGHTWARDS_ARROW));
+        this->UI->startMenuSection(this->HTMLResponse, F("Menu"), FPSTR(HTML_UI_ICON_RIGHTWARDS_ARROW));
 
         this->UI->setUrlParams(urlParams, 1);
         this->UI->addMenuItem(this->HTMLResponse, F("Item 1"), urlParams, "", FPSTR(HTML_UI_NO_ICON));
@@ -54,17 +73,64 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
         this->UI->addMenuItem(this->HTMLResponse, F("Item 1"), urlParams, "", FPSTR(HTML_UI_ICON_ARROW));
 
         // External Link
-        this->UI->addMenuItemExternal(this->HTMLResponse, F("Smart'my Dom"), F("https://www.smartnydom.pl"),FPSTR(HTML_UI_ICON_ARROW));
+        this->UI->addMenuItemExternal(this->HTMLResponse, F("Smart'my Dom"), F("https://www.smartnydom.pl"), FPSTR(HTML_UI_ICON_ARROW));
 
         this->UI->endMenuSection(this->HTMLResponse);
 
         //** Body */
         this->UI->startBodySection(this->HTMLResponse);
+
+        this->UI->setUrlParams(urlParams, 1, 200);
+        this->UI->startForm(this->HTMLResponse, urlParams, "additional=value");
+
         this->UI->openSection(this->HTMLResponse, F("This is Section"), F("This is an example of section"));
+
+        this->UI->addInputFormItem(this->HTMLResponse, "text", "integer", "This is a numer field", "1", "25", "0", "200", "1", "This is a hint", false);
+        this->UI->addInputFormItem(this->HTMLResponse, "text", "string", "This is a string  field", "This is text", "100", ESPAPP_FORM_SKIP_ATTRIBUTE, ESPAPP_FORM_SKIP_ATTRIBUTE, ESPAPP_FORM_SKIP_ATTRIBUTE, "This is a hint", false);
+
+        this->UI->addCheckboxFormItem(this->HTMLResponse, "checkbox", "This is a checkbox", "1", true, "This is a hint", false);
+
+        this->UI->addRadioButtonFormItem(this->HTMLResponse, "radio", "This is a radio button", "1", true, "This is a hint", false);
+
+        this->UI->addSelectFormItemOpen(this->HTMLResponse, F("select"), F("This is a select field"));
+        this->UI->addSelectOptionFormItem(this->HTMLResponse, "Option 1", "1", true);
+        this->UI->addSelectOptionFormItem(this->HTMLResponse, "Option 2", "2", false);
+        this->UI->addSelectFormItemClose(this->HTMLResponse);
+
+        this->UI->addParagraph(this->HTMLResponse, F("This is a paragraph"));
+
         this->UI->closeSection(this->HTMLResponse);
+        this->UI->endForm(this->HTMLResponse, FPSTR(HTML_UI_SUBMITT_BUTTON_SAVE));
 
         this->UI->openMessageSection(this->HTMLResponse, F("This is Message Section"), F("This is an example of message section"));
+
+        this->UI->addParagraph(this->HTMLResponse, F("This is a paragraph"));
+
         this->UI->closeMessageSection(this->HTMLResponse);
+
+        /** File explorer */
+        this->UI->openSection(this->HTMLResponse, F("Files explorer"), F("Files list"));
+
+        this->UI->startList(this->HTMLResponse);
+
+        String files[10];
+        size_t count = 0;
+        this->System->Flash->listAllFiles("cfg", files, 10, count);
+
+        for (size_t i = 0; i < count; i++)
+        {
+            this->UI->addListItem(this->HTMLResponse, files[i].c_str());
+        }
+
+        this->UI->endList(this->HTMLResponse);
+
+        this->HTMLResponse->concat(F("<form action=\"/?site=0\" method=\"POST\" enctype=\"multipart/form-data\">"));
+        this->HTMLResponse->concat(F("<input type=\"file\" name=\"uploadedFile\">"));
+        this->HTMLResponse->concat(F("<input type=\"text\" name=\"directory\" placeholder=\"Enter folder name\">"));
+        this->HTMLResponse->concat(F("<button type=\"submit\">Upload</button>"));
+        this->HTMLResponse->concat(F("</form>"));
+
+        this->UI->closeSection(this->HTMLResponse);
 
         /** Site configuration */
         this->UI->setLang(this->HTMLResponse, F("pl"));

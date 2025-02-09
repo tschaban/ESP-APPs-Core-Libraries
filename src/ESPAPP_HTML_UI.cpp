@@ -132,14 +132,13 @@ void ESPAPP_HTML_UI::addMenuItemExternal(String *item,
     this->replaceTagTitle(item, title);
     this->replaceTagIcon(item, icon);
     item->replace(F("{{s.u}}"), url);
-    
 }
 
 /** Section releated methods  */
 void ESPAPP_HTML_UI::openSection(String *site, const char *title,
                                  const __FlashStringHelper *description)
 {
-    site->concat(FPSTR(HTML_UI_FORM_BLOCK_HEADER));
+    site->concat(FPSTR(HTML_UI_SECTION_START));
     site->replace(F("{{T}}"), title);
     site->replace(F("{{D}}"), description);
 }
@@ -148,14 +147,14 @@ void ESPAPP_HTML_UI::openSection(String *site,
                                  const __FlashStringHelper *title,
                                  const __FlashStringHelper *description)
 {
-    site->concat(FPSTR(HTML_UI_FORM_BLOCK_HEADER));
+    site->concat(FPSTR(HTML_UI_SECTION_START));
     site->replace(F("{{T}}"), title);
     site->replace(F("{{D}}"), description);
 }
 
 void ESPAPP_HTML_UI::closeSection(String *site)
 {
-    site->concat(FPSTR(HTML_UI_FORM_BLOCK_CLOSURE));
+    site->concat(FPSTR(HTML_UI_SECTION_END));
 }
 
 void ESPAPP_HTML_UI::openMessageSection(
@@ -177,6 +176,20 @@ void ESPAPP_HTML_UI::closeMessageSection(String *site)
 {
     site->concat(F("</ul>"));
     this->closeSection(site);
+}
+
+/** Form */
+
+void ESPAPP_HTML_UI::startForm(String *site, ESPAPP_HTTP_REQUEST *url, const char *parameters)
+{
+    site->concat(FPSTR(HTML_UI_FORM_START));
+    this->replaceTagUrlParams(site, url, parameters);
+}
+
+void ESPAPP_HTML_UI::endForm(String *site, const __FlashStringHelper *submiButtonLabel)
+{
+    site->concat(FPSTR(HTML_UI_FORM_END));
+    site->replace(F("{{b.t}}"), submiButtonLabel);
 }
 
 void ESPAPP_HTML_UI::addInputFormItem(String *item, const char *type,
@@ -321,13 +334,33 @@ void ESPAPP_HTML_UI::addSelectFormItemClose(String *item)
     item->concat(FPSTR(HTML_UI_ITEM_SELECT_CLOSE));
 }
 
+void ESPAPP_HTML_UI::addParagraph(String *item, const __FlashStringHelper *text)
+{
+    item->concat(FPSTR(HTML_UI_ITEM_PARAGRAPH));
+    item->replace(F("{{i.v}}"), text);
+}
+
+void ESPAPP_HTML_UI::startList(String *site) {
+    site->concat(FPSTR(HTML_UI_ITEM_LIST_START));
+}
+
+void ESPAPP_HTML_UI::endList(String *site) {
+    site->concat(FPSTR(HTML_UI_ITEM_LIST_END));
+}
+
+void ESPAPP_HTML_UI::addListItem(String *site, const char *item) { 
+    site->concat(FPSTR(HTML_UI_ITEM_LIST_ITEM));
+    site->replace(F("{{i.v}}"), item);
+}
+
 /** Private */
 void ESPAPP_HTML_UI::replaceTagTitle(String *item, const __FlashStringHelper *title)
 {
     item->replace(FPSTR(HTML_UI_TAG_TITLE), title);
 }
 
-void ESPAPP_HTML_UI::replaceTagIcon(String *item, const __FlashStringHelper *icon) {
+void ESPAPP_HTML_UI::replaceTagIcon(String *item, const __FlashStringHelper *icon)
+{
     item->replace(FPSTR(HTML_UI_TAG_ICON), icon);
 }
 

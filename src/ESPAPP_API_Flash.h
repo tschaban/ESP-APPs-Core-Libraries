@@ -55,7 +55,9 @@ public:
   bool init(void);
   bool getJSON(const __FlashStringHelper *fileName, JsonDocument &doc);
   bool saveJSON(const __FlashStringHelper *fileName, JsonDocument &doc);
-  
+  boolean listAllFiles(String files[], size_t capacity, size_t &count);
+  boolean listAllFiles(const char* directory, String files[], size_t capacity, size_t &count);
+  boolean uploadFile(const char *directory, const char *filename, const uint8_t *data, size_t length);
 };
 
 #endif // _ESPAPP_API_FLASH_h
