@@ -8,8 +8,5 @@
 #define ESPAPP_FORM_INPUT_TYPE_PASSWORD "password"
 #define ESPAPP_FORM_SKIP_ATTRIBUTE "?"
 
-#define ESPAPP_HTTP_SITE_UPLOAD 0
-#define ESPAPP_HTTP_SITE_INDEX 1
-
 
 #endif // _ESPAPP_Parameters_h

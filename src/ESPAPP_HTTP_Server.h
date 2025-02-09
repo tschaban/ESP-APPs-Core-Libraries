@@ -5,6 +5,7 @@
 
 #include <ESPAPP_Core.h>
 
+
 #ifdef ESP32
 #include <WebServer.h>
 #else /* ESP8266 */
@@ -32,6 +33,7 @@ bool init(void);
 void listener(void);
 void readHTTPRequest(void);
 bool pushHTMLResponse();
+bool processUploadFile();
 
 
 

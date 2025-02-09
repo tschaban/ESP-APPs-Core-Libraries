@@ -1,6 +1,7 @@
 #ifndef _ESPAPP_CORE_h
 #define _ESPAPP_CORE_h
 
+
 #include <ESPAPP_Parameters.h>
 #include <ESPAPP_API_Flash.h>
 #ifdef DEBUG

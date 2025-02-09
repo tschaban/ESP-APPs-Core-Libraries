@@ -3,7 +3,7 @@
 #ifdef DEBUG
 ESPAPP_API_Flash::ESPAPP_API_Flash(ESPAPP_SerialMessages *_Msg)
 {
-  Msg = _Msg;
+  this->Msg = _Msg;
 }
 #else
 ESPAPP_API_Flash::ESPAPP_API_Flash()
@@ -15,13 +15,12 @@ ESPAPP_API_Flash::ESPAPP_API_Flash()
 
 bool ESPAPP_API_Flash::getJSON(const __FlashStringHelper *fileName, JsonDocument &doc)
 {
- 
+
   // Hardcoded JSON string for testing
   const char *input = "{\"p\":{\"s\":\"IoT World\",\"p\":\"iotiotiot\",\"d\":1,\"i\":\"\",\"g\":\"\",\"b\":\"\",\"d1\":\"8.8.8.8\",\"d2\":\"8.8.4.4\"},\"s\":{\"s\":\"\",\"p\":\"\",\"d\":1,\"i\":\"\",\"g\":\"\",\"b\":\"\",\"d1\":\"\",\"d2\":\"\"},\"n\":20,\"w\":1,\"ws\":1,\"nf\":2,\"m\":1}";
   DeserializationError error = deserializeJson(doc, input);
   return true;
 
- 
   boolean success = false;
   File configFile;
   if (openFile(configFile, ESP_APP_OPEN_FILE_READING,
@@ -45,15 +44,16 @@ bool ESPAPP_API_Flash::getJSON(const __FlashStringHelper *fileName, JsonDocument
     }
 #ifdef DEBUG
     else
-      Msg->printError(F("Deserialisation error: "), F("JSON"));
-    Msg->printValue(error.c_str());
+      this->Msg->printError(F("Deserialisation error: "), F("JSON"));
+    this->Msg->printValue(error.c_str());
   }
 #endif
 
   return success;
- };
+};
 
-bool ESPAPP_API_Flash::saveJSON(const __FlashStringHelper *fileName, JsonDocument &doc) {
+bool ESPAPP_API_Flash::saveJSON(const __FlashStringHelper *fileName, JsonDocument &doc)
+{
   boolean success = false;
   File configFile;
   if (openFile(configFile, ESP_APP_OPEN_FILE_WRITING,
@@ -70,7 +70,7 @@ bool ESPAPP_API_Flash::init(void)
 {
   bool success = false;
 #ifdef DEBUG
-  Msg->printInformation(F("Initializing file system"), F("FS"));
+  this->Msg->printInformation(F("Initializing file system"), F("FS"));
 #endif
   success = mountFileSystem();
 
@@ -78,7 +78,7 @@ bool ESPAPP_API_Flash::init(void)
   {
     success = fileExist(ESP_APP_FILE_SYSTEM_INITIALIZED);
 #ifdef DEBUG
-    Msg->printBulletPoint(F("Files structure exists"));
+    this->Msg->printBulletPoint(F("Files structure exists"));
 #endif
   }
 
@@ -90,11 +90,11 @@ bool ESPAPP_API_Flash::init(void)
 #ifdef DEBUG
   if (success)
   {
-    Msg->printBulletPoint(F("File system is ready"));
+    this->Msg->printBulletPoint(F("File system is ready"));
   }
   else
   {
-    Msg->printError(F("File system is NOT ready"), F("FS"));
+    this->Msg->printError(F("File system is NOT ready"), F("FS"));
   }
 #endif
 
@@ -109,11 +109,11 @@ bool ESPAPP_API_Flash::mountFileSystem(void)
 #ifdef DEBUG
   if (success)
   {
-    Msg->printInformation(F("File system mounted: "), F("FS"));
+    this->Msg->printInformation(F("File system mounted: "), F("FS"));
   }
   else
   {
-    Msg->printError(F("File system NOT mounted: "), F("FS"));
+    this->Msg->printError(F("File system NOT mounted: "), F("FS"));
   }
 #endif
 
@@ -124,7 +124,7 @@ bool ESPAPP_API_Flash::formatFileSystem(void)
 {
   bool success = false;
 #ifdef DEBUG
-  Msg->printBulletPoint(F("Formatting File System"));
+  this->Msg->printBulletPoint(F("Formatting File System"));
 #endif
 
   success = LittleFS.format();
@@ -132,17 +132,17 @@ bool ESPAPP_API_Flash::formatFileSystem(void)
   if (success)
   {
 #ifdef DEBUG
-    Msg->printBulletPoint(F("Creating directories structure"));
+    this->Msg->printBulletPoint(F("Creating directories structure"));
 #endif
     LittleFS.mkdir(F(ESP_APP_DIRECTORY_CONFIG));
     LittleFS.mkdir(F(ESP_APP_DIRECTORY_DATA));
     LittleFS.open(F(ESP_APP_FILE_SYSTEM_INITIALIZED), ESP_APP_OPEN_FILE_WRITING).close();
 #ifdef DEBUG
-    Msg->printBulletPoint(F("Completed"));
+    this->Msg->printBulletPoint(F("Completed"));
   }
   else
   {
-    Msg->printError(F("Formatting failed"), F("FS"));
+    this->Msg->printError(F("Formatting failed"), F("FS"));
 #endif
   }
 
@@ -153,10 +153,10 @@ bool ESPAPP_API_Flash::fileExist(const char *path)
 {
   bool _ret = LittleFS.exists(path);
 #ifdef DEBUG
-  Msg->printBulletPoint(F("File: "));
-  Msg->printValue(path);
-  Msg->printValue(F(" - Found: "));
-  Msg->printValue(_ret);
+  this->Msg->printBulletPoint(F("File: "));
+  this->Msg->printValue(path);
+  this->Msg->printValue(F(" - Found: "));
+  this->Msg->printValue(_ret);
 #endif
   return _ret;
 }
@@ -165,9 +165,9 @@ bool ESPAPP_API_Flash::createFile(const char *path)
 {
   boolean success = false;
 #ifdef DEBUG
-  Msg->printBulletPoint(F("File: "));
-  Msg->printValue(path);
-  Msg->printValue(F(" - Created: "));
+  this->Msg->printBulletPoint(F("File: "));
+  this->Msg->printValue(path);
+  this->Msg->printValue(F(" - Created: "));
 #endif
 
   File createFile = LittleFS.open(path, ESP_APP_OPEN_FILE_WRITING);
@@ -179,7 +179,7 @@ bool ESPAPP_API_Flash::createFile(const char *path)
   }
 
 #ifdef DEBUG
-  Msg->printValue(success);
+  this->Msg->printValue(success);
 #endif
 
   return success;
@@ -190,14 +190,14 @@ bool ESPAPP_API_Flash::openFile(File &openedFile, const char *mode,
 {
 
 #ifdef DEBUG
-  Msg->printHeader(1, 0, 72, ESP_APP_MSG_HEADER_TYPE_DASH);
+  this->Msg->printHeader(1, 0, 72, ESP_APP_MSG_HEADER_TYPE_DASH);
 #endif
 
   bool success = false;
 
 #ifdef DEBUG
-  Msg->printBulletPoint(F("Opening file: "));
-  Msg->printValue(path);
+  this->Msg->printBulletPoint(F("Opening file: "));
+  this->Msg->printValue(path);
 #endif
 
   success = fileExist(path);
@@ -215,8 +215,8 @@ bool ESPAPP_API_Flash::openFile(File &openedFile, const char *mode,
   success = openedFile ? true : false;
 
 #ifdef DEBUG
-  Msg->printValue(F(" - Opened: "));
-  Msg->printValue(success);
+  this->Msg->printValue(F(" - Opened: "));
+  this->Msg->printValue(success);
 #endif
 
   return success;
@@ -240,53 +240,106 @@ bool ESPAPP_API_Flash::openFile(File &openedFile, const char *mode,
   return openFile(openedFile, mode, fileName, id, createIfNotExists);
 }
 
-boolean ESPAPP_API_Flash::listAllFiles(String files[], size_t capacity, size_t &count)
+bool ESPAPP_API_Flash::listAllFiles(String files[], size_t capacity, size_t &count)
+{
+  return this->listAllFiles((PGM_P)F(ESP_APP_EMPTY_STRING), files, capacity, count);
+}
+
+bool ESPAPP_API_Flash::listAllFiles(const char *directory, String files[], size_t capacity, size_t &count)
 {
   count = 0;
-  File root = LittleFS.open("/");
-  if (!root || !root.isDirectory()) {
+  char listedDirectory[strlen(directory) + 1];
+  sprintf(listedDirectory, "/%s", directory);
+
+this->Msg->printInformation(F("### listAllFiles"), F("FS"));
+this->Msg->printBulletPoint(F("director length: "));
+this->Msg->printValue(strlen(directory));
+this->Msg->printBulletPoint(F("directory: "));
+this->Msg->printValue(directory);
+this->Msg->printBulletPoint(F("listedDirectory: "));
+this->Msg->printValue(listedDirectory);
+
+#ifdef DEBUG
+  this->Msg->printInformation(F("Listing files in directory"), F("FS"));
+  this->Msg->printBulletPoint(F("Directory: "));
+  this->Msg->printValue(listedDirectory);
+#endif
+
+  File root = LittleFS.open(listedDirectory);
+  if (!root || !root.isDirectory())
+  {
+#ifdef DEBUG
+    this->Msg->printBulletPoint(F("Directory not found"));
+#endif
     return false;
   }
 
   File file = root.openNextFile();
-  while (file && count < capacity) {
+  while (file && count < capacity)
+  {
     files[count++] = file.name();
     file = root.openNextFile();
   }
+
+#ifdef DEBUG
+  this->Msg->printBulletPoint(F("Files in the directory: "));
+  this->Msg->printValue(count);
+#endif
+
   root.close();
   return true;
 }
 
-boolean ESPAPP_API_Flash::listAllFiles(const char* directory, String files[], size_t capacity, size_t &count)
+bool ESPAPP_API_Flash::uploadFile(const char *directory, const char *filename, const uint8_t *data, size_t length)
 {
-  count = 0;
-  File root = LittleFS.open(directory);
-  if (!root || !root.isDirectory()) {
-    return false;
-  }
 
-  File file = root.openNextFile();
-  while (file && count < capacity) {
-    files[count++] = file.name();
-    file = root.openNextFile();
-  }
-  root.close();
-  return true;
-}
+this->Msg->printInformation(F("Uploading file"), F("uploadFile"));
+this->Msg->printBulletPoint(F("Directory: "));
+this->Msg->printValue(directory);
+this->Msg->printBulletPoint(F("Filename: "));
+this->Msg->printValue(filename);
+this->Msg->printBulletPoint(F("Data length: "));
+this->Msg->printValue(length);
 
-boolean ESPAPP_API_Flash::uploadFile(const char *directory, const char *filename, const uint8_t *data, size_t length)
-{
+
+
+
+  char uploadDirectroy[strlen(directory) + 1];
+  char uploadFilename[strlen(uploadDirectroy) + strlen(filename) + 1];
+  sprintf(uploadDirectroy, "/%s", directory);
+  sprintf(uploadFilename, "%s/%s", uploadDirectroy, filename);
+
+#ifdef DEBUG
+  this->Msg->printBulletPoint(F("Directory: "));
+  this->Msg->printValue(uploadDirectroy);
+  this->Msg->printBulletPoint(F("Upload path: "));
+  this->Msg->printValue(uploadFilename);
+#endif
+
   // Ensure directory exists
-  if (!LittleFS.exists(directory)) {
-    LittleFS.mkdir(directory);
+  if (!LittleFS.exists(uploadDirectroy))
+  {
+    LittleFS.mkdir(uploadDirectroy);
+#ifdef DEBUG
+    this->Msg->printBulletPoint(F("Directory created: "));
+    this->Msg->printValue(uploadDirectroy);
+#endif
   }
-  
-  String path = String(directory) + "/" + String(filename);
-  File file = LittleFS.open(path, ESP_APP_OPEN_FILE_WRITING);
-  if (!file) {
+
+  File file = LittleFS.open(uploadFilename, ESP_APP_OPEN_FILE_WRITING);
+  if (!file)
+  {
+#ifdef DEBUG
+    this->Msg->printError(F("File not saved: "), F("FS"));
+    this->Msg->printValue(uploadFilename);
+#endif
     return false;
   }
   file.write(data, length);
   file.close();
+#ifdef DEBUG
+  this->Msg->printBulletPoint(F("File saved: "));
+  this->Msg->printValue(uploadFilename);
+#endif
   return true;
 }

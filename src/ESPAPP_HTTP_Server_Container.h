@@ -4,6 +4,7 @@
 #include <ESPAPP_Core.h>
 #include <ESPAPP_HTTP_Server.h>
 
+
 #ifdef ESPAPP_CUSTOM_HTML_SITES_GENERATORA
 #include <ESPAPP_HTML_SitesGenerator.h>
 #else
@@ -18,10 +19,14 @@ private:
     ESPAPP_HTML_SitesGenerator *Site;
 
     void handleHTTPRequests(void);
+    void handleHTTPFileUpload(void);
     void handleFavicon(void);
+
+    
 #ifdef ESP32
     void onNotFound(WebServer::THandlerFunction fn);
     void handle(const char *uri, WebServer::THandlerFunction handler);
+    void handle(const char *uri, WebServer::THandlerFunction handler, WebServer::THandlerFunction handlerUpload);    
     // void handleFirmwareUpgrade(const char *uri,  WebServer::THandlerFunction handlerUpgrade,  WebServer::THandlerFunction handlerUpload);
 #else // ESP8266
     void onNotFound(ESP8266WebServer::THandlerFunction fn);

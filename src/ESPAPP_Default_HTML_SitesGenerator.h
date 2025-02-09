@@ -4,6 +4,7 @@
 #ifndef ESPAPP_CUSTOM_HTML_SITES_GENERATORA
 
 #include <ESPAPP_Core.h>
+#include <ESPAPP_Parameters_HTTP_Server.h>
 #include <ESPAPP_HTML_UI.h>
 
 class ESPAPP_HTML_SitesGenerator

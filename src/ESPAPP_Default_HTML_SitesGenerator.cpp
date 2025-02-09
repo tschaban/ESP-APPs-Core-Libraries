@@ -25,12 +25,50 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
     switch (this->HTTPRequest->siteId)
     {
     case ESPAPP_HTTP_SITE_UPLOAD:
+    {
         this->UI->startHeaderSection(this->HTMLResponse);
         this->UI->startMenuSection(this->HTMLResponse, F("Menu"), FPSTR(HTML_UI_ICON_RIGHTWARDS_ARROW));
         this->UI->endMenuSection(this->HTMLResponse);
         this->UI->startBodySection(this->HTMLResponse);
-        this->UI->openSection(this->HTMLResponse, F("Upload file"), F("Upload file to the server"));
+
+
+        String files[10];
+        size_t count = 0;
+
+        this->UI->openSection(this->HTMLResponse, F("Files explorer"), F("Files list"));
+        this->UI->startList(this->HTMLResponse);
+
+        this->System->Flash->listAllFiles(files, 10, count);
+
+        for (size_t i = 0; i < count; i++)
+        {
+            this->UI->addListItem(this->HTMLResponse, files[i].c_str());
+        }
+        this->UI->endList(this->HTMLResponse);
+
         this->UI->closeSection(this->HTMLResponse);
+        // Show files in cfg folder
+        count = 0;
+        this->UI->openSection(this->HTMLResponse, F("Files explorer"), F("File in the /cfg folder"));
+        this->UI->startList(this->HTMLResponse);
+
+        this->System->Flash->listAllFiles("cfg", files, 10, count);
+        for (size_t i = 0; i < count; i++)
+        {
+            this->UI->addListItem(this->HTMLResponse, files[i].c_str());
+        }
+        this->UI->endList(this->HTMLResponse);
+
+        this->UI->closeSection(this->HTMLResponse);
+
+        this->UI->openSection(this->HTMLResponse, F("Upload file"), F("Upload file to a selected folder"));
+        this->HTMLResponse->concat(F("<form action=\"/upload?site=0&cmd=0\" method=\"POST\" enctype=\"multipart/form-data\">"));
+        this->HTMLResponse->concat(F("<input type=\"file\" name=\"uploadedFile\">"));
+        this->HTMLResponse->concat(F("<button class=\"b bs\" type=\"submit\">Upload</button>"));
+        this->HTMLResponse->concat(F("</form>"));
+        this->UI->closeSection(this->HTMLResponse);
+
+
         /** Site configuration */
         this->UI->setLang(this->HTMLResponse, F("pl"));
         this->UI->setLogo(this->HTMLResponse, F("https://s.smartnydom.pl/i/esp32-firmware"));
@@ -43,7 +81,9 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
         this->UI->siteEnd(this->HTMLResponse);
         setHTTPResponseCode(ESP_APP_HTTP_RESPONSE_CODE_OK);
         break;
+    }
     default:
+    {
         /** Header */
         this->UI->startHeaderSection(this->HTMLResponse);
 
@@ -53,8 +93,8 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
 
         this->UI->startMenuSection(this->HTMLResponse, F("Menu"), FPSTR(HTML_UI_ICON_RIGHTWARDS_ARROW));
 
-        this->UI->setUrlParams(urlParams, 1);
-        this->UI->addMenuItem(this->HTMLResponse, F("Item 1"), urlParams, "", FPSTR(HTML_UI_NO_ICON));
+        this->UI->setUrlParams(urlParams, 0);
+        this->UI->addMenuItem(this->HTMLResponse, F("File explorer"), urlParams, "", FPSTR(HTML_UI_NO_ICON));
         this->UI->addMenuItem(this->HTMLResponse, F("Item 2"), urlParams, "additional=value", FPSTR(HTML_UI_NO_ICON));
         this->UI->setUrlParams(urlParams, 2);
         this->UI->addMenuItem(this->HTMLResponse, F("Item 3"), urlParams, "", FPSTR(HTML_UI_NO_ICON));
@@ -108,30 +148,6 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
 
         this->UI->closeMessageSection(this->HTMLResponse);
 
-        /** File explorer */
-        this->UI->openSection(this->HTMLResponse, F("Files explorer"), F("Files list"));
-
-        this->UI->startList(this->HTMLResponse);
-
-        String files[10];
-        size_t count = 0;
-        this->System->Flash->listAllFiles("cfg", files, 10, count);
-
-        for (size_t i = 0; i < count; i++)
-        {
-            this->UI->addListItem(this->HTMLResponse, files[i].c_str());
-        }
-
-        this->UI->endList(this->HTMLResponse);
-
-        this->HTMLResponse->concat(F("<form action=\"/?site=0\" method=\"POST\" enctype=\"multipart/form-data\">"));
-        this->HTMLResponse->concat(F("<input type=\"file\" name=\"uploadedFile\">"));
-        this->HTMLResponse->concat(F("<input type=\"text\" name=\"directory\" placeholder=\"Enter folder name\">"));
-        this->HTMLResponse->concat(F("<button type=\"submit\">Upload</button>"));
-        this->HTMLResponse->concat(F("</form>"));
-
-        this->UI->closeSection(this->HTMLResponse);
-
         /** Site configuration */
         this->UI->setLang(this->HTMLResponse, F("pl"));
         this->UI->setLogo(this->HTMLResponse, F("https://s.smartnydom.pl/i/esp32-firmware"));
@@ -145,6 +161,7 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
         setHTTPResponseCode(ESP_APP_HTTP_RESPONSE_CODE_NOT_FOUND);
         success = true;
         break;
+    }
     }
 
 #ifdef DEBUG

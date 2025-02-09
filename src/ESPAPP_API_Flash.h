@@ -17,8 +17,8 @@
 #define ESP_APP_OPEN_FILE_APPEND "a"
 
 /* Directories */
-#define ESP_APP_DIRECTORY_CONFIG "/cfg"
-#define ESP_APP_DIRECTORY_DATA "/data"
+#define ESP_APP_DIRECTORY_CONFIG "cfg"
+#define ESP_APP_DIRECTORY_DATA "data"
 
 
 /* File informing that system file is read */
@@ -55,9 +55,9 @@ public:
   bool init(void);
   bool getJSON(const __FlashStringHelper *fileName, JsonDocument &doc);
   bool saveJSON(const __FlashStringHelper *fileName, JsonDocument &doc);
-  boolean listAllFiles(String files[], size_t capacity, size_t &count);
-  boolean listAllFiles(const char* directory, String files[], size_t capacity, size_t &count);
-  boolean uploadFile(const char *directory, const char *filename, const uint8_t *data, size_t length);
+  bool listAllFiles(String files[], size_t capacity, size_t &count);
+  bool listAllFiles(const char* directory, String files[], size_t capacity, size_t &count);
+  bool uploadFile(const char *directory, const char *filename, const uint8_t *data, size_t length);
 };
 
 #endif // _ESPAPP_API_FLASH_h

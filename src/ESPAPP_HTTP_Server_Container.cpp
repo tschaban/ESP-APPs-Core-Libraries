@@ -20,6 +20,9 @@ bool ESPAPP_HTTPServerContainer::init(void)
     onNotFound(std::bind(&ESPAPP_HTTPServerContainer::handleHTTPRequests, this));
     handle("/", std::bind(&ESPAPP_HTTPServerContainer::handleHTTPRequests, this));
     handle("/favicon.ico", std::bind(&ESPAPP_HTTPServerContainer::handleFavicon, this));
+    handle("/upload", std::bind(&ESPAPP_HTTPServerContainer::handleHTTPRequests, this),
+           std::bind(&ESPAPP_HTTPServerContainer::handleHTTPFileUpload, this));
+
     // handle("/log", handleDownloadLogFile);
     // handleFirmwareUpgrade("/upgrade", handleHTTPRequests, handleUpload);
 
@@ -47,6 +50,12 @@ void ESPAPP_HTTPServerContainer::handleFavicon(void)
     /* Do nothing */
 }
 
+void ESPAPP_HTTPServerContainer::handleHTTPFileUpload(void)
+{
+
+    this->Server->processUploadFile();
+}
+
 #ifndef ESP32 /* ESP82xx */
 void ESPAPP_HTTPServer::handle(const char *uri,
                                ESP8266WebServer::THandlerFunction handler)
@@ -72,10 +81,18 @@ void ESPAPP_HTTPServerContainer::handle(const char *uri,
     this->Server->HTTPServer->on(uri, handler);
 }
 
+void ESPAPP_HTTPServerContainer::handle(const char *uri,
+                                        WebServer::THandlerFunction handler,
+                                        WebServer::THandlerFunction handlerUpload)
+{
+    this->Server->HTTPServer->on(uri, HTTP_POST, handler, handlerUpload);
+}
+
 void ESPAPP_HTTPServerContainer::onNotFound(WebServer::THandlerFunction fn)
 {
     this->Server->HTTPServer->onNotFound(fn);
 }
+
 /*
 void ESPAPP_HTTPServer::handleFirmwareUpgrade(
     const char *uri, WebServer::THandlerFunction handlerUpgrade,

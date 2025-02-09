@@ -6,6 +6,7 @@
 #include <ESPAPP_Parameters_HTML_UI.h>
 
 #define ESP_APP_NONE 255
+#define ESP_APP_EMPTY_STRING ""
 #define ESP_APP_DEFAULT_DEVICE_NAME "ESP Device"
 
 /* Configuration of Terminal messages outputs */
@@ -56,10 +57,19 @@
 
 
 /* HTTP Server */
+#include <ESPAPP_Parameters_HTTP_Server.h>
 #define ESP_APP_HTTP_HTML_MAX_RESPONSE_SIZE 2048
 #define ESP_APP_HTTP_RESPONSE_CODE_OK 200
 #define ESP_APP_HTTP_RESPONSE_CODE_NOT_FOUND 404
 
+/* File system */
+#define ESP_APP_FILE_MAX_FILE_NAME_LENGTH 30
+#define ESP_APP_FILE_MAX_DIRECTORY_NAME_LENGTH 20
+
+const char path_root[] PROGMEM           = "";
+const char path_configuration[] PROGMEM  = "cfg";
+const char path_data[] PROGMEM      = "data";
+const char* const ESP_APP_DIRECTORIES[] PROGMEM = {path_root, path_configuration, path_data};
 
 /* Data structures */
 
@@ -90,6 +100,10 @@ struct NETWORK
 #endif
 };
 
+struct ESPAPP_FILE {
+  char directory[ESP_APP_FILE_MAX_DIRECTORY_NAME_LENGTH];
+};
+
 struct ESPAPP_HTTP_REQUEST
 {
   uint8_t siteId = ESP_APP_NONE;
@@ -97,6 +111,7 @@ struct ESPAPP_HTTP_REQUEST
   uint8_t action = ESP_APP_NONE;
   uint8_t option = ESP_APP_NONE;
   int HTTPResponseCode = ESP_APP_HTTP_RESPONSE_CODE_OK;
+  ESPAPP_FILE *file = new ESPAPP_FILE;
 };
 
 
