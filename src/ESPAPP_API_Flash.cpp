@@ -240,24 +240,16 @@ bool ESPAPP_API_Flash::openFile(File &openedFile, const char *mode,
   return openFile(openedFile, mode, fileName, id, createIfNotExists);
 }
 
-bool ESPAPP_API_Flash::listAllFiles(String files[], size_t capacity, size_t &count)
+bool ESPAPP_API_Flash::listAllFiles(ESPAPP_FILE files[], size_t capacity, size_t &count)
 {
   return this->listAllFiles((PGM_P)F(ESP_APP_EMPTY_STRING), files, capacity, count);
 }
 
-bool ESPAPP_API_Flash::listAllFiles(const char *directory, String files[], size_t capacity, size_t &count)
+bool ESPAPP_API_Flash::listAllFiles(const char *directory, ESPAPP_FILE files[], size_t capacity, size_t &count)
 {
   count = 0;
   char listedDirectory[strlen(directory) + 1];
   sprintf(listedDirectory, "/%s", directory);
-
-this->Msg->printInformation(F("### listAllFiles"), F("FS"));
-this->Msg->printBulletPoint(F("director length: "));
-this->Msg->printValue(strlen(directory));
-this->Msg->printBulletPoint(F("directory: "));
-this->Msg->printValue(directory);
-this->Msg->printBulletPoint(F("listedDirectory: "));
-this->Msg->printValue(listedDirectory);
 
 #ifdef DEBUG
   this->Msg->printInformation(F("Listing files in directory"), F("FS"));
@@ -277,7 +269,11 @@ this->Msg->printValue(listedDirectory);
   File file = root.openNextFile();
   while (file && count < capacity)
   {
-    files[count++] = file.name();
+    strncpy(files[count].name, file.name(), sizeof(files[count].name) - 1);
+    files[count].name[sizeof(files[count].name) - 1] = '\0';
+    files[count].isDirectory = file.isDirectory();
+    files[count].size = file.size();
+    count++;
     file = root.openNextFile();
   }
 
@@ -293,16 +289,13 @@ this->Msg->printValue(listedDirectory);
 bool ESPAPP_API_Flash::uploadFile(const char *directory, const char *filename, const uint8_t *data, size_t length)
 {
 
-this->Msg->printInformation(F("Uploading file"), F("uploadFile"));
-this->Msg->printBulletPoint(F("Directory: "));
-this->Msg->printValue(directory);
-this->Msg->printBulletPoint(F("Filename: "));
-this->Msg->printValue(filename);
-this->Msg->printBulletPoint(F("Data length: "));
-this->Msg->printValue(length);
-
-
-
+  this->Msg->printInformation(F("Uploading file"), F("uploadFile"));
+  this->Msg->printBulletPoint(F("Directory: "));
+  this->Msg->printValue(directory);
+  this->Msg->printBulletPoint(F("Filename: "));
+  this->Msg->printValue(filename);
+  this->Msg->printBulletPoint(F("Data length: "));
+  this->Msg->printValue(length);
 
   char uploadDirectroy[strlen(directory) + 1];
   char uploadFilename[strlen(uploadDirectroy) + strlen(filename) + 1];

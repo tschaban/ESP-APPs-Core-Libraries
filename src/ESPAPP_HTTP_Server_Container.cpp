@@ -53,7 +53,7 @@ void ESPAPP_HTTPServerContainer::handleFavicon(void)
 void ESPAPP_HTTPServerContainer::handleHTTPFileUpload(void)
 {
 
-    this->Server->processUploadFile();
+    this->Server->processUploadFile(1);
 }
 
 #ifndef ESP32 /* ESP82xx */

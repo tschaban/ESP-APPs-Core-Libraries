@@ -55,8 +55,8 @@ public:
   bool init(void);
   bool getJSON(const __FlashStringHelper *fileName, JsonDocument &doc);
   bool saveJSON(const __FlashStringHelper *fileName, JsonDocument &doc);
-  bool listAllFiles(String files[], size_t capacity, size_t &count);
-  bool listAllFiles(const char* directory, String files[], size_t capacity, size_t &count);
+  bool listAllFiles(ESPAPP_FILE files[], size_t capacity, size_t &count);
+  bool listAllFiles(const char* directory, ESPAPP_FILE files[], size_t capacity, size_t &count);
   bool uploadFile(const char *directory, const char *filename, const uint8_t *data, size_t length);
 };
 

@@ -48,19 +48,17 @@ bool ESPAPP_HTTPServer::pushHTMLResponse()
 void ESPAPP_HTTPServer::readHTTPRequest(void)
 {
 
-// Debug: Print all arguments
-    int argsCount = this->HTTPServer->args();
-    this->System->Msg->printBulletPoint(F("Total arguments: "));
-    this->System->Msg->printValue(argsCount);
-    Serial << endl;
-    for (int i = 0; i < argsCount; i++) {
-        Serial << this->HTTPServer->argName(i);
-        this->System->Msg->printValue("=");
-        Serial << this->HTTPServer->arg(i) << endl;
-    }
-
-
-
+  // Debug: Print all arguments
+  int argsCount = this->HTTPServer->args();
+  this->System->Msg->printBulletPoint(F("Total arguments: "));
+  this->System->Msg->printValue(argsCount);
+  Serial << endl;
+  for (int i = 0; i < argsCount; i++)
+  {
+    Serial << this->HTTPServer->argName(i);
+    this->System->Msg->printValue("=");
+    Serial << this->HTTPServer->arg(i) << endl;
+  }
 
   this->HTTPRequest->siteId = this->HTTPServer->hasArg(F("site")) ? this->HTTPServer->arg(F("site")).toInt() : ESP_APP_NONE;
   this->HTTPRequest->command = this->HTTPServer->hasArg(F("cmd")) ? this->HTTPServer->arg(F("cmd")).toInt() : ESP_APP_NONE;
@@ -82,128 +80,114 @@ void ESPAPP_HTTPServer::readHTTPRequest(void)
   {
     if (this->HTTPServer->hasArg(F("directory")))
     {
-      this->HTTPServer->arg(F("directory")).toCharArray(this->HTTPRequest->file->directory, this->HTTPServer->arg(F("directory")).length() + 1);
+      this->HTTPServer->arg(F("directory")).toCharArray(this->HTTPRequest->file->name, this->HTTPServer->arg(F("directory")).length() + 1);
     }
     else
     {
-      sprintf(this->HTTPRequest->file->directory, (const char *)F(ESP_APP_EMPTY_STRING));
+      sprintf(this->HTTPRequest->file->name, (const char *)F(ESP_APP_EMPTY_STRING));
     }
 
 #ifdef DEBUG
     this->System->Msg->printBulletPoint(F("Directory: "));
-    this->System->Msg->printValue(this->HTTPRequest->file->directory);
+    this->System->Msg->printValue(this->HTTPRequest->file->name);
 
 #endif
   }
 }
 
-bool ESPAPP_HTTPServer::processUploadFile()
+bool ESPAPP_HTTPServer::processUploadFile(uint8_t locationId)
 {
   bool success = false;
-
-  char uploadFileName[ESP_APP_FILE_MAX_FILE_NAME_LENGTH];
-
   HTTPUpload &upload = this->HTTPServer->upload();
 
-  this->System->Msg->printError(F("Upload: STAT: "), F("UPLOAD"));
-  this->System->Msg->printValue(upload.status);
-
-  char directory[ESP_APP_FILE_MAX_DIRECTORY_NAME_LENGTH] = "cfg";
-
-//strcpy_P(directory, (char *)pgm_read_dword(&(ESP_APP_DIRECTORIES[locationId])));
-
-Serial << "##### = " << directory << endl;
-
-
+  static size_t fileSize = 0;
+  static std::vector<uint8_t> fileBuffer;
+  static bool fileExededSize = false;
 
   if (upload.status == UPLOAD_FILE_START)
   {
-    this->System->Msg->printBulletPoint(F("Upload: File name: "));
-    this->System->Msg->printValue(upload.filename);
-    this->System->Msg->printBulletPoint(F("Upload: File size: "));
-    this->System->Msg->printValue(upload.totalSize, F("B"));
-    this->System->Msg->printBulletPoint(F("Upload: Status: "));
-    this->System->Msg->printValue(upload.status);
-    this->System->Msg->printBulletPoint(F("Upload: Current size: "));
-    this->System->Msg->printValue(upload.currentSize, F("B"));
-    this->System->Msg->printBulletPoint(F("Upload: Buffer size: "));
-    this->System->Msg->printValue(upload.bufsize, F("B"));
-    this->System->Msg->printBulletPoint(F("Upload: Total size: "));
-    this->System->Msg->printValue(upload.totalSize, F("B"));
-  }
-  else if (upload.status == UPLOAD_FILE_WRITE)
-  {
-    this->System->Msg->printValue(F("."));
-  }
-  else if (upload.status == UPLOAD_FILE_END)
-  {
-    if (strlen(upload.filename) > 0)
-    {
-      this->System->Msg->printBulletPoint(F("Uploaded finished"));
-      this->System->Msg->printBulletPoint(F("File size: "));
-      this->System->Msg->printValue(upload.totalSize, F("B"));
-      this->System->Msg->printBulletPoint(F("Saving in the file system"));
-
-      success = this->System->Flash->uploadFile(directory, upload.filename,
-                                                upload.buf, upload.totalSize);
-    }
-  }
-  return success;
-
-
- upload.filename.toCharArray(uploadFileName, upload.filename.length() + 1);
-  size_t fileSize = 0;
-  std::vector<uint8_t> fileBuffer;
 
 #ifdef DEBUG
-  this->System->Msg->printBulletPoint(F("Upload: File name: "));
-  this->System->Msg->printValue(uploadFileName);
-  this->System->Msg->printBulletPoint(F("Upload: File size: "));
-  this->System->Msg->printValue(upload.totalSize, F("B"));
-  this->System->Msg->printBulletPoint(F("Upload: Status: "));
-  this->System->Msg->printValue(upload.status);
-  this->System->Msg->printBulletPoint(F("Upload: Current size: "));
-  this->System->Msg->printValue(upload.currentSize, F("B"));
-  this->System->Msg->printBulletPoint(F("Upload: Buffer size: "));
-  this->System->Msg->printValue(fileBuffer.size(), F("B"));
-  this->System->Msg->printBulletPoint(F("Upload: Total size: "));
-  this->System->Msg->printValue(upload.totalSize, F("B"));
-
+    this->System->Msg->printBulletPoint(F("Upload Started"));
+    this->System->Msg->printBulletPoint(F("Buffer size: "));
+    this->System->Msg->printValue(HTTP_UPLOAD_BUFLEN);
 #endif
 
-  if (upload.status == UPLOAD_FILE_START)
-  {
     fileSize = 0;
     fileBuffer.clear();
-
-#ifdef DEBUG
-    this->System->Msg->printBulletPoint(F("Uploaded started: "));
-#endif
+    fileExededSize = false;
   }
   else if (upload.status == UPLOAD_FILE_WRITE)
   {
-    fileSize += upload.currentSize;
-    fileBuffer.insert(fileBuffer.end(), upload.buf, upload.buf + upload.currentSize);
+
+    if (!fileExededSize)
+    {
+      if (fileSize + upload.currentSize > ESP_APP_FILE_MAX_SIZE)
+      {
+        fileExededSize = true;
+      }
+      else
+      {
+        fileSize += upload.currentSize;
+        fileBuffer.insert(fileBuffer.end(), upload.buf, upload.buf + upload.currentSize);
 #ifdef DEBUG
-    this->System->Msg->printValue(F("."));
+        this->System->Msg->printValue(F("."));
 #endif
+      }
+#ifdef DEBUG
+    }
+    else
+    {
+      this->System->Msg->printValue(F("!"));
+#endif
+    }
   }
   else if (upload.status == UPLOAD_FILE_END)
   {
-    if (strlen(uploadFileName) > 0)
+    this->System->Msg->printBulletPoint(F("Uploaded finished"));
+
+    if (!fileExededSize)
     {
+
+      char uploadFileName[ESP_APP_FILE_MAX_FILE_NAME_LENGTH];
+      upload.filename.toCharArray(uploadFileName, upload.filename.length() + 1);
+
+      char directory[ESP_APP_FILE_MAX_DIRECTORY_NAME_LENGTH];
+      strcpy_P(directory, (char *)pgm_read_dword(&(ESP_APP_DIRECTORIES[locationId])));
+
 #ifdef DEBUG
-      this->System->Msg->printBulletPoint(F("Uploaded finished"));
-      this->System->Msg->printBulletPoint(F("File size: "));
-      this->System->Msg->printValue(fileSize, F("B"));
-      this->System->Msg->printBulletPoint(F("Saving in the file system"));
+      this->System->Msg->printBulletPoint(F("Upload: Size: "));
+      this->System->Msg->printValue(upload.totalSize, F("B"));
+      this->System->Msg->printBulletPoint(F("Upload: File name: "));
+      this->System->Msg->printValue(uploadFileName);
+      this->System->Msg->printBulletPoint(F("Save to directory: "));
+      this->System->Msg->printValue(directory);
 #endif
 
-
-
-      success = this->System->Flash->uploadFile(this->HTTPRequest->file->directory, uploadFileName,
-                                                fileBuffer.data(), fileSize);
+      if (strlen(uploadFileName) > 0)
+      {
+#ifdef DEBUG
+        this->System->Msg->printBulletPoint(F("Saving in the file system"));
+#endif
+        success = this->System->Flash->uploadFile(directory, uploadFileName,
+                                                  fileBuffer.data(), upload.totalSize);
+      }
+#ifdef DEBUG
+      else
+      {
+        this->System->Msg->printError(F("Empty file name"), F("HTTP Server"));
+      }
+#endif
     }
+#ifdef DEBUG
+    else
+    {
+      this->System->Msg->printError(F("Max uploaded file size exceeded"), F("HTTP Server"));
+      this->System->Msg->printValue((uint16_t)ESP_APP_FILE_MAX_SIZE/1024);
+      this->System->Msg->printValue(F("kB"));
+    }
+#endif
   }
+
   return success;
 }

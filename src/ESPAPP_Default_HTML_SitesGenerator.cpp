@@ -31,9 +31,9 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
         this->UI->endMenuSection(this->HTMLResponse);
         this->UI->startBodySection(this->HTMLResponse);
 
-
-        String files[10];
+        ESPAPP_FILE files[10];
         size_t count = 0;
+        char fileInfo[ESP_APP_FILE_MAX_FILE_NAME_LENGTH + 2 + 1 + 6 + 1]; // [Filename] 1000000B
 
         this->UI->openSection(this->HTMLResponse, F("Files explorer"), F("Files list"));
         this->UI->startList(this->HTMLResponse);
@@ -42,7 +42,15 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
 
         for (size_t i = 0; i < count; i++)
         {
-            this->UI->addListItem(this->HTMLResponse, files[i].c_str());
+            if (files[i].isDirectory)
+            {
+                sprintf(fileInfo, "[%s]", files[i].name);
+            }
+            else
+            {   
+                sprintf(fileInfo, "%s %dB", files[i].name, files[i].size);
+            }
+            this->UI->addListItem(this->HTMLResponse, fileInfo);
         }
         this->UI->endList(this->HTMLResponse);
 
@@ -55,7 +63,15 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
         this->System->Flash->listAllFiles("cfg", files, 10, count);
         for (size_t i = 0; i < count; i++)
         {
-            this->UI->addListItem(this->HTMLResponse, files[i].c_str());
+            if (files[i].isDirectory)
+            {
+                sprintf(fileInfo, "[%s]", files[i].name);
+            }
+            else
+            {   
+                sprintf(fileInfo, "%s %dB", files[i].name, files[i].size);
+            }
+            this->UI->addListItem(this->HTMLResponse, fileInfo);
         }
         this->UI->endList(this->HTMLResponse);
 
@@ -67,7 +83,6 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
         this->HTMLResponse->concat(F("<button class=\"b bs\" type=\"submit\">Upload</button>"));
         this->HTMLResponse->concat(F("</form>"));
         this->UI->closeSection(this->HTMLResponse);
-
 
         /** Site configuration */
         this->UI->setLang(this->HTMLResponse, F("pl"));

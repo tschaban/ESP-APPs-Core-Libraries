@@ -30,7 +30,6 @@
 #define ESP_APP_BOOT_MODE_CONFIGURATION 10
 #define ESP_APP_BOOT_MODE_NORMAL 20
 
-
 /* Network: Parameters */
 #define ESP_APP_NETWORK_CONNECTION_MODE_NO_CONNECTION 0
 #define ESP_APP_NETWORK_CONNECTION_MODE_HOTSPOT 1
@@ -46,7 +45,7 @@
 #define ESP_APP_NETWORK_DEFAULT_SUBNET ""
 #define ESP_APP_NETWORK_DEFAULT_DNS1 "8.8.8.8"
 #define ESP_APP_NETWORK_DEFAULT_DNS2 "8.8.4.4"
-#define ESP_APP_NETWORK_DEFAULT_MDNS 1 
+#define ESP_APP_NETWORK_DEFAULT_MDNS 1
 
 #ifndef ESP32
 #define ESP_APP_NETWORK_DEFAULT_RADIO_MODE ESP_APP_NONE
@@ -54,7 +53,6 @@
 #define ESP_APP_NETWORK_DEFAULT_OUTPUT_POWER_MIN 0
 #define ESP_APP_NETWORK_DEFAULT_OUTPUT_POWER_MAX 20.5
 #endif
-
 
 /* HTTP Server */
 #include <ESPAPP_Parameters_HTTP_Server.h>
@@ -65,11 +63,12 @@
 /* File system */
 #define ESP_APP_FILE_MAX_FILE_NAME_LENGTH 30
 #define ESP_APP_FILE_MAX_DIRECTORY_NAME_LENGTH 20
+#define ESP_APP_FILE_MAX_SIZE 10*1024 // 10kB
 
-const char path_root[] PROGMEM           = "";
-const char path_configuration[] PROGMEM  = "cfg";
-const char path_data[] PROGMEM      = "data";
-const char* const ESP_APP_DIRECTORIES[] PROGMEM = {path_root, path_configuration, path_data};
+const char path_root[] PROGMEM = "";
+const char path_configuration[] PROGMEM = "cfg";
+const char path_data[] PROGMEM = "data";
+const char *const ESP_APP_DIRECTORIES[] PROGMEM = {path_root, path_configuration, path_data};
 
 /* Data structures */
 
@@ -77,22 +76,22 @@ struct NETWORK_SETTING
 {
   char ssid[33];
   char password[33];
-  bool isDHCP;// = ESP_APP_NETWORK_DEFAULT_DHCP;
+  bool isDHCP; // = ESP_APP_NETWORK_DEFAULT_DHCP;
   char ip[16];
-  char gateway[16];// = ESP_APP_NETWORK_DEFAULT_GATEWAY;
-  char subnet[16];// = ESP_APP_NETWORK_DEFAULT_SUBNET;
-  char dns1[16];// = ESP_APP_NETWORK_DEFAULT_DNS1;
-  char dns2[16];// = ESP_APP_NETWORK_DEFAULT_DNS2;
+  char gateway[16]; // = ESP_APP_NETWORK_DEFAULT_GATEWAY;
+  char subnet[16];  // = ESP_APP_NETWORK_DEFAULT_SUBNET;
+  char dns1[16];    // = ESP_APP_NETWORK_DEFAULT_DNS1;
+  char dns2[16];    // = ESP_APP_NETWORK_DEFAULT_DNS2;
 };
 
 struct NETWORK
 {
   NETWORK_SETTING primary;
   NETWORK_SETTING secondary;
-  uint8_t noConnectionAttempts;// = ESP_APP_NETWORK_DEFAULT_CONNECTION_ATTEMPTS;
-  uint8_t waitTimeConnections;// = ESP_APP_NETWORK_DEFAULT_WAIT_TIME;
-  uint8_t waitTimeSeries;// = ESP_APP_NETWORK_DEFAULT_WAIT_TIME;
-  uint8_t noFailuresToSwitchNetwork;// = ESP_APP_NETWORK_DEFAULT_SWITCH_NETWORK_AFTER;
+  uint8_t noConnectionAttempts;      // = ESP_APP_NETWORK_DEFAULT_CONNECTION_ATTEMPTS;
+  uint8_t waitTimeConnections;       // = ESP_APP_NETWORK_DEFAULT_WAIT_TIME;
+  uint8_t waitTimeSeries;            // = ESP_APP_NETWORK_DEFAULT_WAIT_TIME;
+  uint8_t noFailuresToSwitchNetwork; // = ESP_APP_NETWORK_DEFAULT_SWITCH_NETWORK_AFTER;
   bool mDNS;
 #if !defined(ESP32)
   uint8_t radioMod ESP_APP_NETWORK_DEFAULT_RADIO_MODE;
@@ -100,9 +99,12 @@ struct NETWORK
 #endif
 };
 
-struct ESPAPP_FILE {
-  char directory[ESP_APP_FILE_MAX_DIRECTORY_NAME_LENGTH];
-};
+typedef struct 
+{
+  char name[ESP_APP_FILE_MAX_DIRECTORY_NAME_LENGTH];
+  bool isDirectory;
+  size_t size;
+} ESPAPP_FILE;
 
 struct ESPAPP_HTTP_REQUEST
 {
@@ -113,6 +115,5 @@ struct ESPAPP_HTTP_REQUEST
   int HTTPResponseCode = ESP_APP_HTTP_RESPONSE_CODE_OK;
   ESPAPP_FILE *file = new ESPAPP_FILE;
 };
-
 
 #endif // _ESPAPP_Parameters_h
