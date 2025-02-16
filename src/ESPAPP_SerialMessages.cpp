@@ -68,12 +68,12 @@ void ESPAPP_SerialMessages::printValue(unsigned long number, uint8_t newLineAfte
 
 void ESPAPP_SerialMessages::printValue(const char *text, uint8_t newLineBefore,
                              uint8_t newLineAfter) {
-  print(text, F(""), ESP_APP_MSG_TYPE_LINE, newLineBefore, newLineAfter, 0);
+  print(text, F(""), ESPAPP_MSG_TYPE_LINE, newLineBefore, newLineAfter, 0);
 }
 
 void ESPAPP_SerialMessages::printValue(const __FlashStringHelper *text,
                              uint8_t newLineBefore, uint8_t newLineAfter) {
-  print(text, F(""), ESP_APP_MSG_TYPE_LINE, newLineBefore, newLineAfter, 0);
+  print(text, F(""), ESPAPP_MSG_TYPE_LINE, newLineBefore, newLineAfter, 0);
 }
 
 void ESPAPP_SerialMessages::printValue(float number, const __FlashStringHelper *text,
@@ -105,30 +105,30 @@ void ESPAPP_SerialMessages::addMessageHeader(uint8_t type,
     Serial << F(" ");
   }
   
-  Serial << (type == ESP_APP_MSG_TYPE_INFORMATION
-                 ? F(ESP_APP_TERMINAL_FONT_GREEN)
-                 : (type == ESP_APP_MSG_TYPE_WARNING
-                        ? F(ESP_APP_TERMINAL_FONT_BLUE)
-                        : (type == ESP_APP_MSG_TYPE_ERROR
-                               ?  F(ESP_APP_TERMINAL_FONT_RED)
+  Serial << (type == ESPAPP_MSG_TYPE_INFORMATION
+                 ? F(ESPAPP_TERMINAL_FONT_GREEN)
+                 : (type == ESPAPP_MSG_TYPE_WARNING
+                        ? F(ESPAPP_TERMINAL_FONT_BLUE)
+                        : (type == ESPAPP_MSG_TYPE_ERROR
+                               ?  F(ESPAPP_TERMINAL_FONT_RED)
                                : F(""))));
   
 
-  Serial << (type == ESP_APP_MSG_TYPE_INFORMATION
+  Serial << (type == ESPAPP_MSG_TYPE_INFORMATION
                  ? F("INFO")
-                 : (type == ESP_APP_MSG_TYPE_WARNING
+                 : (type == ESPAPP_MSG_TYPE_WARNING
                         ? F("WARN")
-                        : (type == ESP_APP_MSG_TYPE_ERROR
+                        : (type == ESPAPP_MSG_TYPE_ERROR
                                ? F("ERROR")
-                               : (type == ESP_APP_MSG_TYPE_BULLET_POINT
+                               : (type == ESPAPP_MSG_TYPE_BULLET_POINT
                                       ? F("• ")
                                       : F("")))));
 
 
-  Serial << F(ESP_APP_TERMINAL_FONT_RESET_COLOR); 
+  Serial << F(ESPAPP_TERMINAL_FONT_RESET_COLOR); 
   
-  if (type == ESP_APP_MSG_TYPE_ERROR || type == ESP_APP_MSG_TYPE_INFORMATION ||
-      type == ESP_APP_MSG_TYPE_WARNING) {
+  if (type == ESPAPP_MSG_TYPE_ERROR || type == ESPAPP_MSG_TYPE_INFORMATION ||
+      type == ESPAPP_MSG_TYPE_WARNING) {
     Serial << F(": ") << messageCategory << F(": ");
   }
 }
@@ -146,7 +146,7 @@ void ESPAPP_SerialMessages::printInformation(const char *text,
                                    const __FlashStringHelper *messageCategory,
                                    uint8_t newLineBefore,
                                    uint8_t newLineAfter) {
-  print(text, messageCategory, ESP_APP_MSG_TYPE_INFORMATION, newLineBefore,
+  print(text, messageCategory, ESPAPP_MSG_TYPE_INFORMATION, newLineBefore,
         newLineAfter, 0);
 }
 
@@ -154,53 +154,53 @@ void ESPAPP_SerialMessages::printInformation(const __FlashStringHelper *text,
                                    const __FlashStringHelper *messageCategory,
                                    uint8_t newLineBefore,
                                    uint8_t newLineAfter) {
-  print(text, messageCategory, ESP_APP_MSG_TYPE_INFORMATION, newLineBefore,
+  print(text, messageCategory, ESPAPP_MSG_TYPE_INFORMATION, newLineBefore,
         newLineAfter, 0);
 }
 
 void ESPAPP_SerialMessages::printWarning(const char *text,
                                const __FlashStringHelper *messageCategory,
                                uint8_t newLineBefore, uint8_t newLineAfter) {
-  print(text, messageCategory, ESP_APP_MSG_TYPE_WARNING, newLineBefore,
+  print(text, messageCategory, ESPAPP_MSG_TYPE_WARNING, newLineBefore,
         newLineAfter, 0);
 }
 
 void ESPAPP_SerialMessages::printWarning(const __FlashStringHelper *text,
                                const __FlashStringHelper *messageCategory,
                                uint8_t newLineBefore, uint8_t newLineAfter) {
-  print(text, messageCategory, ESP_APP_MSG_TYPE_WARNING, newLineBefore,
+  print(text, messageCategory, ESPAPP_MSG_TYPE_WARNING, newLineBefore,
         newLineAfter, 0);
 }
 
 void ESPAPP_SerialMessages::printError(const char *text,
                              const __FlashStringHelper *messageCategory,
                              uint8_t newLineBefore, uint8_t newLineAfter) {
-  print(text, messageCategory, ESP_APP_MSG_TYPE_ERROR, newLineBefore,
+  print(text, messageCategory, ESPAPP_MSG_TYPE_ERROR, newLineBefore,
         newLineAfter, 0);
 }
 
 void ESPAPP_SerialMessages::printError(const __FlashStringHelper *text,
                              const __FlashStringHelper *messageCategory,
                              uint8_t newLineBefore, uint8_t newLineAfter) {
-  print(text, messageCategory, ESP_APP_MSG_TYPE_ERROR, newLineBefore,
+  print(text, messageCategory, ESPAPP_MSG_TYPE_ERROR, newLineBefore,
         newLineAfter, 0);
 }
 
 void ESPAPP_SerialMessages::printBulletPoint(const char *text, uint8_t newLineAfter) {
-  print(text, F(""), ESP_APP_MSG_TYPE_BULLET_POINT, 1, newLineAfter, 2);
+  print(text, F(""), ESPAPP_MSG_TYPE_BULLET_POINT, 1, newLineAfter, 2);
 }
 
 void ESPAPP_SerialMessages::printBulletPoint(const __FlashStringHelper *text,
                                    uint8_t newLineAfter) {
-  print(text, F(""), ESP_APP_MSG_TYPE_BULLET_POINT, 1, newLineAfter, 2);
+  print(text, F(""), ESPAPP_MSG_TYPE_BULLET_POINT, 1, newLineAfter, 2);
 }
 void ESPAPP_SerialMessages::printHeader(uint8_t newLineBefore, uint8_t newLineAfter,
                               uint8_t length, uint8_t type) {
   addNewLines(newLineBefore);
   for (uint8_t i = 0; i < length; i++) {
-    Serial << (type == ESP_APP_MSG_HEADER_TYPE_DASH
+    Serial << (type == ESPAPP_MSG_HEADER_TYPE_DASH
                    ? F("-")
-                   : (type == ESP_APP_MSG_HEADER_TYPE_SPACE ? F(" ") : F("#")));
+                   : (type == ESPAPP_MSG_HEADER_TYPE_SPACE ? F(" ") : F("#")));
   }
   addNewLines(newLineAfter);
 }
@@ -218,7 +218,7 @@ void ESPAPP_SerialMessages::getFileSystemDubugInformation() {
   printInformation(F("Summary: "), F("FS"));
   printBulletPoint(F("Used: "));
 
-#if ESP_APP_FILE_SYSTEM == ESP_APP_FS_SPIFFS
+#if ESPAPP_FILE_SYSTEM == ESPAPP_FS_SPIFFS
   SPIFFS.info(fileSystem);
   Serial << fileSystem.usedBytes / 1024 << F("/")
          << fileSystem.totalBytes / 1024 << F("kB");
@@ -312,7 +312,7 @@ void ESPAPP_SerialMessages::printProcessingRequest(
     const __FlashStringHelper *type) {
   printInformation(F("Processing: "), type);
   Serial << deviceItemName;
-  if (deviceId != ESP_APP_UNKNWON) {
+  if (deviceId != ESPAPP_UNKNWON) {
     Serial << F(", Id: ") << deviceId;
   }
 }

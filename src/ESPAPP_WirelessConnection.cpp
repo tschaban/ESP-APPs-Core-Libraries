@@ -43,7 +43,7 @@ bool ESPAPP_WirelessConnection::init(void)
 
     if (strlen(configuration->secondary.ssid) > 0 &&
         strcmp(configuration->secondary.ssid,
-               ESP_APP_NETWORK_DEFAULT_NONE_SSID) != 0 &&
+               ESPAPP_NETWORK_DEFAULT_NONE_SSID) != 0 &&
         strlen(configuration->secondary.password) > 0)
     {
       isBackupConfigurationSet = true;
@@ -83,7 +83,7 @@ bool ESPAPP_WirelessConnection::init(void)
     }
 
 #endif
-    if (System->connectionMode() == ESP_APP_NETWORK_CONNECTION_MODE_HOTSPOT)
+    if (System->connectionMode() == ESPAPP_NETWORK_CONNECTION_MODE_HOTSPOT)
     {
 #ifdef DEBUG
       System->Msg->printInformation(F("Starting Hotspot..."), F("WIFI"));
@@ -280,7 +280,7 @@ void ESPAPP_WirelessConnection::listener()
 
   if (ready)
   {
-    if (!System->connectionMode() == ESP_APP_NETWORK_CONNECTION_MODE_NO_CONNECTION)
+    if (!System->connectionMode() == ESPAPP_NETWORK_CONNECTION_MODE_NO_CONNECTION)
     {
       if (!connected())
       {
@@ -308,7 +308,7 @@ void ESPAPP_WirelessConnection::listener()
                     F("is not configured. Going to configuration mode"),
                     F("WIFI"));
 #endif
-                System->reboot(ESP_APP_NETWORK_CONNECTION_MODE_HOTSPOT);
+                System->reboot(ESPAPP_NETWORK_CONNECTION_MODE_HOTSPOT);
               }
 
               if (isPrimaryConfiguration)
@@ -462,7 +462,7 @@ void ESPAPP_WirelessConnection::listener()
 
 #ifdef DEBUG
 
-          System->Msg->printHeader(2, 1, ESP_APP_MSG_HEADER_DEFAULT_LENGTH, ESP_APP_MSG_HEADER_TYPE_DASH);
+          System->Msg->printHeader(2, 1, ESPAPP_MSG_HEADER_DEFAULT_LENGTH, ESPAPP_MSG_HEADER_TYPE_DASH);
           System->Msg->printValue(F("Connection established"));
           System->Msg->printBulletPoint(F("MAC: "));
           Serial << WirelessNetwork.macAddress();
@@ -506,7 +506,7 @@ void ESPAPP_WirelessConnection::listener()
           //    Data->getDeviceID(deviceIdExtended, true);
           //     Serial << deviceIdExtended << F(".local");
 
-          System->Msg->printHeader(1, 1, ESP_APP_MSG_HEADER_DEFAULT_LENGTH, ESP_APP_MSG_HEADER_TYPE_DASH);
+          System->Msg->printHeader(1, 1, ESPAPP_MSG_HEADER_DEFAULT_LENGTH, ESPAPP_MSG_HEADER_TYPE_DASH);
 #endif
         }
       }

@@ -18,4 +18,4 @@ void ESPAPP_Core::reboot(uint8_t mode)
   ESP.restart();
 }
 
-uint8_t ESPAPP_Core::connectionMode() { return ESP_APP_NETWORK_CONNECTION_MODE_CLIENT; }
+uint8_t ESPAPP_Core::connectionMode() { return ESPAPP_NETWORK_CONNECTION_MODE_CLIENT; }

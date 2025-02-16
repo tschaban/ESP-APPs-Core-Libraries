@@ -4,7 +4,7 @@ ESPAPP_HTTPServer::ESPAPP_HTTPServer(ESPAPP_Core *_System)
 {
   this->HTTPServer = new WebServer(80);
   this->System = _System;
-  this->outputStream->reserve(ESP_APP_HTTP_HTML_MAX_RESPONSE_SIZE);
+  this->outputStream->reserve(ESPAPP_HTTP_HTML_MAX_RESPONSE_SIZE);
 };
 
 ESPAPP_HTTPServer::~ESPAPP_HTTPServer() {};
@@ -48,15 +48,18 @@ bool ESPAPP_HTTPServer::pushHTMLResponse()
 void ESPAPP_HTTPServer::readHTTPRequest(void)
 {
 
-  this->HTTPRequest->siteId = this->HTTPServer->hasArg(F("site")) ? this->HTTPServer->arg(F("site")).toInt() : ESP_APP_NONE;
-  this->HTTPRequest->command = this->HTTPServer->hasArg(F("cmd")) ? this->HTTPServer->arg(F("cmd")).toInt() : ESP_APP_NONE;
-  this->HTTPRequest->action = this->HTTPServer->hasArg(F("action")) ? this->HTTPServer->arg(F("action")).toInt() : ESP_APP_NONE;
-  this->HTTPRequest->option = this->HTTPServer->hasArg(F("option")) ? this->HTTPServer->arg(F("option")).toInt() : ESP_APP_NONE;
-   
-  if (this->HTTPServer->hasArg(F("p1"))) {
-    this->HTTPServer->arg(F("p1")).toCharArray(this->HTTPRequest->parameter1, ESP_APP_HTTP_REQUEST_PARAMETER_1_MAX_LENGTH);
-  } else {
-    strcpy(this->HTTPRequest->parameter1, ESP_APP_EMPTY_STRING);
+  this->HTTPRequest->siteId = this->HTTPServer->hasArg(F("site")) ? this->HTTPServer->arg(F("site")).toInt() : ESPAPP_NONE;
+  this->HTTPRequest->command = this->HTTPServer->hasArg(F("cmd")) ? this->HTTPServer->arg(F("cmd")).toInt() : ESPAPP_NONE;
+  this->HTTPRequest->action = this->HTTPServer->hasArg(F("action")) ? this->HTTPServer->arg(F("action")).toInt() : ESPAPP_NONE;
+  this->HTTPRequest->option = this->HTTPServer->hasArg(F("option")) ? this->HTTPServer->arg(F("option")).toInt() : ESPAPP_NONE;
+
+  if (this->HTTPServer->hasArg(F("p1")))
+  {
+    this->HTTPServer->arg(F("p1")).toCharArray(this->HTTPRequest->parameter1, ESPAPP_HTTP_REQUEST_PARAMETER_1_MAX_LENGTH);
+  }
+  else
+  {
+    strcpy(this->HTTPRequest->parameter1, ESPAPP_EMPTY_STRING);
   }
 
 #ifdef DEBUG
@@ -98,7 +101,7 @@ bool ESPAPP_HTTPServer::processUploadFile(uint8_t locationId)
 
     if (!fileExededSize)
     {
-      if (fileSize + upload.currentSize > ESP_APP_FILE_MAX_SIZE)
+      if (fileSize + upload.currentSize > ESPAPP_FILE_MAX_SIZE)
       {
         fileExededSize = true;
       }
@@ -125,11 +128,11 @@ bool ESPAPP_HTTPServer::processUploadFile(uint8_t locationId)
     if (!fileExededSize)
     {
 
-      char uploadFileName[ESP_APP_FILE_MAX_FILE_NAME_LENGTH];
+      char uploadFileName[ESPAPP_FILE_MAX_FILE_NAME_LENGTH];
       upload.filename.toCharArray(uploadFileName, upload.filename.length() + 1);
 
-      char directory[ESP_APP_FILE_MAX_FILE_NAME_LENGTH];
-      strcpy_P(directory, (char *)pgm_read_dword(&(ESP_APP_DIRECTORIES[locationId])));
+      char directory[ESPAPP_FILE_MAX_FILE_NAME_LENGTH];
+      strcpy_P(directory, (char *)pgm_read_dword(&(ESPAPP_DIRECTORIES[locationId])));
 
 #ifdef DEBUG
       this->System->Msg->printBulletPoint(F("Upload: Size: "));
@@ -159,9 +162,48 @@ bool ESPAPP_HTTPServer::processUploadFile(uint8_t locationId)
     else
     {
       this->System->Msg->printError(F("Max uploaded file size exceeded"), F("HTTP Server"));
-      this->System->Msg->printValue((uint16_t)ESP_APP_FILE_MAX_SIZE / 1024);
+      this->System->Msg->printValue((uint16_t)ESPAPP_FILE_MAX_SIZE / 1024);
       this->System->Msg->printValue(F("kB"));
     }
+#endif
+  }
+
+  return success;
+}
+
+bool ESPAPP_HTTPServer::processFaviconRequest(void)
+{
+  return true;
+}
+
+bool ESPAPP_HTTPServer::processCSSFileRequest(void)
+{
+  bool success = false;
+#ifdef DEBUG
+  this->System->Msg->printBulletPoint(F("Processing CSS file request"));
+#endif
+  if (this->System->Flash->initialized())
+  {
+#ifdef DEBUG
+    this->System->Msg->printBulletPoint(F("Flash system initialized"));
+#endif
+    File file = this->System->Flash->fileSystem.open(F(ESPAPP_CSS_FILE), ESPAPP_OPEN_FILE_READING);
+    if (file)
+    {
+      this->HTTPServer->streamFile(file, "text/css");
+      file.close();
+      success = true;
+#ifdef DEBUG
+      this->System->Msg->printBulletPoint(F("CSS file streamed successfully"));
+#endif
+    }
+  }
+
+  if (!success)
+  {
+    this->HTTPServer->send(404, "text/plain", "File Not Found");
+#ifdef DEBUG
+    this->System->Msg->printError(F("CSS file not found"), F("HTTP Server"));
 #endif
   }
 

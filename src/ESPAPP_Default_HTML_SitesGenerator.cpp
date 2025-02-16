@@ -33,8 +33,7 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
 
         ESPAPP_FILE files[10];
         size_t count = 0;
-        char fileInfo[ESP_APP_FILE_MAX_FILE_NAME_LENGTH + 2 + 1 + 6 + 1]; // [Filename] 1000000B
-
+    
         this->UI->openSection(this->HTMLResponse, F("Files explorer"), F("Files list"));
         this->UI->startFileExplorer(this->HTMLResponse);
 
@@ -57,7 +56,7 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
 
         this->UI->closeSection(this->HTMLResponse);
 
-        this->UI->openSection(this->HTMLResponse, F("Upload file"), F("Upload file to a selected folder"));
+        this->UI->openSection(this->HTMLResponse, F("Upload file"), F("Upload file to the current folder"));
         this->HTMLResponse->concat(F("<form action=\"/upload?site=0&cmd=0\" method=\"POST\" enctype=\"multipart/form-data\">"));
         this->HTMLResponse->concat(F("<input type=\"file\" name=\"uploadedFile\">"));
         this->HTMLResponse->concat(F("<button class=\"b bs\" type=\"submit\">Upload</button>"));
@@ -74,7 +73,7 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
 
         /** Site closure  */
         this->UI->siteEnd(this->HTMLResponse);
-        setHTTPResponseCode(ESP_APP_HTTP_RESPONSE_CODE_OK);
+        setHTTPResponseCode(ESPAPP_HTTP_RESPONSE_CODE_OK);
         break;
     }
     default:
@@ -104,7 +103,7 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
         this->UI->addMenuSubMenuHeader(this->HTMLResponse, F("SubMenu 1"));
         this->UI->setUrlParams(urlParams, 1, 1, 1, 1);
         this->UI->addMenuItem(this->HTMLResponse, F("Item 1"), urlParams, "aditional=test", FPSTR(HTML_UI_ICON_ARROW));
-        this->UI->setUrlParams(urlParams, 1, ESP_APP_NONE, ESP_APP_NONE, ESP_APP_NONE);
+        this->UI->setUrlParams(urlParams, 1, ESPAPP_NONE, ESPAPP_NONE, ESPAPP_NONE);
         this->UI->addMenuItem(this->HTMLResponse, F("Item 1"), urlParams, "", FPSTR(HTML_UI_ICON_ARROW));
 
         // External Link
@@ -153,7 +152,7 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
 
         /** Site closure  */
         this->UI->siteEnd(this->HTMLResponse);
-        setHTTPResponseCode(ESP_APP_HTTP_RESPONSE_CODE_NOT_FOUND);
+        setHTTPResponseCode(ESPAPP_HTTP_RESPONSE_CODE_NOT_FOUND);
         success = true;
         break;
     }

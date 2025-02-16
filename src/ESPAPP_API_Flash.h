@@ -5,23 +5,11 @@
 
 #include <ArduinoJson.h>
 #include <ESPAPP_Parameters.h>
-#include <LITTLEFS.h>
+#include <LittleFS.h>
 
 #ifdef DEBUG
 #include <ESPAPP_SerialMessages.h>
 #endif
-
-/* File openig modes */
-#define ESP_APP_OPEN_FILE_READING "r"
-#define ESP_APP_OPEN_FILE_WRITING "w"
-#define ESP_APP_OPEN_FILE_APPEND "a"
-
-/* Directories */
-#define ESP_APP_DIRECTORY_CONFIG "cfg"
-#define ESP_APP_DIRECTORY_DATA "data"
-
-/* File informing that system file is read */
-#define ESP_APP_FILE_SYSTEM_INITIALIZED "/.token"
 
 class ESPAPP_API_Flash
 {
@@ -30,13 +18,15 @@ private:
   ESPAPP_SerialMessages *Msg;
 #endif
 
+  bool fileSystemReady = false;
+
   bool mountFileSystem(void);
   bool formatFileSystem(void);
   bool fileExist(const char *path);
   bool createFile(const char *path);
 
   bool openFile(File &openedFile, const char *mode,
-                const __FlashStringHelper *path, uint8_t id = ESP_APP_NONE,
+                const __FlashStringHelper *path, uint8_t id = ESPAPP_NONE,
                 boolean createIfNotExists = true);
 
   bool openFile(File &openedFile, const char *mode, const char *path, uint8_t id,
@@ -50,10 +40,15 @@ public:
 #else
   ESPAPP_API_Flash();
 #endif
+  fs::LittleFSFS fileSystem = LittleFS;
 
   bool init(void);
+  bool initialized(void);
   bool getJSON(const __FlashStringHelper *fileName, JsonDocument &doc);
   bool saveJSON(const __FlashStringHelper *fileName, JsonDocument &doc);
+
+  bool deleteFile(const char *path);
+  bool deleteFolder(const char *path);
 
   bool listFolders(ESPAPP_FILE files[], size_t capacity, size_t &count);
   bool listFolders(const char *directory, ESPAPP_FILE files[], size_t capacity, size_t &count);

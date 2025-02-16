@@ -5,7 +5,7 @@
 * - LITTLEFS.h
 * Following must be defined in your app
 * - DEBUG
-* - ESP_APP_FILE_SYSTEM = ESP_APP_FS_SPIFFS or ESP_APP_FS_LITTLEFS
+* - ESPAPP_FILE_SYSTEM = ESPAPP_FS_SPIFFS or ESPAPP_FS_LITTLEFS
 */
 
 #ifndef _ESPAPP_SerialMessages_h
@@ -24,27 +24,27 @@ extern "C" {
 
 /* Define in you app if you diff thean LittleFS*/
 
-#define ESP_APP_FS_SPIFFS 0
-#define ESP_APP_FS_LITTLEFS 1
+#define ESPAPP_FS_SPIFFS 0
+#define ESPAPP_FS_LITTLEFS 1
 
 
-#ifndef ESP_APP_FILE_SYSTEM
-#define ESP_APP_FILE_SYSTEM ESP_APP_FS_LITTLEFS
-// #define ESP_APP_FILE_SYSTEM ESP_APP_FS_SPIFFS
+#ifndef ESPAPP_FILE_SYSTEM
+#define ESPAPP_FILE_SYSTEM ESPAPP_FS_LITTLEFS
+// #define ESPAPP_FILE_SYSTEM ESPAPP_FS_SPIFFS
 #endif
 
 /* Unknown ID */
-#define ESP_APP_UNKNWON 255
+#define ESPAPP_UNKNWON 255
 
 /* Type for messages */
-#define ESP_APP_MSG_TYPE_LINE 0
-#define ESP_APP_MSG_TYPE_BULLET_POINT 1
-#define ESP_APP_MSG_TYPE_INFORMATION 7
-#define ESP_APP_MSG_TYPE_WARNING 8
-#define ESP_APP_MSG_TYPE_ERROR 9
+#define ESPAPP_MSG_TYPE_LINE 0
+#define ESPAPP_MSG_TYPE_BULLET_POINT 1
+#define ESPAPP_MSG_TYPE_INFORMATION 7
+#define ESPAPP_MSG_TYPE_WARNING 8
+#define ESPAPP_MSG_TYPE_ERROR 9
 
 /* Header default length */
-#define ESP_APP_MSG_HEADER_DEFAULT_LENGTH 72
+#define ESPAPP_MSG_HEADER_DEFAULT_LENGTH 72
 
 #ifndef UPDATE_SIZE_UNKNOWN
 #define UPDATE_SIZE_UNKNOWN 0xFFFFFFFF
@@ -54,7 +54,7 @@ extern "C" {
 #include <LITTLEFS.h>
 #else /* ESP8266 */
 #include <FS.h>
-#if ESP_APP_FILE_SYSTEM == ESP_APP_FS_LITTLEFS
+#if ESPAPP_FILE_SYSTEM == ESPAPP_FS_LITTLEFS
 #include <LITTLEFS.h>
 #endif
 #endif // ESP32/ESP8266
@@ -66,7 +66,7 @@ class ESPAPP_SerialMessages {
 private:
 
 
-#if ESP_APP_FILE_SYSTEM == ESP_APP_FS_SPIFFS
+#if ESPAPP_FILE_SYSTEM == ESPAPP_FS_SPIFFS
   FSInfo fileSystem;
 #endif
 
@@ -148,8 +148,8 @@ public:
 
 
   void printHeader(uint8_t newLineBefore = 1, uint8_t newLineAfter = 1,
-                   uint8_t length = ESP_APP_MSG_HEADER_DEFAULT_LENGTH,
-                   uint8_t type = ESP_APP_MSG_HEADER_TYPE_HASH);
+                   uint8_t length = ESPAPP_MSG_HEADER_DEFAULT_LENGTH,
+                   uint8_t type = ESPAPP_MSG_HEADER_TYPE_HASH);
 
   void getFreeMemorySize();
   void getFileSystemDubugInformation();

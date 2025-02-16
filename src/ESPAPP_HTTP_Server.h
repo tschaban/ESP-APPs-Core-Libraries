@@ -37,6 +37,8 @@ public:
     void readHTTPRequest(void);
     bool pushHTMLResponse();
     bool processUploadFile(uint8_t locationId);
+    bool processCSSFileRequest(void);
+    bool processFaviconRequest(void);
 };
 
 #endif // _ESPAPP_HTTP_Server_h

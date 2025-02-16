@@ -22,7 +22,7 @@ bool ESPAPP_HTTPServerContainer::init(void)
     handle("/favicon.ico", std::bind(&ESPAPP_HTTPServerContainer::handleFavicon, this));
     handle("/upload", std::bind(&ESPAPP_HTTPServerContainer::handleHTTPRequests, this),
            std::bind(&ESPAPP_HTTPServerContainer::handleHTTPFileUpload, this));
-
+    handle("/style.css", std::bind(&ESPAPP_HTTPServerContainer::handleCSS, this));
     // handle("/log", handleDownloadLogFile);
     // handleFirmwareUpgrade("/upgrade", handleHTTPRequests, handleUpload);
 
@@ -33,7 +33,7 @@ void ESPAPP_HTTPServerContainer::handleHTTPRequests(void)
 {
 
 #ifdef DEBUG
-    this->System->Msg->printHeader(1, 0, ESP_APP_MSG_HEADER_DEFAULT_LENGTH, ESP_APP_MSG_HEADER_TYPE_DASH);
+    this->System->Msg->printHeader(1, 0, ESPAPP_MSG_HEADER_DEFAULT_LENGTH, ESPAPP_MSG_HEADER_TYPE_DASH);
     this->System->Msg->printInformation(F("New HTTP Request"), F("HTTP Server"));
 #endif
     this->Server->readHTTPRequest();
@@ -41,13 +41,13 @@ void ESPAPP_HTTPServerContainer::handleHTTPRequests(void)
     this->Server->pushHTMLResponse();
 
 #ifdef DEBUG
-    this->System->Msg->printHeader(1, 1, ESP_APP_MSG_HEADER_DEFAULT_LENGTH, ESP_APP_MSG_HEADER_TYPE_DASH);
+    this->System->Msg->printHeader(1, 1, ESPAPP_MSG_HEADER_DEFAULT_LENGTH, ESPAPP_MSG_HEADER_TYPE_DASH);
 #endif
 }
 
 void ESPAPP_HTTPServerContainer::handleFavicon(void)
 {
-    /* Do nothing */
+   this->Server->processFaviconRequest();
 }
 
 void ESPAPP_HTTPServerContainer::handleHTTPFileUpload(void)
@@ -55,6 +55,14 @@ void ESPAPP_HTTPServerContainer::handleHTTPFileUpload(void)
 
     this->Server->processUploadFile(1);
 }
+
+void ESPAPP_HTTPServerContainer::handleCSS(void)
+{
+    this->Server->processCSSFileRequest();
+}
+
+
+
 
 #ifndef ESP32 /* ESP82xx */
 void ESPAPP_HTTPServer::handle(const char *uri,
@@ -87,6 +95,7 @@ void ESPAPP_HTTPServerContainer::handle(const char *uri,
 {
     this->Server->HTTPServer->on(uri, HTTP_POST, handler, handlerUpload);
 }
+
 
 void ESPAPP_HTTPServerContainer::onNotFound(WebServer::THandlerFunction fn)
 {

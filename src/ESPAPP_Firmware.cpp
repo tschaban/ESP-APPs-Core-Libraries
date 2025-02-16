@@ -67,7 +67,7 @@ void ESPAPP_Firmware::begin()
 
 uint8_t ESPAPP_Firmware::getBootMode(void)
 {
-  return ESP_APP_BOOT_MODE_NORMAL;
+  return ESPAPP_BOOT_MODE_NORMAL;
 }
 
 bool ESPAPP_Firmware::initializeNetwork(void)

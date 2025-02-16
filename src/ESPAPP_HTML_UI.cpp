@@ -68,7 +68,7 @@ void ESPAPP_HTML_UI::clearOrphantTags(String *site)
 {
     site->replace(F("{{s.lang}}"), F("en"));
     site->replace(F("{{s.refresh}}"), FPSTR(HTML_UI_EMPTY_STRING));
-    site->replace(F("{{s.title}}"), F(ESP_APP_DEFAULT_DEVICE_NAME));
+    site->replace(F("{{s.title}}"), F(ESPAPP_DEFAULT_DEVICE_NAME));
     site->replace(F("{{s.css}}"), FPSTR(HTML_UI_CSS));
     site->replace(F("{{f.logo}}"), FPSTR(HTML_UI_EMPTY_STRING));
     site->replace(F("{{f.subtitle-1}}"), FPSTR(HTML_UI_EMPTY_STRING));
@@ -393,7 +393,7 @@ void ESPAPP_HTML_UI::replaceTagIcon(String *item, const __FlashStringHelper *ico
 void ESPAPP_HTML_UI::replaceTagUrlParams(String *item, ESPAPP_HTTP_REQUEST *url, const char *parameters)
 {
 
-    if (url->siteId != ESP_APP_NONE)
+    if (url->siteId != ESPAPP_NONE)
     {
         item->replace(F("{{mi.s}}"), (PGM_P)F("site=") + String(url->siteId) + (PGM_P)F("&"));
     }
@@ -402,7 +402,7 @@ void ESPAPP_HTML_UI::replaceTagUrlParams(String *item, ESPAPP_HTTP_REQUEST *url,
         item->replace(F("{{mi.s}}"), FPSTR(HTML_UI_EMPTY_STRING));
     }
 
-    if (url->command != ESP_APP_NONE)
+    if (url->command != ESPAPP_NONE)
     {
         item->replace(F("{{mi.c}}"), (PGM_P)F("cmd=") + String(url->command) + (PGM_P)F("&"));
     }
@@ -411,7 +411,7 @@ void ESPAPP_HTML_UI::replaceTagUrlParams(String *item, ESPAPP_HTTP_REQUEST *url,
         item->replace(F("{{mi.c}}"), FPSTR(HTML_UI_EMPTY_STRING));
     }
 
-    if (url->action != ESP_APP_NONE)
+    if (url->action != ESPAPP_NONE)
     {
         item->replace(F("{{mi.a}}"), (PGM_P)F("action=") + String(url->command) + (PGM_P)F("&"));
     }
@@ -420,7 +420,7 @@ void ESPAPP_HTML_UI::replaceTagUrlParams(String *item, ESPAPP_HTTP_REQUEST *url,
         item->replace(F("{{mi.a}}"), FPSTR(HTML_UI_EMPTY_STRING));
     }
 
-    if (url->option != ESP_APP_NONE)
+    if (url->option != ESPAPP_NONE)
     {
         item->replace(F("{{mi.o}}"), (PGM_P)F("option=") + String(url->command) + (PGM_P)F("&"));
     }

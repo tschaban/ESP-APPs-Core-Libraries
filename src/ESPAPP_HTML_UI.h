@@ -34,7 +34,7 @@ public:
     void setBody(String *site, const __FlashStringHelper *body);
     void setURL(String *site, const __FlashStringHelper *url);
     void setLogoURL(String *site, const __FlashStringHelper *logoURL);
-    void setUrlParams(ESPAPP_HTTP_REQUEST *url, uint8_t siteId = ESP_APP_NONE, uint8_t command = ESP_APP_NONE, uint8_t action = ESP_APP_NONE, uint8_t option = ESP_APP_NONE);
+    void setUrlParams(ESPAPP_HTTP_REQUEST *url, uint8_t siteId = ESPAPP_NONE, uint8_t command = ESPAPP_NONE, uint8_t action = ESPAPP_NONE, uint8_t option = ESPAPP_NONE);
 
     /** Site level */
     void startHeaderSection(String *site);

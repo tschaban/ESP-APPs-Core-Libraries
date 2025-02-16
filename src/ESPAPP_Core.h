@@ -10,7 +10,7 @@
 
 struct CORE_CONFIGURATION
 {
-    char deviceName[33] = ESP_APP_DEFAULT_DEVICE_NAME;
+    char deviceName[33] = ESPAPP_DEFAULT_DEVICE_NAME;
 };
 
 
@@ -35,7 +35,7 @@ public:
 
 
   /* Method reboots device to specyfic mode  define by MODE_.. */
-  void reboot(uint8_t mode = ESP_APP_NETWORK_CONNECTION_MODE_CLIENT);
+  void reboot(uint8_t mode = ESPAPP_NETWORK_CONNECTION_MODE_CLIENT);
 
   /* Method returns current device mode */
   uint8_t connectionMode(void);
