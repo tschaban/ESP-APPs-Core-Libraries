@@ -36,44 +36,24 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
         char fileInfo[ESP_APP_FILE_MAX_FILE_NAME_LENGTH + 2 + 1 + 6 + 1]; // [Filename] 1000000B
 
         this->UI->openSection(this->HTMLResponse, F("Files explorer"), F("Files list"));
-        this->UI->startList(this->HTMLResponse);
+        this->UI->startFileExplorer(this->HTMLResponse);
 
-        this->System->Flash->listAllFiles(files, 10, count);
+        this->System->Flash->listFolders(this->HTTPRequest->parameter1, files, 10, count);
 
         for (size_t i = 0; i < count; i++)
         {
-            if (files[i].isDirectory)
-            {
-                sprintf(fileInfo, "[%s]", files[i].name);
-            }
-            else
-            {   
-                sprintf(fileInfo, "%s %dB", files[i].name, files[i].size);
-            }
-            this->UI->addListItem(this->HTMLResponse, fileInfo);
+            this->UI->addFileExplorerFolderItem(this->HTMLResponse, files[i].name, files[i].size);
         }
-        this->UI->endList(this->HTMLResponse);
 
-        this->UI->closeSection(this->HTMLResponse);
-        // Show files in cfg folder
         count = 0;
-        this->UI->openSection(this->HTMLResponse, F("Files explorer"), F("File in the /cfg folder"));
-        this->UI->startList(this->HTMLResponse);
+        this->System->Flash->listFiles(this->HTTPRequest->parameter1, files, 10, count);
 
-        this->System->Flash->listAllFiles("cfg", files, 10, count);
         for (size_t i = 0; i < count; i++)
         {
-            if (files[i].isDirectory)
-            {
-                sprintf(fileInfo, "[%s]", files[i].name);
-            }
-            else
-            {   
-                sprintf(fileInfo, "%s %dB", files[i].name, files[i].size);
-            }
-            this->UI->addListItem(this->HTMLResponse, fileInfo);
+            this->UI->addFileExplorerFileItem(this->HTMLResponse, files[i].name, files[i].size);
         }
-        this->UI->endList(this->HTMLResponse);
+
+        this->UI->endFileExplorer(this->HTMLResponse);
 
         this->UI->closeSection(this->HTMLResponse);
 

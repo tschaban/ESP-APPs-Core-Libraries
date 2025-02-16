@@ -20,7 +20,6 @@
 #define ESP_APP_DIRECTORY_CONFIG "cfg"
 #define ESP_APP_DIRECTORY_DATA "data"
 
-
 /* File informing that system file is read */
 #define ESP_APP_FILE_SYSTEM_INITIALIZED "/.token"
 
@@ -43,7 +42,7 @@ private:
   bool openFile(File &openedFile, const char *mode, const char *path, uint8_t id,
                 boolean createIfNotExists = true);
 
-
+  bool readFSElements(const char *directory, ESPAPP_FILE files[], size_t capacity, size_t &count, bool includeFiles, bool includeFolders);
 
 public:
 #ifdef DEBUG
@@ -55,8 +54,13 @@ public:
   bool init(void);
   bool getJSON(const __FlashStringHelper *fileName, JsonDocument &doc);
   bool saveJSON(const __FlashStringHelper *fileName, JsonDocument &doc);
-  bool listAllFiles(ESPAPP_FILE files[], size_t capacity, size_t &count);
-  bool listAllFiles(const char* directory, ESPAPP_FILE files[], size_t capacity, size_t &count);
+
+  bool listFolders(ESPAPP_FILE files[], size_t capacity, size_t &count);
+  bool listFolders(const char *directory, ESPAPP_FILE files[], size_t capacity, size_t &count);
+
+  bool listFiles(ESPAPP_FILE files[], size_t capacity, size_t &count);
+  bool listFiles(const char *directory, ESPAPP_FILE files[], size_t capacity, size_t &count);
+
   bool uploadFile(const char *directory, const char *filename, const uint8_t *data, size_t length);
 };
 

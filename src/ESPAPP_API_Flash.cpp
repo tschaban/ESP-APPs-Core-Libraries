@@ -240,20 +240,35 @@ bool ESPAPP_API_Flash::openFile(File &openedFile, const char *mode,
   return openFile(openedFile, mode, fileName, id, createIfNotExists);
 }
 
-bool ESPAPP_API_Flash::listAllFiles(ESPAPP_FILE files[], size_t capacity, size_t &count)
-{
-  return this->listAllFiles((PGM_P)F(ESP_APP_EMPTY_STRING), files, capacity, count);
+bool ESPAPP_API_Flash::listFiles(ESPAPP_FILE files[], size_t capacity, size_t &count) {
+  return readFSElements((PGM_P)F(""), files, capacity, count, true, false);
 }
 
-bool ESPAPP_API_Flash::listAllFiles(const char *directory, ESPAPP_FILE files[], size_t capacity, size_t &count)
+bool ESPAPP_API_Flash::listFiles(const char *directory, ESPAPP_FILE files[], size_t capacity, size_t &count)
+{
+  return readFSElements(directory, files, capacity, count, true, false);
+}
+
+bool ESPAPP_API_Flash::listFolders(ESPAPP_FILE files[], size_t capacity, size_t &count)
+{
+  return readFSElements((PGM_P)F(""), files, capacity, count, false, true);
+}
+
+bool ESPAPP_API_Flash::listFolders(const char *directory, ESPAPP_FILE files[], size_t capacity, size_t &count)
+{
+  return readFSElements(directory, files, capacity, count, false, true);
+}
+
+
+bool ESPAPP_API_Flash::readFSElements(const char *directory, ESPAPP_FILE files[], size_t capacity, size_t &count, bool includeFiles, bool includeFolders)
 {
   count = 0;
-  char listedDirectory[strlen(directory) + 1];
+  char listedDirectory[strlen(directory) + 2];
+  char listedFilename[ESP_APP_FILE_MAX_FILE_NAME_LENGTH];
   sprintf(listedDirectory, "/%s", directory);
 
 #ifdef DEBUG
-  this->Msg->printInformation(F("Listing files in directory"), F("FS"));
-  this->Msg->printBulletPoint(F("Directory: "));
+  this->Msg->printBulletPoint(F("Listing directory: "));
   this->Msg->printValue(listedDirectory);
 #endif
 
@@ -261,26 +276,81 @@ bool ESPAPP_API_Flash::listAllFiles(const char *directory, ESPAPP_FILE files[], 
   if (!root || !root.isDirectory())
   {
 #ifdef DEBUG
-    this->Msg->printBulletPoint(F("Directory not found"));
+    this->Msg->printError(F("Failed to open directory: "), F("FS"));
+    this->Msg->printValue(listedDirectory);
 #endif
     return false;
   }
 
-  File file = root.openNextFile();
-  while (file && count < capacity)
+  // First, list directories if includeFolders = true
+  if (includeFolders)
   {
-    strncpy(files[count].name, file.name(), sizeof(files[count].name) - 1);
-    files[count].name[sizeof(files[count].name) - 1] = '\0';
-    files[count].isDirectory = file.isDirectory();
-    files[count].size = file.size();
-    count++;
-    file = root.openNextFile();
-  }
+    root.rewindDirectory();
+    File entry = root.openNextFile();
+    while (entry && count < capacity)
+    {
+      if (entry.isDirectory())
+      {
+        strncpy(files[count].name, entry.name(), sizeof(files[count].name) - 1);
+        files[count].name[sizeof(files[count].name) - 1] = '\0';
+        files[count].isDirectory = true;
+        sprintf(listedFilename, "/%s", entry.name());
+        
+        // Count how many files are in this directory
+        File subDir = LittleFS.open(listedFilename);
+        size_t fileCount = 0;
+        if (subDir && subDir.isDirectory())
+        {
+          File subEntry = subDir.openNextFile();
+          while (subEntry)
+          {
+            if (!subEntry.isDirectory())
+            {
+              fileCount++;
+            }
+            subEntry = subDir.openNextFile();
+          }
+          subDir.close();
+        }
+        files[count].size = fileCount;  // store number of files in 'size'
+        count++;
 
 #ifdef DEBUG
-  this->Msg->printBulletPoint(F("Files in the directory: "));
-  this->Msg->printValue(count);
+        this->Msg->printBulletPoint(F("Directory: "));
+        this->Msg->printValue(files[count - 1].name);
+        this->Msg->printValue(F(" - Files count: "));
+        this->Msg->printValue(files[count - 1].size);
 #endif
+      }
+      entry = root.openNextFile();
+    }
+  }
+
+  // Then, list files if includeFiles = true
+  if (includeFiles)
+  {
+    root.rewindDirectory();
+    File entry = root.openNextFile();
+    while (entry && count < capacity)
+    {
+      if (!entry.isDirectory())
+      {
+        strncpy(files[count].name, entry.name(), sizeof(files[count].name) - 1);
+        files[count].name[sizeof(files[count].name) - 1] = '\0';
+        files[count].isDirectory = false;
+        files[count].size = entry.size(); // store file size in bytes
+        count++;
+
+#ifdef DEBUG
+        this->Msg->printBulletPoint(F("File: "));
+        this->Msg->printValue(files[count - 1].name);
+        this->Msg->printValue(F(" - Size: "));
+        this->Msg->printValue(files[count - 1].size);
+#endif
+      }
+      entry = root.openNextFile();
+    }
+  }
 
   root.close();
   return true;

@@ -59,10 +59,10 @@
 #define ESP_APP_HTTP_HTML_MAX_RESPONSE_SIZE 2048
 #define ESP_APP_HTTP_RESPONSE_CODE_OK 200
 #define ESP_APP_HTTP_RESPONSE_CODE_NOT_FOUND 404
+#define ESP_APP_HTTP_REQUEST_PARAMETER_1_MAX_LENGTH 32
 
 /* File system */
 #define ESP_APP_FILE_MAX_FILE_NAME_LENGTH 30
-#define ESP_APP_FILE_MAX_DIRECTORY_NAME_LENGTH 20
 #define ESP_APP_FILE_MAX_SIZE 10*1024 // 10kB
 
 const char path_root[] PROGMEM = "";
@@ -101,7 +101,7 @@ struct NETWORK
 
 typedef struct 
 {
-  char name[ESP_APP_FILE_MAX_DIRECTORY_NAME_LENGTH];
+  char name[ESP_APP_FILE_MAX_FILE_NAME_LENGTH];
   bool isDirectory;
   size_t size;
 } ESPAPP_FILE;
@@ -112,6 +112,7 @@ struct ESPAPP_HTTP_REQUEST
   uint8_t command = ESP_APP_NONE;
   uint8_t action = ESP_APP_NONE;
   uint8_t option = ESP_APP_NONE;
+  char parameter1[ESP_APP_HTTP_REQUEST_PARAMETER_1_MAX_LENGTH];
   int HTTPResponseCode = ESP_APP_HTTP_RESPONSE_CODE_OK;
   ESPAPP_FILE *file = new ESPAPP_FILE;
 };

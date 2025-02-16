@@ -48,22 +48,16 @@ bool ESPAPP_HTTPServer::pushHTMLResponse()
 void ESPAPP_HTTPServer::readHTTPRequest(void)
 {
 
-  // Debug: Print all arguments
-  int argsCount = this->HTTPServer->args();
-  this->System->Msg->printBulletPoint(F("Total arguments: "));
-  this->System->Msg->printValue(argsCount);
-  Serial << endl;
-  for (int i = 0; i < argsCount; i++)
-  {
-    Serial << this->HTTPServer->argName(i);
-    this->System->Msg->printValue("=");
-    Serial << this->HTTPServer->arg(i) << endl;
-  }
-
   this->HTTPRequest->siteId = this->HTTPServer->hasArg(F("site")) ? this->HTTPServer->arg(F("site")).toInt() : ESP_APP_NONE;
   this->HTTPRequest->command = this->HTTPServer->hasArg(F("cmd")) ? this->HTTPServer->arg(F("cmd")).toInt() : ESP_APP_NONE;
   this->HTTPRequest->action = this->HTTPServer->hasArg(F("action")) ? this->HTTPServer->arg(F("action")).toInt() : ESP_APP_NONE;
   this->HTTPRequest->option = this->HTTPServer->hasArg(F("option")) ? this->HTTPServer->arg(F("option")).toInt() : ESP_APP_NONE;
+   
+  if (this->HTTPServer->hasArg(F("p1"))) {
+    this->HTTPServer->arg(F("p1")).toCharArray(this->HTTPRequest->parameter1, ESP_APP_HTTP_REQUEST_PARAMETER_1_MAX_LENGTH);
+  } else {
+    strcpy(this->HTTPRequest->parameter1, ESP_APP_EMPTY_STRING);
+  }
 
 #ifdef DEBUG
   this->System->Msg->printBulletPoint(F("Site ID: "));
@@ -75,24 +69,6 @@ void ESPAPP_HTTPServer::readHTTPRequest(void)
   this->System->Msg->printBulletPoint(F("Option: "));
   this->System->Msg->printValue(this->HTTPRequest->option);
 #endif
-
-  if (this->HTTPRequest->siteId == ESPAPP_HTTP_SITE_UPLOAD && this->HTTPRequest->command == ESPAPP_HTTP_COMMAND_UPLOAD)
-  {
-    if (this->HTTPServer->hasArg(F("directory")))
-    {
-      this->HTTPServer->arg(F("directory")).toCharArray(this->HTTPRequest->file->name, this->HTTPServer->arg(F("directory")).length() + 1);
-    }
-    else
-    {
-      sprintf(this->HTTPRequest->file->name, (const char *)F(ESP_APP_EMPTY_STRING));
-    }
-
-#ifdef DEBUG
-    this->System->Msg->printBulletPoint(F("Directory: "));
-    this->System->Msg->printValue(this->HTTPRequest->file->name);
-
-#endif
-  }
 }
 
 bool ESPAPP_HTTPServer::processUploadFile(uint8_t locationId)
@@ -152,7 +128,7 @@ bool ESPAPP_HTTPServer::processUploadFile(uint8_t locationId)
       char uploadFileName[ESP_APP_FILE_MAX_FILE_NAME_LENGTH];
       upload.filename.toCharArray(uploadFileName, upload.filename.length() + 1);
 
-      char directory[ESP_APP_FILE_MAX_DIRECTORY_NAME_LENGTH];
+      char directory[ESP_APP_FILE_MAX_FILE_NAME_LENGTH];
       strcpy_P(directory, (char *)pgm_read_dword(&(ESP_APP_DIRECTORIES[locationId])));
 
 #ifdef DEBUG
@@ -183,7 +159,7 @@ bool ESPAPP_HTTPServer::processUploadFile(uint8_t locationId)
     else
     {
       this->System->Msg->printError(F("Max uploaded file size exceeded"), F("HTTP Server"));
-      this->System->Msg->printValue((uint16_t)ESP_APP_FILE_MAX_SIZE/1024);
+      this->System->Msg->printValue((uint16_t)ESP_APP_FILE_MAX_SIZE / 1024);
       this->System->Msg->printValue(F("kB"));
     }
 #endif

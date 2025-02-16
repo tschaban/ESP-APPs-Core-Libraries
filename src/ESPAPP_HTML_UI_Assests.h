@@ -1,6 +1,8 @@
 #ifndef _ESPAPP_HTML_UI_ASSETS_h
 #define _ESPAPP_HTML_UI_ASSETS_h
 
+/* Build on https://pure-css.github.io/start/*/
+
 const char HTML_UI_EMPTY_STRING[] PROGMEM = "";
 
 const char HTML_UI_SUBMITT_BUTTON_SAVE[] PROGMEM = "Save";
@@ -69,5 +71,12 @@ const char HTML_UI_ITEM_LIST_START[] PROGMEM = "<fieldset><ul class=\"lst\">";
 const char HTML_UI_ITEM_LIST_END[] PROGMEM = "</ul></fieldset>";
 const char HTML_UI_ITEM_LIST_ITEM[] PROGMEM = "<li class=\"m\">{{i.v}}</li>";
 
+
+/** Files explorer */
+
+const char HTML_UI_FILE_EXPLORER_HEADER[] PROGMEM = "<table><tr><th>File name</th><th>Size</th><th>Acton</th></tr>";
+const char HTML_UI_FILE_EXPLORER_FOLDER_ITEM[] PROGMEM = "<tr><td><a href=\"/?site=0&p1={{f.n}}\">{{f.n}}</a></td><td>{{f.s}} files</td><td>Delete</td></tr>";
+const char HTML_UI_FILE_EXPLORER_FILE_ITEM[] PROGMEM = "<tr><td>{{f.n}}</td><td>{{f.s}}B</td><td>Download | Delete</td></tr>";
+const char HTML_UI_FILE_EXPLORER_FOOTER[] PROGMEM = "</table>";
 
 #endif

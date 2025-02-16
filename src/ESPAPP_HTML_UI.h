@@ -77,6 +77,11 @@ public:
     void startForm(String *site, ESPAPP_HTTP_REQUEST *url, const char *parameters);
     void endForm(String *site, const __FlashStringHelper *submiButtonLabel);
 
+    /** Files Explorer */
+    void startFileExplorer(String *site);
+    void endFileExplorer(String *site);
+    void addFileExplorerFolderItem(String *site, const char *name, size_t size);
+    void addFileExplorerFileItem(String *site, const char *name, size_t size);
 
     /** Form's items */
     void addInputFormItem(String *item, const char *type, const char *name,

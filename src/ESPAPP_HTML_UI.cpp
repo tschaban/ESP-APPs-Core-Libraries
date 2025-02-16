@@ -353,6 +353,32 @@ void ESPAPP_HTML_UI::addListItem(String *site, const char *item) {
     site->replace(F("{{i.v}}"), item);
 }
 
+/** Files explorer */
+void ESPAPP_HTML_UI::startFileExplorer(String *site)
+{
+    site->concat(FPSTR(HTML_UI_FILE_EXPLORER_HEADER));
+}
+
+void ESPAPP_HTML_UI::endFileExplorer(String *site)
+{
+    site->concat(FPSTR(HTML_UI_FILE_EXPLORER_FOOTER));
+}
+
+void ESPAPP_HTML_UI::addFileExplorerFolderItem(String *site, const char *name, size_t size)
+{
+    site->concat(FPSTR(HTML_UI_FILE_EXPLORER_FOLDER_ITEM));
+    site->replace(F("{{f.n}}"), name);
+    site->replace(F("{{f.s}}"), String(size));
+}
+
+void ESPAPP_HTML_UI::addFileExplorerFileItem(String *site, const char *name, size_t size)
+{
+    site->concat(FPSTR(HTML_UI_FILE_EXPLORER_FILE_ITEM));
+    site->replace(F("{{f.n}}"), name);
+    site->replace(F("{{f.s}}"), String(size));
+}
+
+
 /** Private */
 void ESPAPP_HTML_UI::replaceTagTitle(String *item, const __FlashStringHelper *title)
 {
