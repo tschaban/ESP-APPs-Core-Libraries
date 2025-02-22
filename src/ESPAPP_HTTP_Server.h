@@ -13,15 +13,17 @@
 // #include <WiFiClient.h>
 
 
-
-
-
-
 class ESPAPP_HTTPServer
 {
 
 private:
     ESPAPP_Core *System;
+    
+    HTTPUpload uploadFile;
+    size_t fileSize = 0;
+    std::vector<uint8_t> fileBuffer;
+    bool fileExededSize = false;
+    bool fileUploadSuccess = false;
 
 public:
     ESPAPP_HTTPServer(ESPAPP_Core *_System);
@@ -35,9 +37,15 @@ public:
     bool init(void);
     void listener(void);
     void readHTTPRequest(void);
-    bool pushHTMLResponse();
-    bool processUploadFile(uint8_t locationId);
+    void readHTTPRequestDirectoryName(char *path);
+    bool pushHTMLResponse();    
+    
+    void processUploadFile(void);
+    bool fileUpladedSuccessfully(void);
+    bool saveUploadedFile(void);
+    
     bool processCSSFileRequest(void);
+    bool processJSFileRequest(void);
     bool processFaviconRequest(void);
 };
 

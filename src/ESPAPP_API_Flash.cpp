@@ -71,7 +71,7 @@ bool ESPAPP_API_Flash::init(void)
 #ifdef DEBUG
   this->Msg->printInformation(F("Initializing file system"), F("FS"));
 #endif
-fileSystemReady = mountFileSystem();
+  fileSystemReady = mountFileSystem();
 
   if (fileSystemReady)
   {
@@ -108,7 +108,7 @@ bool ESPAPP_API_Flash::initialized(void)
 bool ESPAPP_API_Flash::mountFileSystem(void)
 {
 
-  bool success = fileSystem.begin();
+  bool success = fileSystem.begin(false, (PGM_P)F(ESPAPP_FS_BASEPATH), ESPAPP_FS_MAX_OPEN_FILES, (PGM_P)F(ESPAPP_FS_PARTITION_NAME));
 
 #ifdef DEBUG
   if (success)
@@ -132,15 +132,20 @@ bool ESPAPP_API_Flash::formatFileSystem(void)
 #endif
 
   success = fileSystem.format();
+  {
+    success = fileSystem.begin(false, (PGM_P)F(ESPAPP_FS_BASEPATH), ESPAPP_FS_MAX_OPEN_FILES, (PGM_P)F(ESPAPP_FS_PARTITION_NAME));
+  }
 
   if (success)
   {
-#ifdef DEBUG
-    this->Msg->printBulletPoint(F("Creating directories structure"));
-#endif
-    fileSystem.mkdir(F(ESPAPP_DIRECTORY_CONFIG));
-    fileSystem.mkdir(F(ESPAPP_DIRECTORY_DATA));
-    fileSystem.mkdir(F(ESPAPP_DIRECTORY_UI));
+
+    char folderToCreate[ESPAPP_FILE_MAX_FILE_NAME_LENGTH];
+    for (uint8_t i = 0; i < sizeof(ESPAPP_DIRECTORIES) / sizeof(ESPAPP_DIRECTORIES[0]); i++)
+    {
+      strcpy_P(folderToCreate, (char *)pgm_read_dword(&(ESPAPP_DIRECTORIES[i])));
+      this->createFolder(folderToCreate);
+    }
+
     fileSystem.open(F(ESPAPP_FILE_SYSTEM_INITIALIZED), ESPAPP_OPEN_FILE_WRITING).close();
 #ifdef DEBUG
     this->Msg->printBulletPoint(F("Completed"));
@@ -245,7 +250,8 @@ bool ESPAPP_API_Flash::openFile(File &openedFile, const char *mode,
   return openFile(openedFile, mode, fileName, id, createIfNotExists);
 }
 
-bool ESPAPP_API_Flash::listFiles(ESPAPP_FILE files[], size_t capacity, size_t &count) {
+bool ESPAPP_API_Flash::listFiles(ESPAPP_FILE files[], size_t capacity, size_t &count)
+{
   return readFSElements((PGM_P)F(""), files, capacity, count, true, false);
 }
 
@@ -269,7 +275,7 @@ bool ESPAPP_API_Flash::readFSElements(const char *directory, ESPAPP_FILE files[]
   count = 0;
   char listedDirectory[strlen(directory) + 2];
   char listedFilename[ESPAPP_FILE_MAX_FILE_NAME_LENGTH];
-  sprintf(listedDirectory, "/%s", directory);
+  sprintf(listedDirectory, "%s%s", FPSTR(path_root), directory);
 
 #ifdef DEBUG
   this->Msg->printBulletPoint(F("Listing directory: "));
@@ -298,8 +304,8 @@ bool ESPAPP_API_Flash::readFSElements(const char *directory, ESPAPP_FILE files[]
         strncpy(files[count].name, entry.name(), sizeof(files[count].name) - 1);
         files[count].name[sizeof(files[count].name) - 1] = '\0';
         files[count].isDirectory = true;
-        sprintf(listedFilename, "/%s", entry.name());
-        
+        sprintf(listedFilename, "%s%s", FPSTR(path_root), entry.name());
+
         // Count how many files are in this directory
         File subDir = fileSystem.open(listedFilename);
         size_t fileCount = 0;
@@ -316,7 +322,7 @@ bool ESPAPP_API_Flash::readFSElements(const char *directory, ESPAPP_FILE files[]
           }
           subDir.close();
         }
-        files[count].size = fileCount;  // store number of files in 'size'
+        files[count].size = fileCount; // store number of files in 'size'
         count++;
 
 #ifdef DEBUG
@@ -373,7 +379,7 @@ bool ESPAPP_API_Flash::uploadFile(const char *directory, const char *filename, c
 
   char uploadDirectroy[strlen(directory) + 1];
   char uploadFilename[strlen(uploadDirectroy) + strlen(filename) + 1];
-  sprintf(uploadDirectroy, "/%s", directory);
+  sprintf(uploadDirectroy, "%s", directory);
   sprintf(uploadFilename, "%s/%s", uploadDirectroy, filename);
 
 #ifdef DEBUG
@@ -411,18 +417,42 @@ bool ESPAPP_API_Flash::uploadFile(const char *directory, const char *filename, c
   return true;
 }
 
-bool ESPAPP_API_Flash::deleteFile(const char *path)
+bool ESPAPP_API_Flash::deleteFile(const char *directory, const char *path)
 {
+
+  char deletePath[strlen(directory) + strlen(path) + 2];
+  sprintf(deletePath, "%s/%s", directory, path);
 #ifdef DEBUG
   this->Msg->printBulletPoint(F("Deleting file: "));
   this->Msg->printValue(path);
 #endif
-
-  if (fileSystem.exists(path))
+  if (fileSystem.exists(deletePath))
   {
-    return fileSystem.remove(path);
+    return fileSystem.remove(deletePath);
   }
   return false;
+}
+
+bool ESPAPP_API_Flash::createFolder(const char *path)
+{
+
+#ifdef DEBUG
+  this->Msg->printBulletPoint(F("Creating folder: "));
+  this->Msg->printValue(path);
+#endif
+  bool success = fileSystem.mkdir(path);
+#ifdef DEBUG
+  if (success)
+  {
+   this->Msg->printBulletPoint(F("Folder created successfully"));
+  }
+  else
+  {
+    this->Msg->printError(F("Failed to create folder: "), F("FS"));
+    this->Msg->printValue(path);
+  }
+#endif
+  return success;
 }
 
 bool ESPAPP_API_Flash::deleteFolder(const char *path)

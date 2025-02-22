@@ -1,5 +1,4 @@
 #include "ESPAPP_HTTP_Server.h"
-
 ESPAPP_HTTPServer::ESPAPP_HTTPServer(ESPAPP_Core *_System)
 {
   this->HTTPServer = new WebServer(80);
@@ -45,6 +44,23 @@ bool ESPAPP_HTTPServer::pushHTMLResponse()
   return true;
 }
 
+void ESPAPP_HTTPServer::readHTTPRequestDirectoryName(char *path)
+{
+  if (this->HTTPServer->hasArg(FPSTR(ESPAPP_FORM_INPUT_NAME_DIRECTORY)))
+  {
+    sprintf(path, "%s%s", FPSTR(path_root), this->HTTPServer->arg(FPSTR(ESPAPP_FORM_INPUT_NAME_DIRECTORY)).c_str());
+  }
+  else
+  {
+    sprintf(path, "%s", FPSTR(path_root));
+  }
+
+#ifdef DEBUG
+  this->System->Msg->printBulletPoint(F("Directory: "));
+  this->System->Msg->printValue(path);
+#endif
+}
+
 void ESPAPP_HTTPServer::readHTTPRequest(void)
 {
 
@@ -74,16 +90,11 @@ void ESPAPP_HTTPServer::readHTTPRequest(void)
 #endif
 }
 
-bool ESPAPP_HTTPServer::processUploadFile(uint8_t locationId)
+void ESPAPP_HTTPServer::processUploadFile(void)
 {
-  bool success = false;
-  HTTPUpload &upload = this->HTTPServer->upload();
+  uploadFile = this->HTTPServer->upload();
 
-  static size_t fileSize = 0;
-  static std::vector<uint8_t> fileBuffer;
-  static bool fileExededSize = false;
-
-  if (upload.status == UPLOAD_FILE_START)
+  if (uploadFile.status == UPLOAD_FILE_START)
   {
 
 #ifdef DEBUG
@@ -95,20 +106,21 @@ bool ESPAPP_HTTPServer::processUploadFile(uint8_t locationId)
     fileSize = 0;
     fileBuffer.clear();
     fileExededSize = false;
+    fileUploadSuccess = false;
   }
-  else if (upload.status == UPLOAD_FILE_WRITE)
+  else if (uploadFile.status == UPLOAD_FILE_WRITE)
   {
 
     if (!fileExededSize)
     {
-      if (fileSize + upload.currentSize > ESPAPP_FILE_MAX_SIZE)
+      if (fileSize + uploadFile.currentSize > ESPAPP_FILE_MAX_SIZE)
       {
         fileExededSize = true;
       }
       else
       {
-        fileSize += upload.currentSize;
-        fileBuffer.insert(fileBuffer.end(), upload.buf, upload.buf + upload.currentSize);
+        fileSize += uploadFile.currentSize;
+        fileBuffer.insert(fileBuffer.end(), uploadFile.buf, uploadFile.buf + uploadFile.currentSize);
 #ifdef DEBUG
         this->System->Msg->printValue(F("."));
 #endif
@@ -121,42 +133,19 @@ bool ESPAPP_HTTPServer::processUploadFile(uint8_t locationId)
 #endif
     }
   }
-  else if (upload.status == UPLOAD_FILE_END)
+  else if (uploadFile.status == UPLOAD_FILE_END)
   {
+#ifdef DEBUG
     this->System->Msg->printBulletPoint(F("Uploaded finished"));
+    this->System->Msg->printBulletPoint(F("Upload: File name: "));
+    this->System->Msg->printValue(uploadFile.filename);
+    this->System->Msg->printBulletPoint(F("Upload: Size: "));
+    this->System->Msg->printValue(uploadFile.totalSize, F("B"));
+#endif
 
     if (!fileExededSize)
     {
-
-      char uploadFileName[ESPAPP_FILE_MAX_FILE_NAME_LENGTH];
-      upload.filename.toCharArray(uploadFileName, upload.filename.length() + 1);
-
-      char directory[ESPAPP_FILE_MAX_FILE_NAME_LENGTH];
-      strcpy_P(directory, (char *)pgm_read_dword(&(ESPAPP_DIRECTORIES[locationId])));
-
-#ifdef DEBUG
-      this->System->Msg->printBulletPoint(F("Upload: Size: "));
-      this->System->Msg->printValue(upload.totalSize, F("B"));
-      this->System->Msg->printBulletPoint(F("Upload: File name: "));
-      this->System->Msg->printValue(uploadFileName);
-      this->System->Msg->printBulletPoint(F("Save to directory: "));
-      this->System->Msg->printValue(directory);
-#endif
-
-      if (strlen(uploadFileName) > 0)
-      {
-#ifdef DEBUG
-        this->System->Msg->printBulletPoint(F("Saving in the file system"));
-#endif
-        success = this->System->Flash->uploadFile(directory, uploadFileName,
-                                                  fileBuffer.data(), upload.totalSize);
-      }
-#ifdef DEBUG
-      else
-      {
-        this->System->Msg->printError(F("Empty file name"), F("HTTP Server"));
-      }
-#endif
+      fileUploadSuccess = true;
     }
 #ifdef DEBUG
     else
@@ -167,7 +156,43 @@ bool ESPAPP_HTTPServer::processUploadFile(uint8_t locationId)
     }
 #endif
   }
+}
 
+bool ESPAPP_HTTPServer::fileUpladedSuccessfully(void)
+{
+  bool tmp = fileUploadSuccess;
+  fileUploadSuccess = false;
+  return tmp;
+}
+
+bool ESPAPP_HTTPServer::saveUploadedFile(void)
+{
+  bool success = false;
+  char uploadFileName[ESPAPP_FILE_MAX_FILE_NAME_LENGTH];
+  uploadFile.filename.toCharArray(uploadFileName, uploadFile.filename.length() + 1);
+
+  char directory[ESPAPP_FILE_MAX_FILE_NAME_LENGTH];
+  this->readHTTPRequestDirectoryName(directory);
+
+#ifdef DEBUG
+  this->System->Msg->printBulletPoint(F("Save to directory: "));
+  this->System->Msg->printValue(directory);
+#endif
+
+  if (strlen(uploadFileName) > 0)
+  {
+#ifdef DEBUG
+    this->System->Msg->printBulletPoint(F("Saving in the file system"));
+#endif
+    success = this->System->Flash->uploadFile(directory, uploadFileName,
+                                              fileBuffer.data(), uploadFile.totalSize);
+  }
+#ifdef DEBUG
+  else
+  {
+    this->System->Msg->printError(F("Empty file name"), F("HTTP Server"));
+  }
+#endif
   return success;
 }
 
@@ -178,24 +203,51 @@ bool ESPAPP_HTTPServer::processFaviconRequest(void)
 
 bool ESPAPP_HTTPServer::processCSSFileRequest(void)
 {
-  bool success = false;
+  bool success = true;
 #ifdef DEBUG
-  this->System->Msg->printBulletPoint(F("Processing CSS file request"));
+  this->System->Msg->printInformation(F("Processing CSS file request"), F("HTTP Server"));
 #endif
-  if (this->System->Flash->initialized())
+
+  char pathToCSSFile[strlen_P(path_data) + strlen_P(path_root) + ESPAPP_FILE_MAX_FILE_NAME_LENGTH];
+
+  if (this->HTTPServer->hasArg(F("name")))
   {
+    sprintf(pathToCSSFile, "%s%s%s", FPSTR(path_ui), FPSTR(path_root), this->HTTPServer->arg(F("name")).c_str());
+
 #ifdef DEBUG
-    this->System->Msg->printBulletPoint(F("Flash system initialized"));
+    this->System->Msg->printBulletPoint(F("CSS: "));
+    this->System->Msg->printValue(pathToCSSFile);
 #endif
-    File file = this->System->Flash->fileSystem.open(F(ESPAPP_CSS_FILE), ESPAPP_OPEN_FILE_READING);
-    if (file)
-    {
-      this->HTTPServer->streamFile(file, "text/css");
-      file.close();
-      success = true;
+  }
+  else
+  {
+    success = false;
 #ifdef DEBUG
+    this->System->Msg->printError(F("CSS file name not provided"), F("HTTP Server"));
+#endif
+  }
+
+  if (success && this->System->Flash->initialized())
+  {
+    File cssFile = this->System->Flash->fileSystem.open(pathToCSSFile, ESPAPP_OPEN_FILE_READING);
+    if (cssFile)
+    {
+      this->HTTPServer->streamFile(cssFile, "text/css");
+      cssFile.close();
+      
+     // if (gzip)
+     // {
+     //   this->HTTPServer->sendHeader(F("Content-Encoding"), F("gzip"));
+     // }
+
+
+      #ifdef DEBUG
       this->System->Msg->printBulletPoint(F("CSS file streamed successfully"));
 #endif
+    }
+    else
+    {
+      success = false;
     }
   }
 
@@ -204,6 +256,68 @@ bool ESPAPP_HTTPServer::processCSSFileRequest(void)
     this->HTTPServer->send(404, "text/plain", "File Not Found");
 #ifdef DEBUG
     this->System->Msg->printError(F("CSS file not found"), F("HTTP Server"));
+#endif
+  }
+
+  return success;
+}
+
+
+bool ESPAPP_HTTPServer::processJSFileRequest(void)
+{
+  bool success = true;
+#ifdef DEBUG
+  this->System->Msg->printInformation(F("Processing JS file request"), F("HTTP Server"));
+#endif
+
+  char pathToJSFile[strlen_P(path_data) + strlen_P(path_root) + ESPAPP_FILE_MAX_FILE_NAME_LENGTH];
+
+  if (this->HTTPServer->hasArg(F("name")))
+  {
+    sprintf(pathToJSFile, "%s%s%s", FPSTR(path_ui), FPSTR(path_root), this->HTTPServer->arg(F("name")).c_str());
+
+#ifdef DEBUG
+    this->System->Msg->printBulletPoint(F("JS: "));
+    this->System->Msg->printValue(pathToJSFile);
+#endif
+  }
+  else
+  {
+    success = false;
+#ifdef DEBUG
+    this->System->Msg->printError(F("JS file name not provided"), F("HTTP Server"));
+#endif
+  }
+
+  if (success && this->System->Flash->initialized())
+  {
+    File jsFile = this->System->Flash->fileSystem.open(pathToJSFile, ESPAPP_OPEN_FILE_READING);
+    if (jsFile)
+    {
+      this->HTTPServer->streamFile(jsFile, "application/javascript");
+      jsFile.close();
+      
+     // if (gzip)
+     // {
+     //   this->HTTPServer->sendHeader(F("Content-Encoding"), F("gzip"));
+     // }
+
+
+      #ifdef DEBUG
+      this->System->Msg->printBulletPoint(F("JS file streamed successfully"));
+#endif
+    }
+    else
+    {
+      success = false;
+    }
+  }
+
+  if (!success)
+  {
+    this->HTTPServer->send(404, "text/plain", "File Not Found");
+#ifdef DEBUG
+    this->System->Msg->printError(F("JS file not found"), F("HTTP Server"));
 #endif
   }
 

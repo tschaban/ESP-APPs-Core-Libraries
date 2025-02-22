@@ -22,6 +22,7 @@ private:
     void handleHTTPFileUpload(void);
     void handleFavicon(void);
     void handleCSS(void);
+    void handleJS(void);
 
     
 #ifdef ESP32

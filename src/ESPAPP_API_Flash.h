@@ -6,6 +6,7 @@
 #include <ArduinoJson.h>
 #include <ESPAPP_Parameters.h>
 #include <LittleFS.h>
+#include <FS.h>
 
 #ifdef DEBUG
 #include <ESPAPP_SerialMessages.h>
@@ -24,6 +25,7 @@ private:
   bool formatFileSystem(void);
   bool fileExist(const char *path);
   bool createFile(const char *path);
+  bool createFolder(const char *path);
 
   bool openFile(File &openedFile, const char *mode,
                 const __FlashStringHelper *path, uint8_t id = ESPAPP_NONE,
@@ -40,14 +42,15 @@ public:
 #else
   ESPAPP_API_Flash();
 #endif
-  fs::LittleFSFS fileSystem = LittleFS;
+
+  fs::LittleFSFS &fileSystem = LittleFS;
 
   bool init(void);
   bool initialized(void);
   bool getJSON(const __FlashStringHelper *fileName, JsonDocument &doc);
   bool saveJSON(const __FlashStringHelper *fileName, JsonDocument &doc);
 
-  bool deleteFile(const char *path);
+  bool deleteFile(const char *directory, const char *path);
   bool deleteFolder(const char *path);
 
   bool listFolders(ESPAPP_FILE files[], size_t capacity, size_t &count);

@@ -3,14 +3,10 @@
 
 #define ESPAPP_MAX_SITE_SIZE 10*1024 // 10kB
 
-/* Form constants */
-#define ESPAPP_FORM_INPUT_TYPE_NUMBER "number"
-#define ESPAPP_FORM_INPUT_TYPE_TEXT "text"
-#define ESPAPP_FORM_INPUT_TYPE_PASSWORD "password"
-#define ESPAPP_FORM_SKIP_ATTRIBUTE "?"
+// Needs to be reflected in HTML_UI_FILE_EXPLORER_UPLOAD_FORM in ESPAPP_HTML_UI_Assests.h
+const char ESPAPP_FORM_INPUT_NAME_DIRECTORY[] PROGMEM = "directory";
 
-/** CSS File */
-#define ESPAPP_CSS_FILE "/ui/style.css"
+
 
 
 #endif // _ESPAPP_Parameters_h

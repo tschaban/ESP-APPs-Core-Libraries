@@ -4,7 +4,7 @@ ESPAPP_HTTPServerContainer::ESPAPP_HTTPServerContainer(ESPAPP_Core *_System)
 {
     this->System = _System;
     this->Server = new ESPAPP_HTTPServer(_System);
-    this->Site = new ESPAPP_HTML_SitesGenerator(_System, this->Server->outputStream, this->Server->HTTPRequest);
+    this->Site = new ESPAPP_HTML_SitesGenerator(_System, this->Server, this->Server->outputStream);
 };
 
 ESPAPP_HTTPServerContainer::~ESPAPP_HTTPServerContainer() {
@@ -22,7 +22,9 @@ bool ESPAPP_HTTPServerContainer::init(void)
     handle("/favicon.ico", std::bind(&ESPAPP_HTTPServerContainer::handleFavicon, this));
     handle("/upload", std::bind(&ESPAPP_HTTPServerContainer::handleHTTPRequests, this),
            std::bind(&ESPAPP_HTTPServerContainer::handleHTTPFileUpload, this));
-    handle("/style.css", std::bind(&ESPAPP_HTTPServerContainer::handleCSS, this));
+    handle("/css", std::bind(&ESPAPP_HTTPServerContainer::handleCSS, this));
+    handle("/js", std::bind(&ESPAPP_HTTPServerContainer::handleCSS, this));
+
     // handle("/log", handleDownloadLogFile);
     // handleFirmwareUpgrade("/upgrade", handleHTTPRequests, handleUpload);
 
@@ -52,8 +54,7 @@ void ESPAPP_HTTPServerContainer::handleFavicon(void)
 
 void ESPAPP_HTTPServerContainer::handleHTTPFileUpload(void)
 {
-
-    this->Server->processUploadFile(1);
+    this->Server->processUploadFile();
 }
 
 void ESPAPP_HTTPServerContainer::handleCSS(void)
@@ -61,6 +62,10 @@ void ESPAPP_HTTPServerContainer::handleCSS(void)
     this->Server->processCSSFileRequest();
 }
 
+void ESPAPP_HTTPServerContainer::handleJS(void)
+{
+    this->Server->processJSFileRequest();
+}
 
 
 

@@ -3,284 +3,101 @@
 
 <head>
     <meta charset="utf-8">
-    <title>AFE : JadalniaKinkiet</title>
-    <link href="https://fonts.googleapis.com/css2?family=Titillium+Web&display=swap" rel="stylesheet">
-    <style>
-        html {
-            background: url(http://api.smartnydom.pl/images/background-3.8.0.webp) no-repeat center center fixed;
-            -webkit-background-size: cover;
-            -moz-background-size: cover;
-            -o-background-size: cover;
-            background-size: cover
-        }
-
-        .l,
-        .r {
-            margin: 0;
-            padding: 1.2em 1.2em 2.2em 1.2em;
-            display: table-cell
-        }
-
-        .ltit,
-        body {
-            margin: auto
-        }
-
-        .b,
-        .itm a,
-        a {
-            text-decoration: none
-        }
-
-        body {
-            padding: 2em;
-            max-width: 980px
-        }
-
-        .c {
-            display: table;
-            width: 100%;
-            margin-bottom: .5em
-        }
-
-        .m {
-            text-decoration: none;
-            padding-left: 1.5em;
-            color: #777;
-            font-size: 0.9em
-        }
-
-        .l {
-            width: 280px;
-            background: #000;
-            color: #fff;
-            border-top-left-radius: .8em;
-            border-bottom-left-radius: .8em;
-            opacity: .93
-        }
-
-        .r {
-            background: #eee;
-            border-top-right-radius: .8em;
-            border-bottom-right-radius: .8em;
-            opacity: .93
-        }
-
-        a,
-        button,
-        h1,
-        h3,
-        h4,
-        input,
-        label,
-        li,
-        p,
-        span,
-        small,
-        code {
-            font-family: 'Titillium Web', sans-serif
-        }
-
-        h4 {
-            font-size: .8em;
-            margin-bottom: 1px
-        }
-
-        .lst {
-            list-style: none;
-            margin: 0;
-            padding: 0
-        }
-
-        .itm a,
-        .itm i {
-            display: block;
-            white-space: nowrap;
-            padding: 0 1em;
-            color: #aaa;
-            font-size: .8em
-        }
-
-        .itm i {
-            font-weight: 700;
-            padding-top: .5em
-        }
-
-        .cf label,
-        .hint,
-        input,
-        select {
-            display: inline-block;
-            vertical-align: middle
-        }
-
-        .itm a:focus,
-        .itm a:hover {
-            background-color: #aaa;
-            text-decoration: none;
-            padding: 0 1.5em;
-            color: #000
-        }
-
-        .ci {
-            margin-bottom: 1em
-        }
-
-        .ci h1 {
-            color: #999;
-            border-bottom: 1px solid #ddd;
-            font-size: 1.2em;
-            font-weight: 500;
-            margin: 0
-        }
-
-        .ci .cd {
-            color: #aaa;
-            font-size: 80%;
-            font-style: italic;
-            margin-bottom: 2em;
-            margin-top: 0
-        }
-
-        .cm {
-            color: #999;
-            font-size: 90%;
-            margin: 0 0 20px
-        }
-
-        .la {
-            margin: 0 .1em;
-            padding: .3em 1em;
-            color: #fff;
-            background: #999;
-            font-size: 80%
-        }
-
-        .cc label,
-        .cf label {
-            font-size: .875em
-        }
-
-        .lr {
-            background: #ca3c3c
-        }
-
-        .bs,
-        .lg {
-            background: #2fb548
-        }
-
-        fieldset {
-            margin: 0;
-            padding: .35em 0 .75em;
-            border: 0
-        }
-
-        .cf {
-            margin-bottom: .3em
-        }
-
-        .cc {
-            margin: 0 0 .1em 9.4em
-        }
-
-        .cf label {
-            text-align: right;
-            width: 10em;
-            margin: 0 1em 0 0
-        }
-
-        input,
-        select {
-            padding: .4em .6em;
-            border: 1px solid #ccc;
-            box-sizing: border-box
-        }
-
-        .hint {
-            padding-left: .5em;
-            color: #aaa;
-            font-size: 80%
-        }
-
-        .b {
-            font-size: 100%;
-            padding: .2em 1em;
-            border: 1px solid #999;
-            border: transparent;
-            color: #fff
-        }
-
-        .be {
-            background: #ca3c3c
-        }
-
-        .bw {
-            background: #df7514
-        }
-
-        .bc {
-            background: #42b8dd
-        }
-
-        .b:focus,
-        .b:hover {
-            background-image: -webkit-linear-gradient(transparent, rgba(0, 0, 0, .05) 40%, rgba(0, 0, 0, .1));
-            background-image: linear-gradient(transparent, rgba(0, 0, 0, .05) 40%, rgba(0, 0, 0, .1))
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP Device</title>
+    <link rel="stylesheet" href="/css?name=pure-min.css.gz">
+    <link rel="stylesheet" href="/css?name=layout.css.gz">
 </head>
 
 <body>
-    <div class="c">
-        <div class="l"><img style="opacity:.4" src="http://api.smartnydom.pl/images/afe-logo.png"><br><small
-                style="opacity:.3">Wersja T0-3.8.0.B12 ESP8285 (Build:3118)<br>RAM wykorzystany w 64.5%</small></div>
-        <div class="r">
-            <div class="ci">
-                <h1>JadalniaKinkiet</h1>
-                <p class="cd"></p>
-                <fieldset>
-                    <ul class="lst">
-                        <li class="m">Multicast DNS jest włączony</li>
-                        <li class="m">Jeśli LAN wspiera mDNS urządzenie będzie dostępne pod <a target="_blank"
-                                href="http://afe-4C4eEB3b-D69d9Dd6.local">adresem</a></li>
-                        <li class="m">Testujesz wersj&#281; Beta AFE Firmware. Prosz&#281; zg&#322;aszaj problemy <a
-                                style="color:#0475b6" href="https://www.smartnydom.pl/forum/afe-firmware/">tutaj</a>.
-                            Dzi&#281;kuj&#281;!</li>
-                        <li class="m">AFE Pro: Jest aktywne</li>
-                        <li class="m"><a style="color:#0475b6" href="/?o=47">Więcej</a> informacji o urządzeniu</li>
-                        <li class="m"><a style="color:#0475b6" href="/?o=50">Logi</a> systemowe</li>
+    <div id="layout" class="pure-g">
+        <div class="sidebar pure-u-1 pure-u-md-1-4">
+            <div class="header">
+                <h1 class="brand-title">ESPAPP</h1>
+                <h2 class="brand-tagline">Version</h2>
+                <nav class="nav">
+                    <ul class="nav-list">
+                        <li class="nav-item"><a class="pure-button" href="/?site=0&">File explorer</a></li>
+                        <li class="nav-item"><a class="pure-button" href="/?site=1&">Site template</a></li>
+                        <li class="nav-item"><a class="pure-button" href="/?site=2&cmd=1&">&#8227; Item 4</a></li>
+                        <li class="nav-item"><a class="pure-button" href="/?site=3&cmd=1&action=1&">Item 5</a></li>
+                        <li class="nav-item"><a class="pure-button" href="/?site=4&cmd=1&action=1&option=1&">Item 6</a>
+                        </li>
+                        <li class="nav-item"><a class="pure-button" href="https://www.smartnydom.pl">&#8227; Smart'my
+                                Dom</a></li>
                     </ul>
-                </fieldset>
+                </nav>
             </div>
-            <div class="ci">
-                <h1>Konfiguracja</h1>
-                <p class="cd">Aby uruchomić panel konfiguracyjny użyj jednego z poniższych przycisków</p>
-                <fieldset>
-                    <form method="post">
-                        <div class="cf"><input name="p" type="password" placeholder="Hasło"> <input type="submit"
-                                class="b bs" value="Tryb normalny" formaction="/?o=0&i=1" /> <input type="submit"
-                                class="b be" value="Tryb HotSpot" formaction="/?o=0&i=2" /></div>
-                    </form>
-                </fieldset>
-            </div>
-            <div class="ci">
-                <h1>Informacje dodatkowe</h1>
-                <p class="cd"></p>
-                <fieldset>
-                    <p style="color:#aaa;font-size:.9em;margin:0 0 2em 0">Oprogramowanie aktywnie u&#380;ywane z
-                        HomeAssistant, OpenHab oraz Domoticz<br>Oprogramowanie pobrane: 4363x</p>
-                    <p style="color:#aaa;font-size:.9em;margin:0">Dzia&#322;a &#128077; ? <a style="color:#0475b6"
-                            href="https://s.smartnydom.pl/r/wsparcie">Rozwa&#380; wsparcie</a> N-setek godzin mojej
-                        pracy. Dzi&#281;ki <a style="color:#0475b6"
-                            href="https://afe.smartnydom.pl/pl/postawowe-informacje/o-autorze">adrian</a><br><br><strong>Wspierajacy
-                            w 2k24</strong>: wojtek_gtx, Rafa&#322; Jankiii</p>
-                </fieldset>
+        </div>
+        <div class="content pure-u-1 pure-u-md-3-4">
+            <div>
+                <div class="posts">
+                    <h1 class="content-subhead">Files explorer</h1>
+                    <section class="post">
+                        <header class="post-header">
+                            <h2 class="post-title">Files list</h2>
+                        </header>
+                        <div class="post-description">
+                            <table class="pure-table pure-table-horizontal">
+                                <tr>
+                                    <th>File name</th>
+                                    <th>Size</th>
+                                    <th>Acton</th>
+                                </tr>
+                                <tr>
+                                    <td><a href="/?site=0&p1=cfg">cfg</a></td>
+                                    <td>1 files</td>
+                                    <td>Delete</td>
+                                </tr>
+                                <tr>
+                                    <td><a href="/?site=0&p1=data">data</a></td>
+                                    <td>0 files</td>
+                                    <td>Delete</td>
+                                </tr>
+                                <tr>
+                                    <td><a href="/?site=0&p1=ui">ui</a></td>
+                                    <td>2 files</td>
+                                    <td>Delete</td>
+                                </tr>
+                                <tr>
+                                    <td>.token</td>
+                                    <td>0B</td>
+                                    <td>
+                                        <form action="/?site=0&cmd=1" method="POST"><input type="hidden" name="f"
+                                                value=".token"><input type="hidden" name="directory" value="/"><button
+                                                class="pure-button pure-button-primary" type="submit">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </section>
+                </div>
+                <div class="posts">
+                    <h1 class="content-subhead">Upload file</h1>
+                    <section class="post">
+                        <header class="post-header">
+                            <h2 class="post-title">Upload file to the current folder</h2>
+                        </header>
+                        <div class="post-description">
+                            <form action="/upload?site=0&cmd=0" method="POST" enctype="multipart/form-data"><input
+                                    type="file" name="uploadedFile"><input type="hidden" name="directory"
+                                    value="/"><button class="pure-button pure-button-primary"
+                                    type="submit">Upload</button></form>
+                        </div>
+                    </section>
+                </div>
+                <div class="footer">
+                    <div class="pure-menu pure-menu-horizontal">
+                        <ul>
+                            <li class="pure-menu-item"><a href="" class="pure-menu-link">About</a></li>
+                            <li class="pure-menu-item"><a href="" class="pure-menu-link">GitHub</a></li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    <div style="text-align: right;"><a href="https://smartnydom.pl"><img style="opacity:.8;"
-                src="http://api.smartnydom.pl/images/smartnydom.png" /></a></div>
 </body>
 
 </html>

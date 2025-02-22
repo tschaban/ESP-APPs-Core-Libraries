@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="pl">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="refresh" content="610; url=/">
+    <title>AFE : SalonLampaTyl</title>
+    <link href="https://fonts.googleapis.com/css2?family=Titillium+Web&display=swap" rel="stylesheet">
+    <style>
+        html {
+            background: url(http://api.smartnydom.pl/images/background-3.8.0.webp) no-repeat center center fixed;
+            -webkit-background-size: cover;
+            -moz-background-size: cover;
+            -o-background-size: cover;
+            background-size: cover
+        }
+
+        .l,
+        .r {
+            margin: 0;
+            padding: 1.2em 1.2em 2.2em 1.2em;
+            display: table-cell
+        }
+
+        .ltit,
+        body {
+            margin: auto
+        }
+
+        .b,
+        .itm a,
+        a {
+            text-decoration: none
+        }
+
+        body {
+            padding: 2em;
+            max-width: 980px
+        }
+
+        .c {
+            display: table;
+            width: 100%;
+            margin-bottom: .5em
+        }
+
+        .m {
+            text-decoration: none;
+            padding-left: 1.5em;
+            color: #777;
+            font-size: 0.9em
+        }
+
+        .l {
+            width: 280px;
+            background: #000;
+            color: #fff;
+            border-top-left-radius: .8em;
+            border-bottom-left-radius: .8em;
+            opacity: .93
+        }
+
+        .r {
+            background: #eee;
+            border-top-right-radius: .8em;
+            border-bottom-right-radius: .8em;
+            opacity: .93
+        }
+
+        a,
+        button,
+        h1,
+        h3,
+        h4,
+        input,
+        label,
+        li,
+        p,
+        span,
+        small,
+        code {
+            font-family: 'Titillium Web', sans-serif
+        }
+
+        h4 {
+            font-size: .8em;
+            margin-bottom: 1px
+        }
+
+        .lst {
+            list-style: none;
+            margin: 0;
+            padding: 0
+        }
+
+        .itm a,
+        .itm i {
+            display: block;
+            white-space: nowrap;
+            padding: 0 1em;
+            color: #aaa;
+            font-size: .8em
+        }
+
+        .itm i {
+            font-weight: 700;
+            padding-top: .5em
+        }
+
+        .cf label,
+        .hint,
+        input,
+        select {
+            display: inline-block;
+            vertical-align: middle
+        }
+
+        .itm a:focus,
+        .itm a:hover {
+            background-color: #aaa;
+            text-decoration: none;
+            padding: 0 1.5em;
+            color: #000
+        }
+
+        .ci {
+            margin-bottom: 1em
+        }
+
+        .ci h1 {
+            color: #999;
+            border-bottom: 1px solid #ddd;
+            font-size: 1.2em;
+            font-weight: 500;
+            margin: 0
+        }
+
+        .ci .cd {
+            color: #aaa;
+            font-size: 80%;
+            font-style: italic;
+            margin-bottom: 2em;
+            margin-top: 0
+        }
+
+        .cm {
+            color: #999;
+            font-size: 90%;
+            margin: 0 0 20px
+        }
+
+        .la {
+            margin: 0 .1em;
+            padding: .3em 1em;
+            color: #fff;
+            background: #999;
+            font-size: 80%
+        }
+
+        .cc label,
+        .cf label {
+            font-size: .875em
+        }
+
+        .lr {
+            background: #ca3c3c
+        }
+
+        .bs,
+        .lg {
+            background: #2fb548
+        }
+
+        fieldset {
+            margin: 0;
+            padding: .35em 0 .75em;
+            border: 0
+        }
+
+        .cf {
+            margin-bottom: .3em
+        }
+
+        .cc {
+            margin: 0 0 .1em 9.4em
+        }
+
+        .cf label {
+            text-align: right;
+            width: 10em;
+            margin: 0 1em 0 0
+        }
+
+        input,
+        select {
+            padding: .4em .6em;
+            border: 1px solid #ccc;
+            box-sizing: border-box
+        }
+
+        .hint {
+            padding-left: .5em;
+            color: #aaa;
+            font-size: 80%
+        }
+
+        .b {
+            font-size: 100%;
+            padding: .2em 1em;
+            border: 1px solid #999;
+            border: transparent;
+            color: #fff
+        }
+
+        .be {
+            background: #ca3c3c
+        }
+
+        .bw {
+            background: #df7514
+        }
+
+        .bc {
+            background: #42b8dd
+        }
+
+        .b:focus,
+        .b:hover {
+            background-image: -webkit-linear-gradient(transparent, rgba(0, 0, 0, .05) 40%, rgba(0, 0, 0, .1));
+            background-image: linear-gradient(transparent, rgba(0, 0, 0, .05) 40%, rgba(0, 0, 0, .1))
+        }
+    </style>
+</head>
+
+<body>
+    <div class="c">
+        <div class="l"><img style="opacity:.4" src="http://api.smartnydom.pl/images/afe-logo.png"><br><small
+                style="opacity:.3">Wersja T0-3.8.0.B12 ESP8285 (Build:3118)<br>RAM wykorzystany w 64.8%</small>
+            <ul class="lst"></ul>
+            <h4>&#10150; Menu</h4>
+            <ul class="lst">
+                <li class="itm"><a href="/?o=1">Urządzenie</a></li>
+            </ul>
+            <h4>&#10150; Połączenia</h4>
+            <ul class="lst">
+                <li class="itm"><a href="/?o=2">Sieć WiFi</a></li>
+                <li class="itm"><a href="/?o=3">MQTT Broker</a></li>
+                <li class="itm"><a href="/?o=46">Integracja z Home Assistant</a></li>
+            </ul>
+            <h4>&#10150; Sprzęt</h4>
+            <ul class="lst">
+                <li class="itm"><i>Konfiguracja przekaźników</i></li>
+                <li class="itm"><a href="/?o=8&i=0">&#8227; Przekaźnik: 1</a></li>
+                <li class="itm"><i>Przyciski</i></li>
+                <li class="itm"><a href="/?o=9&i=0">&#8227; Przycisk: 1</a></li>
+            </ul>
+            <h4>&#10150; Funkcje</h4>
+            <ul class="lst"></ul>
+            <h4>&#10150; Firmware</h4>
+            <ul class="lst">
+                <li class="itm"><a href="/?o=45">Wersja</a></li>
+                <li class="itm"><a href="/?o=10">Ustaw hasło</a></li>
+                <li class="itm"><a href="/?o=20">Aktualizacja oprogramowania</a></li>
+                <li class="itm"><a href="/?o=16">Ustawienia początkowe</a></li>
+                <li class="itm"><a href="/?o=11">Wersja PRO</a></li>
+                <li class="itm"><a href="https://afe.smartnydom.pl">Dokumentacja</a></li>
+                <li class="itm"><a href="https://www.smartnydom.pl/forum/afe-firmware/">Pomoc</a></li>
+                <li class="itm"><a href="https://afe.yt.pl.smartnydom.pl">YouTube</a></li>
+            </ul>
+            <h4></h4>
+            <ul class="lst">
+                <li class="itm"><a href="/?o=15">&#10004; Zakończ konfigurację</a></li>
+            </ul>
+        </div>
+        <div class="r">
+            <form method="post" action="/?c=1&o=1">
+                <div class="ci">
+                    <h1>Firmware</h1>
+                    <p class="cd"></p>
+                    <fieldset>
+                        <ul class="lst">
+                            <li class="m">Testujesz wersj&#281; Beta AFE Firmware. Prosz&#281; zg&#322;aszaj problemy <a
+                                    style="color:#0475b6"
+                                    href="https://www.smartnydom.pl/forum/afe-firmware/">tutaj</a>. Dzi&#281;kuj&#281;!
+                            </li>
+                            <li class="m">AFE Pro: Jest aktywne</li>
+                        </ul>
+                    </fieldset>
+                </div>
+                <div class="ci">
+                    <h1>Urządzenie</h1>
+                    <p class="cd">Nazwa jest wykorzystywana jako nazwa urządzenia w Twojej lokalnej sieci WiFi oraz jako
+                        nazwa hotspot'a urządzenia</p>
+                    <fieldset>
+                        <div class="cf"><label>Nazwa urządzenia</label><input name="n" type="text" maxlength="16"
+                                value="SalonLampaTyl"><span class="hint">Max 16 znaków</span></div>
+                    </fieldset>
+                </div>
+                <div class="ci">
+                    <h1>Konfiguracja urządzenia</h1>
+                    <p class="cd">Wybierz podłączone elementy do urządzenia</p>
+                    <fieldset>
+                        <div class="cf"><label>Ilość Led'ów</label><select name="l">
+                                <option value="0" selected="selected">Brak</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                            </select></div>
+                        <div class="cf"><label>Ilość przekaźników</label><select name="r">
+                                <option value="0">Brak</option>
+                                <option value="1" selected="selected">1</option>
+                            </select></div>
+                        <div class="cf"><label>Ilość przycisków</label><select name="s">
+                                <option value="0">Brak</option>
+                                <option value="1" selected="selected">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></div>
+                        <div class="cc"><label><input name="ad" type="checkbox" value="1">Pomiary z wejścia
+                                analogowego</label></div>
+                    </fieldset>
+                </div>
+                <div class="ci">
+                    <h1>Sterowanie urządzeniem</h1>
+                    <p class="cd">Włączanie / Wyłączanie mechanizmów sterowania urządzeniem</p>
+                    <fieldset>
+                        <div class="cc"><label><input name="h" type="checkbox" value="1" checked="checked">HTTP
+                                API</label></div>
+                        <div class="cc"><label><input name="m" type="checkbox" value="1" checked="checked">MQTT
+                                API</label></div>
+                    </fieldset>
+                </div>
+                <div class="ci">
+                    <h1>Automatyczne zakończenie konfiguracji</h1>
+                    <p class="cd">Konfiguracja urządzenia zostanie automatycznie wyłączona po 10min. braku akcji w
+                        panelu konfiguracyjnym</p>
+                    <fieldset>
+                        <div class="cc"><label><input name="al" type="checkbox" value="1"
+                                    checked="checked">włączone</label></div>
+                    </fieldset>
+                </div><input type="submit" class="b bs" value="Zapisz">
+            </form>
+        </div>
+    </div>
+    <div style="text-align: right;"><a href="https://smartnydom.pl"><img style="opacity:.8;"
+                src="http://api.smartnydom.pl/images/smartnydom.png" /></a></div>
+</body>
+
+</html>

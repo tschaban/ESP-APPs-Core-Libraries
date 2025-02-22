@@ -3,7 +3,7 @@
 {{s.l}}             Sie Logo: URL
 {{f.n}}             Firmware name
 {{f.v}}             Firmware version
-{{s.css}}           CSS
+{{s.style}}           CSS
 {{s.refresh}}       <meta http-equiv="refresh" content="610; url=/">
 
 {{f.logo}}          http://api.smartnydom.pl/images/afe-logo.png

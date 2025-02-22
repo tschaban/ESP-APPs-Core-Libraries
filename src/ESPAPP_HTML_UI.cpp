@@ -24,9 +24,9 @@ void ESPAPP_HTML_UI::setTitle(String *site, const __FlashStringHelper *title)
     site->replace(F("{{s.title}}"), title);
 }
 
-void ESPAPP_HTML_UI::setCSS(String *site, const __FlashStringHelper *css)
+void ESPAPP_HTML_UI::setStyle(String *site, const __FlashStringHelper *css)
 {
-    site->replace(F("{{s.css}}"), css);
+    site->replace(F("{{s.style}}"), css);
 }
 
 void ESPAPP_HTML_UI::setLogo(String *site, const __FlashStringHelper *logo)
@@ -64,12 +64,38 @@ void ESPAPP_HTML_UI::setLogoURL(String *site, const __FlashStringHelper *logoURL
     site->replace(F("{{f.logo-url}}"), logoURL);
 }
 
+void ESPAPP_HTML_UI::embedCSSFiles(String *site, const char *cssFiles[], size_t count)
+{
+    String cssLinks;
+    for (size_t i = 0; i < count; i++)
+    {
+        String cssTag = FPSTR(HTML_UI_SITE_CSS_FILE_TAG);
+        cssTag.replace(F("{{c.a}}"), cssFiles[i]);
+        cssLinks += cssTag;
+    }
+    site->replace(F("{{s.css}}"), cssLinks);
+}
+
+void ESPAPP_HTML_UI::embedJSFiles(String *site, const char *jsFiles[], size_t count)
+{
+    String jsLinks;
+    for (size_t i = 0; i < count; i++)
+    {
+        String jsTag = FPSTR(HTML_UI_SITE_JS_FILE_TAG);
+        jsTag.replace(F("{{c.a}}"), jsFiles[i]);
+        jsLinks += jsTag;
+    }
+    site->replace(F("{{s.js}}"), jsLinks);
+}
+
 void ESPAPP_HTML_UI::clearOrphantTags(String *site)
 {
     site->replace(F("{{s.lang}}"), F("en"));
     site->replace(F("{{s.refresh}}"), FPSTR(HTML_UI_EMPTY_STRING));
     site->replace(F("{{s.title}}"), F(ESPAPP_DEFAULT_DEVICE_NAME));
-    site->replace(F("{{s.css}}"), FPSTR(HTML_UI_CSS));
+    site->replace(F("{{s.style}}"), FPSTR(HTML_UI_CSS));
+    site->replace(F("{{s.css}}"), FPSTR(HTML_UI_EMPTY_STRING));
+    site->replace(F("{{s.js}}"), FPSTR(HTML_UI_EMPTY_STRING));
     site->replace(F("{{f.logo}}"), FPSTR(HTML_UI_EMPTY_STRING));
     site->replace(F("{{f.subtitle-1}}"), FPSTR(HTML_UI_EMPTY_STRING));
     site->replace(F("{{f.subtitle-2}}"), FPSTR(HTML_UI_EMPTY_STRING));
@@ -80,58 +106,60 @@ void ESPAPP_HTML_UI::clearOrphantTags(String *site)
 
 //------------------------------------------------------------
 
-void ESPAPP_HTML_UI::startHeaderSection(String *site)
+void ESPAPP_HTML_UI::siteStart(String *site)
 {
-    site->concat(FPSTR(HTML_UI_SITE_HEADER_START));
-}
-
-void ESPAPP_HTML_UI::startBodySection(String *site)
-{
-    site->concat(FPSTR(HTML_UI_SITE_BODY_START));
+    site->concat(FPSTR(HTML_UI_SITE_HEADER));
 }
 
 void ESPAPP_HTML_UI::siteEnd(String *site)
 {
-    site->concat(FPSTR(HTML_UI_SITE_END));
+    site->concat(FPSTR(HTML_UI_SITE_FOOTER));
     this->clearOrphantTags(site);
 }
 
-/** Menu realted methods */
-
-void ESPAPP_HTML_UI::startMenuSection(String *item, const __FlashStringHelper *title, const __FlashStringHelper *icon)
+void ESPAPP_HTML_UI::startNavigationBlock(String *site)
 {
-    item->concat(FPSTR(HTML_UI_MENU_START));
+    site->concat(FPSTR(HTML_UI_SITE_MENU_BLOCK_START));
+}
+
+void ESPAPP_HTML_UI::endNavigationBlock(String *site)
+{
+    site->concat(FPSTR(HTML_UI_SITE_MENU_BLOCK_END));
+}
+
+void ESPAPP_HTML_UI::startNavigationList(String *item, const __FlashStringHelper *title, const __FlashStringHelper *icon)
+{
+    item->concat(FPSTR(HTML_UI_SITE_MENU_SECTION_START));
     this->replaceTagTitle(item, title);
     this->replaceTagIcon(item, icon);
 }
 
-void ESPAPP_HTML_UI::endMenuSection(String *item)
+void ESPAPP_HTML_UI::endNavigationList(String *item)
 {
-    item->concat(FPSTR(HTML_UI_MENU_END));
+    item->concat(FPSTR(HTML_UI_SITE_MENU_SECTION_END));
 }
 
-void ESPAPP_HTML_UI::addMenuSubMenuHeader(String *item, const __FlashStringHelper *title)
+void ESPAPP_HTML_UI::addNavigationItem(String *item, const __FlashStringHelper *title, ESPAPP_HTTP_REQUEST *url, const char *parameters, const __FlashStringHelper *icon)
 {
-    item->concat(FPSTR(HTML_UI_MENU_SUBMENU_HEADER));
-    this->replaceTagTitle(item, title);
-}
-
-void ESPAPP_HTML_UI::addMenuItem(String *item, const __FlashStringHelper *title, ESPAPP_HTTP_REQUEST *url, const char *parameters, const __FlashStringHelper *icon)
-{
-    item->concat(FPSTR(HTML_UI_MENU_ITEM));
+    item->concat(FPSTR(HTML_UI_SITE_MENU_SECTION_ITEM));
     this->replaceTagTitle(item, title);
     this->replaceTagUrlParams(item, url, parameters);
     this->replaceTagIcon(item, icon);
 }
 
-void ESPAPP_HTML_UI::addMenuItemExternal(String *item,
-                                         const __FlashStringHelper *title,
-                                         const __FlashStringHelper *url, const __FlashStringHelper *icon)
+void ESPAPP_HTML_UI::addNavigationItemExternal(String *item,
+                                               const __FlashStringHelper *title,
+                                               const __FlashStringHelper *url, const __FlashStringHelper *icon)
 {
-    item->concat(FPSTR(HTML_UI_MENU_ITEM_EXTERNAL));
+    item->concat(FPSTR(HTML_UI_SITE_MENU_SECTION_ITEM_EXTERNAL));
     this->replaceTagTitle(item, title);
     this->replaceTagIcon(item, icon);
     item->replace(F("{{s.u}}"), url);
+}
+
+void ESPAPP_HTML_UI::startBodySection(String *site)
+{
+    site->concat(FPSTR(HTML_UI_SITE_BODY_START));
 }
 
 /** Section releated methods  */
@@ -189,97 +217,154 @@ void ESPAPP_HTML_UI::startForm(String *site, ESPAPP_HTTP_REQUEST *url, const cha
 void ESPAPP_HTML_UI::endForm(String *site, const __FlashStringHelper *submiButtonLabel)
 {
     site->concat(FPSTR(HTML_UI_FORM_END));
-    site->replace(F("{{b.t}}"), submiButtonLabel);
+    site->replace(FPSTR(HTML_UI_TAG_TITLE), submiButtonLabel);
 }
 
-void ESPAPP_HTML_UI::addInputFormItem(String *item, const char *type,
+void ESPAPP_HTML_UI::addInputFormItem(String *item, const __FlashStringHelper *type,
                                       const char *name, const char *label,
                                       const char *value, const char *size,
                                       const char *min, const char *max,
                                       const char *step, const char *hint,
                                       boolean readonly)
 {
-    item->concat(F("<div class=\"cf\"><label>"));
-    item->concat(label);
-    item->concat(F("</label><input name=\""));
-    item->concat(name);
-    item->concat(F("\" type=\""));
-    item->concat(type);
-    item->concat(F("\" "));
+
+    item->concat(FPSTR(HTML_UI_FORM_ITEM_INPUT));
+
+    /** Basic Input */
+    item->replace(FPSTR(HTML_UI_TAG_TITLE), label);
+    item->replace(FPSTR(HTML_UI_TAG_NAME), name);
+    item->replace(F("{{it}}"), type);
+    item->replace(FPSTR(HTML_UI_TAG_VALUE), value);
+
+    /** Add: Readonly attributed */
     if (readonly)
     {
-        item->concat(F("readonly=\"readonly\" "));
+        item->replace(F("{{ir}}"), PSTR(HTML_UI_FORM_ITEM_INPUT_ATTRIBUTE_READONLY));
     }
-    if (strcmp(size, "?") != 0)
+    else
     {
-        item->concat(F("maxlength=\""));
-        item->concat(size);
-        item->concat(F("\" "));
+        item->replace(F("{{ir}}"), FPSTR(HTML_UI_EMPTY_STRING));
     }
-    if (strcmp(type, "number") == 0)
-    {
-        if (strcmp(min, "?") != 0)
-        {
-            item->concat(F("min=\""));
-            item->concat(min);
-            item->concat(F("\" "));
-        }
-        if (strcmp(max, "?") != 0)
-        {
-            item->concat(F("max=\""));
-            item->concat(max);
-            item->concat(F("\" "));
-        }
-        if (strcmp(step, "?") != 0)
-        {
-            item->concat(F("step=\""));
-            item->concat(step);
-            item->concat(F("\" "));
-        }
-    }
-    item->concat(F("value=\""));
-    item->concat(value);
-    item->concat(F("\">"));
-    if (strcmp(size, "?") != 0)
-    {
-        item->concat(F("<span class=\"hint\">Max "));
-        item->concat(size);
-        item->concat(F(" "));
-        item->concat(F("chars"));
-        item->concat(F("</span>"));
-    }
-    if (strcmp(type, "number") == 0)
-    {
-        if (strcmp(min, "?") != 0 && strcmp(max, "?") != 0)
-        {
-            item->concat(F("<span class=\"hint\">"));
-            item->concat(F("range"));
-            item->concat(F(" "));
-            item->concat(min);
-            item->concat(F(" - "));
-            item->concat(max);
-            if (strcmp(hint, "?") != 0)
-            {
-                item->concat(F(" "));
-                item->concat(hint);
-            }
-            item->concat(F("</span>"));
-        }
-        else if (strcmp(hint, "?") != 0)
-        {
-            item->concat(F("<span class=\"hint\">"));
-            item->concat(hint);
-            item->concat(F("</span>"));
-        }
-    }
-    item->concat(F("</div>"));
-}
 
+    /** Add hint if text. If it's not set it will be added automaticaly if min/max/minlength/maxlength provided  */
+    if (strcmp(hint, (PGM_P)FPSTR(HTML_UI_INPUT_SKIP_ATTRIBUTE)) != 0)
+    {
+
+        item->replace(FPSTR(HTML_UI_TAG_HINT), FPSTR(HTML_UI_FORM_ITEM_INPUT_HINT));
+        item->replace(FPSTR(HTML_UI_TAG_VALUE), hint);
+    }
+
+    /** Input Type: Number */
+    if (strcmp((PGM_P)type, (PGM_P)FPSTR(HTML_UI_INPUT_TYPE_NUMBER)) == 0)
+    {
+
+        // min
+        if (strcmp(min, (PGM_P)FPSTR(HTML_UI_INPUT_SKIP_ATTRIBUTE)) != 0)
+        {
+            item->replace(F("{{im}}"), FPSTR(HTML_UI_FORM_ITEM_INPUT_ATTRIBUTE_MIN));
+            item->replace(FPSTR(HTML_UI_TAG_VALUE), min);
+        }
+
+        // max
+        if (strcmp(max, (PGM_P)FPSTR(HTML_UI_INPUT_SKIP_ATTRIBUTE)) != 0)
+        {
+            item->replace(F("{{ix}}"), FPSTR(HTML_UI_FORM_ITEM_INPUT_ATTRIBUTE_MAX));
+            item->replace(FPSTR(HTML_UI_TAG_VALUE), max);
+        }
+
+        // step
+        if (strcmp(step, (PGM_P)FPSTR(HTML_UI_INPUT_SKIP_ATTRIBUTE)) != 0)
+        {
+            item->replace(F("{{ist}}"), FPSTR(HTML_UI_FORM_ITEM_INPUT_ATTRIBUTE_STEP));
+            item->replace(FPSTR(HTML_UI_TAG_VALUE), step);
+        }
+
+        // Hint
+        if (strcmp(hint, (PGM_P)FPSTR(HTML_UI_INPUT_SKIP_ATTRIBUTE)) == 0)
+        {
+            if (strcmp(min, (PGM_P)FPSTR(HTML_UI_INPUT_SKIP_ATTRIBUTE)) != 0 && strcmp(max, (PGM_P)FPSTR(HTML_UI_INPUT_SKIP_ATTRIBUTE)) != 0)
+            {
+
+                item->replace(FPSTR(HTML_UI_TAG_HINT), FPSTR(HTML_UI_FORM_ITEM_INPUT_HINT));
+                item->replace(FPSTR(HTML_UI_TAG_VALUE), FPSTR(HTML_UI_FORM_ITEM_INPUT_HINT_RANGE_NUMBER));
+                item->replace(F("{{l}}"), min);
+                item->replace(F("{{m}}"), max);
+            }
+            else if (strcmp(min, (PGM_P)FPSTR(HTML_UI_INPUT_SKIP_ATTRIBUTE)) != 0)
+            {
+                item->replace(FPSTR(HTML_UI_TAG_HINT), FPSTR(HTML_UI_FORM_ITEM_INPUT_HINT));
+                item->replace(FPSTR(HTML_UI_TAG_VALUE), FPSTR(HTML_UI_FORM_ITEM_INPUT_HINT_MIN_NUMBER));
+                item->replace(F("{{v}}"), min);
+            }
+            else if (strcmp(max, (PGM_P)FPSTR(HTML_UI_INPUT_SKIP_ATTRIBUTE)) != 0)
+            {
+                item->replace(FPSTR(HTML_UI_TAG_HINT), FPSTR(HTML_UI_FORM_ITEM_INPUT_HINT));
+                item->replace(FPSTR(HTML_UI_TAG_VALUE), FPSTR(HTML_UI_FORM_ITEM_INPUT_HINT_MAX_NUMBER));
+                item->replace(F("{{v}}"), max);
+            }
+        }
+        /** Input Type: Text and Password */
+    }
+    else if (strcmp((PGM_P)type, (PGM_P)FPSTR(HTML_UI_INPUT_TYPE_TEXT)) == 0 || strcmp((PGM_P)type, (PGM_P)FPSTR(HTML_UI_INPUT_TYPE_PASSWORD)) == 0)
+    {
+
+        // size
+        if (strcmp(size, (PGM_P)FPSTR(HTML_UI_INPUT_SKIP_ATTRIBUTE)) != 0)
+        {
+            item->replace(F("{{is}}"), FPSTR(HTML_UI_FORM_ITEM_INPUT_ATTRIBUTE_SIZE));
+            item->replace(FPSTR(HTML_UI_TAG_VALUE), size);
+        }
+
+        // minLength
+        if (strcmp(min, (PGM_P)FPSTR(HTML_UI_INPUT_SKIP_ATTRIBUTE)) != 0)
+        {
+            item->replace(F("{{im}}"), FPSTR(HTML_UI_FORM_ITEM_INPUT_ATTRIBUTE_MINLENGTH));
+            item->replace(FPSTR(HTML_UI_TAG_VALUE), min);
+        }
+
+        // maxLength
+        if (strcmp(max, (PGM_P)FPSTR(HTML_UI_INPUT_SKIP_ATTRIBUTE)) != 0)
+        {
+            item->replace(F("{{ix}}"), FPSTR(HTML_UI_FORM_ITEM_INPUT_ATTRIBUTE_MAXLENGTH));
+            item->replace(FPSTR(HTML_UI_TAG_VALUE), max);
+        }
+
+        // Hint
+        if (strcmp(hint, (PGM_P)FPSTR(HTML_UI_INPUT_SKIP_ATTRIBUTE)) == 0)
+        {
+            if (strcmp(min, (PGM_P)FPSTR(HTML_UI_INPUT_SKIP_ATTRIBUTE)) != 0 && strcmp(max, (PGM_P)FPSTR(HTML_UI_INPUT_SKIP_ATTRIBUTE)) != 0)
+            {
+                item->replace(FPSTR(HTML_UI_TAG_HINT), FPSTR(HTML_UI_FORM_ITEM_INPUT_HINT));
+                item->replace(FPSTR(HTML_UI_TAG_VALUE), FPSTR(HTML_UI_FORM_ITEM_INPUT_HINT_RANGE_TEXT));
+                item->replace(F("{{l}}"), min);
+                item->replace(F("{{m}}"), max);
+            }
+            else if (strcmp(min, (PGM_P)FPSTR(HTML_UI_INPUT_SKIP_ATTRIBUTE)) != 0)
+            {
+                item->replace(FPSTR(HTML_UI_TAG_HINT), FPSTR(HTML_UI_FORM_ITEM_INPUT_HINT));
+                item->replace(FPSTR(HTML_UI_TAG_VALUE), FPSTR(HTML_UI_FORM_ITEM_INPUT_HINT_MIN_TEXT));
+                item->replace(F("{{v}}"), min);
+            }
+            else if (strcmp(max, (PGM_P)FPSTR(HTML_UI_INPUT_SKIP_ATTRIBUTE)) != 0)
+            {
+                item->replace(FPSTR(HTML_UI_TAG_HINT), FPSTR(HTML_UI_FORM_ITEM_INPUT_HINT));
+                item->replace(FPSTR(HTML_UI_TAG_VALUE), FPSTR(HTML_UI_FORM_ITEM_INPUT_HINT_MAX_TEXT));
+                item->replace(F("{{v}}"), max);
+            }
+        }
+    }
+    // Clear unused attributes
+    item->replace(F("{{im}}"), FPSTR(HTML_UI_EMPTY_STRING));
+    item->replace(F("{{ix}}"), FPSTR(HTML_UI_EMPTY_STRING));
+    item->replace(F("{{ist}}"), FPSTR(HTML_UI_EMPTY_STRING));
+    item->replace(F("{{is}}"), FPSTR(HTML_UI_EMPTY_STRING));
+    item->replace(FPSTR(HTML_UI_TAG_HINT), FPSTR(HTML_UI_EMPTY_STRING));
+}
 void ESPAPP_HTML_UI::_addSelectionFormItem(
     String *item, boolean type, const char *name, const char *label,
     const char *value, boolean checked, const char *hint, boolean disabled)
 {
-    item->concat(FPSTR(HTML_UI_ITEM_CHECKBOX));
+    item->concat(FPSTR(HTML_UI_FORM_ITEM_CHECKBOX));
     item->replace(F("{{i.t}}"), type ? F("checkbox") : F("radio"));
     item->replace(F("{{i.n}}"), name);
     item->replace(F("{{i.l}}"), label);
@@ -287,7 +372,7 @@ void ESPAPP_HTML_UI::_addSelectionFormItem(
     item->replace(F("{{i.c}}"), checked ? F(" checked=\"checked\"") : F(""));
     item->replace(F("{{i.d}}"), disabled ? F(" disabled=\"disabled\"") : F(""));
     item->replace(F("{{i.h}}"),
-                  strcmp(hint, ESPAPP_FORM_SKIP_ATTRIBUTE) != 0
+                  strcmp(hint, (PGM_P)FPSTR(HTML_UI_INPUT_SKIP_ATTRIBUTE)) != 0
                       ? "<span class=\"hint\">(" + String(hint) + ")</span>"
                       : "");
 }
@@ -298,8 +383,21 @@ void ESPAPP_HTML_UI::addCheckboxFormItem(String *item, const char *name,
                                          const char *hint,
                                          boolean disabled)
 {
-    this->_addSelectionFormItem(item, true, name, label, value, checked, hint,
-                                disabled);
+    item->concat(FPSTR(HTML_UI_FORM_ITEM_CHECKBOX));
+    item->replace(FPSTR(HTML_UI_TAG_TITLE), label);
+    item->replace(FPSTR(HTML_UI_TAG_NAME), name);
+    item->replace(FPSTR(HTML_UI_TAG_VALUE), value);
+    item->replace(F("{{i.c}}"), checked ? FPSTR(HTML_UI_FORM_ITEM_ATTRIBUTE_CHECKED) : FPSTR(HTML_UI_EMPTY_STRING));
+    item->replace(F("{{i.d}}"), disabled ? FPSTR(HTML_UI_FORM_ITEM_ATTRIBUTE_DISABLED) : FPSTR(HTML_UI_EMPTY_STRING));
+    if (strcmp(hint, (PGM_P)FPSTR(HTML_UI_INPUT_SKIP_ATTRIBUTE)) != 0)
+    {
+        item->replace(FPSTR(HTML_UI_TAG_HINT), FPSTR(HTML_UI_FORM_ITEM_INPUT_HINT));
+        item->replace(FPSTR(HTML_UI_TAG_VALUE), hint);
+    }
+    else
+    {
+        item->replace(FPSTR(HTML_UI_TAG_HINT), FPSTR(HTML_UI_EMPTY_STRING));
+    }
 }
 
 void ESPAPP_HTML_UI::addRadioButtonFormItem(
@@ -340,15 +438,18 @@ void ESPAPP_HTML_UI::addParagraph(String *item, const __FlashStringHelper *text)
     item->replace(F("{{i.v}}"), text);
 }
 
-void ESPAPP_HTML_UI::startList(String *site) {
+void ESPAPP_HTML_UI::startList(String *site)
+{
     site->concat(FPSTR(HTML_UI_ITEM_LIST_START));
 }
 
-void ESPAPP_HTML_UI::endList(String *site) {
+void ESPAPP_HTML_UI::endList(String *site)
+{
     site->concat(FPSTR(HTML_UI_ITEM_LIST_END));
 }
 
-void ESPAPP_HTML_UI::addListItem(String *site, const char *item) { 
+void ESPAPP_HTML_UI::addListItem(String *site, const char *item)
+{
     site->concat(FPSTR(HTML_UI_ITEM_LIST_ITEM));
     site->replace(F("{{i.v}}"), item);
 }
@@ -371,13 +472,19 @@ void ESPAPP_HTML_UI::addFileExplorerFolderItem(String *site, const char *name, s
     site->replace(F("{{f.s}}"), String(size));
 }
 
-void ESPAPP_HTML_UI::addFileExplorerFileItem(String *site, const char *name, size_t size)
+void ESPAPP_HTML_UI::addFileExplorerFileItem(String *site, const char *file, size_t size, const char *directory)
 {
     site->concat(FPSTR(HTML_UI_FILE_EXPLORER_FILE_ITEM));
-    site->replace(F("{{f.n}}"), name);
+    site->replace(F("{{f.n}}"), file);
     site->replace(F("{{f.s}}"), String(size));
+    site->replace(F("{{f.d}}"), directory);
 }
 
+void ESPAPP_HTML_UI::addFileExplorerUploadForm(String *site, const char *directory)
+{
+    site->concat(FPSTR(HTML_UI_FILE_EXPLORER_UPLOAD_FORM));
+    site->replace(F("{{f.d}}"), directory);
+}
 
 /** Private */
 void ESPAPP_HTML_UI::replaceTagTitle(String *item, const __FlashStringHelper *title)
