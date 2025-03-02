@@ -277,7 +277,6 @@ void ESPAPP_WirelessConnection::switchConfiguration()
 void ESPAPP_WirelessConnection::listener()
 {
 
-
   if (ready)
   {
     if (!System->connectionMode() == ESPAPP_NETWORK_CONNECTION_MODE_NO_CONNECTION)
@@ -638,31 +637,35 @@ bool ESPAPP_WirelessConnection::readConfiguration(void)
   // JsonDocument doc;
   success = System->Flash->getJSON(F("/cfg/network.json"), doc);
 
+#ifdef DEBUG
+  System->Msg->printBulletPoint(F("Getting data from JSON"));
+#endif
+
   if (success)
   {
-    sprintf(configuration->primary.ssid, doc["p"]["s"]);
-    sprintf(configuration->primary.password, doc["p"]["p"]);
-    configuration->primary.isDHCP = doc["p"]["d"];
-    sprintf(configuration->primary.ip, doc["p"]["i"]);
-    sprintf(configuration->primary.gateway, doc["p"]["g"]);
-    sprintf(configuration->primary.subnet, doc["p"]["b"]);
-    sprintf(configuration->primary.dns1, doc["p"]["d1"]);
-    sprintf(configuration->primary.dns2, doc["p"]["d2"]);
+    sprintf(configuration->primary.ssid, doc["primary"]["ssid"] | "");
+    sprintf(configuration->primary.password, doc["primary"]["password"] | "");
+    configuration->primary.isDHCP = doc["primary"]["dhcp"] | true;
+    sprintf(configuration->primary.ip, doc["primary"]["ip"] | "");
+    sprintf(configuration->primary.gateway, doc["primary"]["gateway"] | "");
+    sprintf(configuration->primary.subnet, doc["primary"]["subnet"] | "");
+    sprintf(configuration->primary.dns1, doc["primary"]["dns1"] | "");
+    sprintf(configuration->primary.dns2, doc["primary"]["dns2"] | "");
 
-    sprintf(configuration->secondary.ssid, doc["s"]["s"]);
-    sprintf(configuration->secondary.password, doc["s"]["p"]);
-    configuration->secondary.isDHCP = doc["s"]["d"];
-    sprintf(configuration->secondary.ip, doc["s"]["i"]);
-    sprintf(configuration->secondary.gateway, doc["s"]["g"]);
-    sprintf(configuration->secondary.subnet, doc["s"]["b"]);
-    sprintf(configuration->secondary.dns1, doc["s"]["d1"]);
-    sprintf(configuration->secondary.dns2, doc["s"]["d2"]);
+    sprintf(configuration->secondary.ssid, doc["secondary"]["ssid"] | "");
+    sprintf(configuration->secondary.password, doc["secondary"]["password"] | "");
+    configuration->secondary.isDHCP = doc["secondary"]["dhcp"] |true;
+    sprintf(configuration->secondary.ip, doc["secondary"]["ip"] | "");
+    sprintf(configuration->secondary.gateway, doc["secondary"]["gateway"] | "");
+    sprintf(configuration->secondary.subnet, doc["secondary"]["subnet"] | "");
+    sprintf(configuration->secondary.dns1, doc["secondary"]["dns1"] | "");
+    sprintf(configuration->secondary.dns2, doc["secondary"]["dns2"] | "");
 
-    configuration->mDNS = doc["m"];
-    configuration->noConnectionAttempts = doc["n"];
-    configuration->waitTimeConnections = doc["w"];
-    configuration->waitTimeSeries = doc["ws"];
-    configuration->noFailuresToSwitchNetwork = doc["nf"];
+    configuration->mDNS = doc["mdns"] | true;
+    configuration->noConnectionAttempts = doc["connectioTimeout"] | 10;
+    configuration->waitTimeConnections = doc["sleepTimeout"] | 10;
+    configuration->waitTimeSeries = doc["sleepTimeout"] | 10;
+    configuration->noFailuresToSwitchNetwork = doc["failuresToSwitch"] | 2;
 
 #ifndef ESP32
     configuration->radioMode = doc["m"];
@@ -670,7 +673,6 @@ bool ESPAPP_WirelessConnection::readConfiguration(void)
 #endif
 
 #ifdef DEBUG
-    System->Msg->printInformation(F("Network configuration loaded"), F("WIFI"));
     System->Msg->printBulletPoint(F("Primary SSID: "));
     System->Msg->printValue(configuration->primary.ssid);
     System->Msg->printBulletPoint(F("Primary IP: "));

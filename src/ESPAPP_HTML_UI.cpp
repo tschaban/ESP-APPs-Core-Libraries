@@ -93,7 +93,6 @@ void ESPAPP_HTML_UI::clearOrphantTags(String *site)
     site->replace(F("{{s.lang}}"), F("en"));
     site->replace(F("{{s.refresh}}"), FPSTR(HTML_UI_EMPTY_STRING));
     site->replace(F("{{s.title}}"), F(ESPAPP_DEFAULT_DEVICE_NAME));
-    site->replace(F("{{s.style}}"), FPSTR(HTML_UI_CSS));
     site->replace(F("{{s.css}}"), FPSTR(HTML_UI_EMPTY_STRING));
     site->replace(F("{{s.js}}"), FPSTR(HTML_UI_EMPTY_STRING));
     site->replace(F("{{f.logo}}"), FPSTR(HTML_UI_EMPTY_STRING));
@@ -233,7 +232,7 @@ void ESPAPP_HTML_UI::addInputFormItem(String *item, const __FlashStringHelper *t
     /** Basic Input */
     item->replace(FPSTR(HTML_UI_TAG_TITLE), label);
     item->replace(FPSTR(HTML_UI_TAG_NAME), name);
-    item->replace(F("{{it}}"), type);
+    item->replace(FPSTR(HTML_UI_TAG_TYPE), type);
     item->replace(FPSTR(HTML_UI_TAG_VALUE), value);
 
     /** Add: Readonly attributed */
@@ -360,30 +359,15 @@ void ESPAPP_HTML_UI::addInputFormItem(String *item, const __FlashStringHelper *t
     item->replace(F("{{is}}"), FPSTR(HTML_UI_EMPTY_STRING));
     item->replace(FPSTR(HTML_UI_TAG_HINT), FPSTR(HTML_UI_EMPTY_STRING));
 }
-void ESPAPP_HTML_UI::_addSelectionFormItem(
-    String *item, boolean type, const char *name, const char *label,
-    const char *value, boolean checked, const char *hint, boolean disabled)
-{
-    item->concat(FPSTR(HTML_UI_FORM_ITEM_CHECKBOX));
-    item->replace(F("{{i.t}}"), type ? F("checkbox") : F("radio"));
-    item->replace(F("{{i.n}}"), name);
-    item->replace(F("{{i.l}}"), label);
-    item->replace(F("{{i.v}}"), value);
-    item->replace(F("{{i.c}}"), checked ? F(" checked=\"checked\"") : F(""));
-    item->replace(F("{{i.d}}"), disabled ? F(" disabled=\"disabled\"") : F(""));
-    item->replace(F("{{i.h}}"),
-                  strcmp(hint, (PGM_P)FPSTR(HTML_UI_INPUT_SKIP_ATTRIBUTE)) != 0
-                      ? "<span class=\"hint\">(" + String(hint) + ")</span>"
-                      : "");
-}
 
-void ESPAPP_HTML_UI::addCheckboxFormItem(String *item, const char *name,
-                                         const char *label,
-                                         const char *value, boolean checked,
-                                         const char *hint,
-                                         boolean disabled)
+void ESPAPP_HTML_UI::addRadioButtonOrCheckBoxFormItem(String *item, const __FlashStringHelper *type, const char *name, const char *label,
+                                                      const char *value, boolean checked,
+                                                      const char *hint,
+                                                      boolean disabled)
+
 {
-    item->concat(FPSTR(HTML_UI_FORM_ITEM_CHECKBOX));
+    item->concat(FPSTR(HTML_UI_FORM_ITEM_CHECK_OR_RADIO_BOX));
+    item->replace(FPSTR(HTML_UI_TAG_TYPE), type);
     item->replace(FPSTR(HTML_UI_TAG_TITLE), label);
     item->replace(FPSTR(HTML_UI_TAG_NAME), name);
     item->replace(FPSTR(HTML_UI_TAG_VALUE), value);
@@ -400,12 +384,22 @@ void ESPAPP_HTML_UI::addCheckboxFormItem(String *item, const char *name,
     }
 }
 
+void ESPAPP_HTML_UI::addCheckBoxFormItem(String *item, const char *name,
+                                         const char *label,
+                                         const char *value, boolean checked,
+                                         const char *hint,
+                                         boolean disabled)
+{
+    this->addRadioButtonOrCheckBoxFormItem(item, FPSTR(HTML_UI_INPUT_TYPE_CHECKBOX), name, label, value, checked, hint,
+                                           disabled);
+}
+
 void ESPAPP_HTML_UI::addRadioButtonFormItem(
     String *item, const char *name, const char *label, const char *value,
     boolean checked, const char *hint, boolean disabled)
 {
-    this->_addSelectionFormItem(item, false, name, label, value, checked, hint,
-                                disabled);
+    this->addRadioButtonOrCheckBoxFormItem(item, FPSTR(HTML_UI_INPUT_TYPE_RADIO), name, label, value, checked, hint,
+                                           disabled);
 }
 
 void ESPAPP_HTML_UI::addSelectFormItemOpen(
@@ -413,8 +407,8 @@ void ESPAPP_HTML_UI::addSelectFormItemOpen(
     const __FlashStringHelper *label)
 {
     item->concat(FPSTR(HTML_UI_ITEM_SELECT_OPEN));
-    item->replace(F("{{i.l}}"), label);
-    item->replace(F("{{i.n}}"), name);
+    item->replace(FPSTR(HTML_UI_TAG_TITLE), label);
+    item->replace(FPSTR(HTML_UI_TAG_NAME), name);
 }
 
 void ESPAPP_HTML_UI::addSelectOptionFormItem(String *item, const char *label,
@@ -422,20 +416,36 @@ void ESPAPP_HTML_UI::addSelectOptionFormItem(String *item, const char *label,
                                              boolean selected)
 {
     item->concat(FPSTR(HTML_UI_ITEM_SELECT_OPTION));
-    item->replace(F("{{i.v}}"), value);
-    item->replace(F("{{i.l}}"), label);
+    item->replace(FPSTR(HTML_UI_TAG_VALUE), value);
+    item->replace(FPSTR(HTML_UI_TAG_TITLE), label);
     item->replace(F("{{i.s}}"), selected ? F(" selected=\"selected\"") : F(""));
 }
 
-void ESPAPP_HTML_UI::addSelectFormItemClose(String *item)
+void ESPAPP_HTML_UI::addSelectFormItemClose(String *item, const char *hint)
 {
     item->concat(FPSTR(HTML_UI_ITEM_SELECT_CLOSE));
+    if (strcmp(hint, (PGM_P)FPSTR(HTML_UI_INPUT_SKIP_ATTRIBUTE)) != 0)
+    {
+        item->replace(FPSTR(HTML_UI_TAG_HINT), FPSTR(HTML_UI_FORM_ITEM_INPUT_HINT));
+        item->replace(FPSTR(HTML_UI_TAG_VALUE), hint);
+    }
+    else
+    {
+        item->replace(FPSTR(HTML_UI_TAG_HINT), FPSTR(HTML_UI_EMPTY_STRING));
+    }
 }
 
-void ESPAPP_HTML_UI::addParagraph(String *item, const __FlashStringHelper *text)
+void ESPAPP_HTML_UI::addParagraph(String *item, const __FlashStringHelper *text, bool indented)
 {
-    item->concat(FPSTR(HTML_UI_ITEM_PARAGRAPH));
-    item->replace(F("{{i.v}}"), text);
+    if (indented)
+    {
+        item->concat(FPSTR(HTML_UI_FORM_ITEM_PARAGRAPH));
+    }
+    else
+    {
+        item->concat(FPSTR(HTML_UI_ITEM_PARAGRAPH));
+    }
+    item->replace(FPSTR(HTML_UI_TAG_VALUE), text);
 }
 
 void ESPAPP_HTML_UI::startList(String *site)
@@ -451,7 +461,7 @@ void ESPAPP_HTML_UI::endList(String *site)
 void ESPAPP_HTML_UI::addListItem(String *site, const char *item)
 {
     site->concat(FPSTR(HTML_UI_ITEM_LIST_ITEM));
-    site->replace(F("{{i.v}}"), item);
+    site->replace(FPSTR(HTML_UI_TAG_VALUE), item);
 }
 
 /** Files explorer */

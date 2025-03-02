@@ -17,9 +17,9 @@ bool ESPAPP_API_Flash::getJSON(const __FlashStringHelper *fileName, JsonDocument
 {
 
   // Hardcoded JSON string for testing
-  const char *input = "{\"p\":{\"s\":\"IoT World\",\"p\":\"iotiotiot\",\"d\":1,\"i\":\"\",\"g\":\"\",\"b\":\"\",\"d1\":\"8.8.8.8\",\"d2\":\"8.8.4.4\"},\"s\":{\"s\":\"\",\"p\":\"\",\"d\":1,\"i\":\"\",\"g\":\"\",\"b\":\"\",\"d1\":\"\",\"d2\":\"\"},\"n\":20,\"w\":1,\"ws\":1,\"nf\":2,\"m\":1}";
-  DeserializationError error = deserializeJson(doc, input);
-  return true;
+  // const char *input = "{\"p\":{\"s\":\"IoT World\",\"p\":\"iotiotiot\",\"d\":1,\"i\":\"\",\"g\":\"\",\"b\":\"\",\"d1\":\"8.8.8.8\",\"d2\":\"8.8.4.4\"},\"s\":{\"s\":\"\",\"p\":\"\",\"d\":1,\"i\":\"\",\"g\":\"\",\"b\":\"\",\"d1\":\"\",\"d2\":\"\"},\"n\":20,\"w\":1,\"ws\":1,\"nf\":2,\"m\":1}";
+  // DeserializationError error = deserializeJson(doc, input);
+  // return true;
 
   boolean success = false;
   File configFile;
@@ -28,18 +28,27 @@ bool ESPAPP_API_Flash::getJSON(const __FlashStringHelper *fileName, JsonDocument
   {
 
 #ifdef DEBUG
-    // printFileContentInformation();
+    this->Msg->printBulletPoint(F("Reading file: "));
+    this->Msg->printValue(fileName);
 #endif
 
     size_t size = configFile.size();
     std::unique_ptr<char[]> buf(new char[size]);
     configFile.readBytes(buf.get(), size);
+
+#ifdef DEBUG
+    this->Msg->printBulletPoint(F("File in the buffer"));
+#endif
+
     DeserializationError error = deserializeJson(doc, buf.get());
 
     configFile.close();
 
     if (!error)
     {
+#ifdef DEBUG
+      this->Msg->printBulletPoint(F("JSON Deserialised"));
+#endif
       success = true;
     }
 #ifdef DEBUG
@@ -225,7 +234,7 @@ bool ESPAPP_API_Flash::openFile(File &openedFile, const char *mode,
   success = openedFile ? true : false;
 
 #ifdef DEBUG
-  this->Msg->printValue(F(" - Opened: "));
+  this->Msg->printBulletPoint(F("Opened: "));
   this->Msg->printValue(success);
 #endif
 
@@ -444,7 +453,7 @@ bool ESPAPP_API_Flash::createFolder(const char *path)
 #ifdef DEBUG
   if (success)
   {
-   this->Msg->printBulletPoint(F("Folder created successfully"));
+    this->Msg->printBulletPoint(F("Folder created successfully"));
   }
   else
   {

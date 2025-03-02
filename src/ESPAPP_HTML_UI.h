@@ -13,11 +13,11 @@ private:
     void replaceTagTitle(String *item, const __FlashStringHelper *title);
     void replaceTagIcon(String *item, const __FlashStringHelper *icon);
     void replaceTagUrlParams(String *item, ESPAPP_HTTP_REQUEST *url, const char *parameters);
-    void _addSelectionFormItem(String *item, boolean type, const char *name,
-                               const char *label, const char *value,
-                               boolean checked,
-                               const char *hint = (PGM_P)FPSTR(HTML_UI_INPUT_SKIP_ATTRIBUTE),
-                               boolean disabled = false);
+
+    void addRadioButtonOrCheckBoxFormItem(String *item, const __FlashStringHelper *type, const char *name, const char *label,
+                                          const char *value, boolean checked,
+                                          const char *hint = (PGM_P)FPSTR(HTML_UI_INPUT_SKIP_ATTRIBUTE),
+                                          boolean disabled = false);
 
 public:
     ESPAPP_HTML_UI(ESPAPP_Core *_System);
@@ -27,8 +27,8 @@ public:
     void setRefresh(String *site, const __FlashStringHelper *refresh);
     void setTitle(String *site, const __FlashStringHelper *title);
     void setStyle(String *site, const __FlashStringHelper *css);
-    void embedCSSFiles(String *site, const char* cssFiles[], size_t count);
-    void embedJSFiles(String *site, const char* jsFiles[], size_t count);
+    void embedCSSFiles(String *site, const char *cssFiles[], size_t count);
+    void embedJSFiles(String *site, const char *jsFiles[], size_t count);
     void setLogo(String *site, const __FlashStringHelper *logo);
     void setSubtitle1(String *site, const __FlashStringHelper *subtitle1);
     void setSubtitle2(String *site, const __FlashStringHelper *subtitle2);
@@ -37,15 +37,12 @@ public:
     void setURL(String *site, const __FlashStringHelper *url);
     void setLogoURL(String *site, const __FlashStringHelper *logoURL);
     void setUrlParams(ESPAPP_HTTP_REQUEST *url, uint8_t siteId = ESPAPP_NONE, uint8_t command = ESPAPP_NONE, uint8_t action = ESPAPP_NONE, uint8_t option = ESPAPP_NONE);
-     
-
-
 
     /** Site level */
-    void siteStart(String *site);    
+    void siteStart(String *site);
     void siteEnd(String *site);
 
-    //** Navigation block */
+    /** Navigation block */
     void startNavigationBlock(String *site);
     void endNavigationBlock(String *site);
 
@@ -54,8 +51,7 @@ public:
 
     void addNavigationItem(String *item, const __FlashStringHelper *title, ESPAPP_HTTP_REQUEST *url, const char *parameters, const __FlashStringHelper *icon);
     void addNavigationItemExternal(String *item, const __FlashStringHelper *title,
-                             const __FlashStringHelper *url, const __FlashStringHelper *icon);
-
+                                   const __FlashStringHelper *url, const __FlashStringHelper *icon);
 
     /** Body */
     void startBodySection(String *site);
@@ -103,7 +99,7 @@ public:
                           const char *hint = (PGM_P)FPSTR(HTML_UI_INPUT_SKIP_ATTRIBUTE),
                           boolean readonly = false);
 
-    void addCheckboxFormItem(String *item, const char *name, const char *label,
+    void addCheckBoxFormItem(String *item, const char *name, const char *label,
                              const char *value, boolean checked,
                              const char *hint = (PGM_P)FPSTR(HTML_UI_INPUT_SKIP_ATTRIBUTE),
                              boolean disabled = false);
@@ -114,12 +110,15 @@ public:
                                 boolean disabled = false);
 
     void addSelectFormItemOpen(String *item, const __FlashStringHelper *name,
-                               const __FlashStringHelper *label);
+                               const __FlashStringHelper *label
+                               );
+
     void addSelectOptionFormItem(String *item, const char *label,
                                  const char *value, boolean selected);
-    void addSelectFormItemClose(String *item);
 
-    void addParagraph(String *item, const __FlashStringHelper *text);
+    void addSelectFormItemClose(String *item, const char *hint = (PGM_P)FPSTR(HTML_UI_INPUT_SKIP_ATTRIBUTE));
+
+    void addParagraph(String *item, const __FlashStringHelper *text, bool indented = false);
 };
 
 #endif

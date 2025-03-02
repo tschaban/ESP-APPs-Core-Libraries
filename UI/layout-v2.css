@@ -243,11 +243,12 @@ Hides the menu at `48em`, but modify this based on your app's needs.
 }
 
 
-
+/* Section Styles */
 .s {
     padding-bottom: 2em;
 }
 
+/* Section Topic */
 .st {
     color: #aaa;
     font-size: 80%;
@@ -257,7 +258,14 @@ Hides the menu at `48em`, but modify this based on your app's needs.
     margin-top: 0
 }
 
+/* Section Content */
 .sc {
     color: #444;
     line-height: 1.8em;
+}
+
+.lst {
+    list-style: none;
+    margin: 0;
+    padding: 0
 }

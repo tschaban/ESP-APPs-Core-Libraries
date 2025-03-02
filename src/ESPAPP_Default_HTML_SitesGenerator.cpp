@@ -27,7 +27,7 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
         "/css?name=pure-min.css.gz", "/css?name=layout-v2.css"};
 
     const char *jsFiles[] = {
-        "/js?name=responsive-menu.js"};
+        "/js?name=responsive-menu-min.js.gz"};
 
     /** Header */
     this->UI->siteStart(this->HTMLResponse);
@@ -100,6 +100,11 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
 
         this->System->Flash->listFolders(this->Server->HTTPRequest->parameter1, files, 10, count);
 
+        if (strcmp(this->Server->HTTPRequest->parameter1, (PGM_P)FPSTR(path_root)) != 0)
+        {
+            this->UI->addFileExplorerFolderItem(this->HTMLResponse, (PGM_P)FPSTR(path_root), 0);
+        }
+
         for (size_t i = 0; i < count; i++)
         {
             this->UI->addFileExplorerFolderItem(this->HTMLResponse, files[i].name, files[i].size);
@@ -107,6 +112,7 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
 
         count = 0;
         this->System->Flash->listFiles(this->Server->HTTPRequest->parameter1, files, 10, count);
+        
 
         for (size_t i = 0; i < count; i++)
         {
@@ -155,11 +161,38 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
 
         this->UI->addInputFormItem(this->HTMLResponse, FPSTR(HTML_UI_INPUT_TYPE_NUMBER), "number", "Number filed", "1000");
 
-        this->UI->addCheckboxFormItem(this->HTMLResponse, "checkbox1", "Checkbox 1", "1", false);
-        this->UI->addCheckboxFormItem(this->HTMLResponse, "checkbox2", "Checkbox 2", "1", true, (PGM_P)FPSTR(HTML_UI_EMPTY_STRING), true);
-        this->UI->addCheckboxFormItem(this->HTMLResponse, "checkbox3", "Checkbox 3", "1", true, "Hint text");
+        this->UI->addCheckBoxFormItem(this->HTMLResponse, "checkbox1", "Checkbox 1", "1", false);
+        this->UI->addCheckBoxFormItem(this->HTMLResponse, "checkbox2", "Checkbox 2", "1", true, (PGM_P)FPSTR(HTML_UI_EMPTY_STRING), true);
+        this->UI->addCheckBoxFormItem(this->HTMLResponse, "checkbox3", "Checkbox 3", "1", true, "Hint text");
 
-        this->UI->addParagraph(this->HTMLResponse, F("This is a paragraph"));
+        this->UI->addRadioButtonFormItem(this->HTMLResponse, "radio", "Radio 1", "1", false);
+        this->UI->addRadioButtonFormItem(this->HTMLResponse, "radio", "Radio 2", "2", false, (PGM_P)FPSTR(HTML_UI_EMPTY_STRING));
+        this->UI->addRadioButtonFormItem(this->HTMLResponse, "radio", "Radio 3", "3", true, "Hint text");
+
+        this->UI->addParagraph(this->HTMLResponse, F("This is a Normal paragraph"));
+        this->UI->addParagraph(this->HTMLResponse, F("This is a Intended paragraph"), true);
+
+        this->UI->addSelectFormItemOpen(this->HTMLResponse, F("select1"), F("Select filed: Simple"));
+        this->UI->addSelectOptionFormItem(this->HTMLResponse, "Option 1", "1", false);
+        this->UI->addSelectOptionFormItem(this->HTMLResponse, "Option 2", "2", true);
+        this->UI->addSelectOptionFormItem(this->HTMLResponse, "Option 3", "3", false);
+        this->UI->addSelectFormItemClose(this->HTMLResponse);
+
+        this->UI->addSelectFormItemOpen(this->HTMLResponse, F("select2"), F("Select filed: Hint"));
+        this->UI->addSelectOptionFormItem(this->HTMLResponse, "Option 1", "1", true);
+        this->UI->addSelectOptionFormItem(this->HTMLResponse, "Option 2", "2", false);
+        this->UI->addSelectOptionFormItem(this->HTMLResponse, "Option 3", "3", false);
+        this->UI->addSelectFormItemClose(this->HTMLResponse,  (PGM_P)F("That is a hint"));
+
+
+        this->UI->startList(this->HTMLResponse);
+        this->UI->addListItem(this->HTMLResponse, (PGM_P)F("List item 1"));
+        this->UI->addListItem(this->HTMLResponse, (PGM_P)F("List item 2"));
+        this->UI->addListItem(this->HTMLResponse, (PGM_P)F("List item 3"));
+        this->UI->addListItem(this->HTMLResponse, (PGM_P)F("List item 4"));
+        this->UI->endList(this->HTMLResponse);
+        
+
 
         this->UI->endForm(this->HTMLResponse, FPSTR(HTML_UI_SUBMITT_BUTTON_SAVE));
 
@@ -168,6 +201,9 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
         this->UI->openMessageSection(this->HTMLResponse, F("This is Message Section"), F("This is an example of message section"));
 
         this->UI->addParagraph(this->HTMLResponse, F("This is a paragraph"));
+
+
+
 
         this->UI->closeMessageSection(this->HTMLResponse);
 
