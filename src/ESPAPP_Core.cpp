@@ -8,7 +8,7 @@ void ESPAPP_Core::reboot(uint8_t mode)
 {
  //@TODO: Implement this function
  // saveMode(mode);
- // yield();
+yield();
 #ifdef DEBUG
   Msg->printHeader(2);
   Msg->printValue(F("Rebooting device in 1sec"));

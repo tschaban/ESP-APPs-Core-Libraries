@@ -262,7 +262,6 @@ bool ESPAPP_HTTPServer::processCSSFileRequest(void)
   return success;
 }
 
-
 bool ESPAPP_HTTPServer::processJSFileRequest(void)
 {
   bool success = true;

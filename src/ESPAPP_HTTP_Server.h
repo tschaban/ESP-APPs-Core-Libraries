@@ -47,6 +47,7 @@ public:
     bool processCSSFileRequest(void);
     bool processJSFileRequest(void);
     bool processFaviconRequest(void);
+
 };
 
 #endif // _ESPAPP_HTTP_Server_h

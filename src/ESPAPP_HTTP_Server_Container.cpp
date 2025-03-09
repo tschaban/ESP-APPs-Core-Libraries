@@ -41,6 +41,7 @@ void ESPAPP_HTTPServerContainer::handleHTTPRequests(void)
     this->Server->readHTTPRequest();
     this->Site->processHTTPRequest();
     this->Server->pushHTMLResponse();
+    this->handleCommand();
 
 #ifdef DEBUG
     this->System->Msg->printHeader(1, 1, ESPAPP_MSG_HEADER_DEFAULT_LENGTH, ESPAPP_MSG_HEADER_TYPE_DASH);
@@ -49,7 +50,7 @@ void ESPAPP_HTTPServerContainer::handleHTTPRequests(void)
 
 void ESPAPP_HTTPServerContainer::handleFavicon(void)
 {
-   this->Server->processFaviconRequest();
+    this->Server->processFaviconRequest();
 }
 
 void ESPAPP_HTTPServerContainer::handleHTTPFileUpload(void)
@@ -67,7 +68,14 @@ void ESPAPP_HTTPServerContainer::handleJS(void)
     this->Server->processJSFileRequest();
 }
 
-
+void ESPAPP_HTTPServerContainer::handleCommand(void)
+{
+    if (this->Server->HTTPRequest->siteId == ESPAPP_HTTP_SITE_REBOOT)
+    {
+        this->Server->HTTPServer->close();
+        this->System->reboot();
+    }
+}
 
 #ifndef ESP32 /* ESP82xx */
 void ESPAPP_HTTPServer::handle(const char *uri,
@@ -100,7 +108,6 @@ void ESPAPP_HTTPServerContainer::handle(const char *uri,
 {
     this->Server->HTTPServer->on(uri, HTTP_POST, handler, handlerUpload);
 }
-
 
 void ESPAPP_HTTPServerContainer::onNotFound(WebServer::THandlerFunction fn)
 {

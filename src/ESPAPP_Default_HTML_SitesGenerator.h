@@ -16,6 +16,7 @@ private:
   String *HTMLResponse = new String();
   ESPAPP_HTTPServer *Server;
   void setHTTPResponseCode(int responseCode = ESPAPP_HTTP_RESPONSE_CODE_OK);
+  void configureSite(void);
 public:
   ESPAPP_HTML_SitesGenerator(ESPAPP_Core *_System, ESPAPP_HTTPServer *_HTTPServer, String *_HTMLResponse);
   ~ESPAPP_HTML_SitesGenerator();

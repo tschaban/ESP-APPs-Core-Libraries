@@ -36,7 +36,7 @@ private:
    * @brief Used to count connection attemps before going to sleep mode
    *
    */
-  uint8_t connections = 0;
+  uint16_t connections = 0;
 
   /**
    * @brief Used to switch between Primary and Backup configuration
@@ -52,6 +52,7 @@ private:
    */
   boolean sleepMode = false;
   unsigned long sleepStartTime = 0;
+  uint16_t scecondsTimer = 0;
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   AFELED *Led;
@@ -155,6 +156,7 @@ public:
    *
    */
   void listener();
+
 
 #ifdef ESP32
   /**

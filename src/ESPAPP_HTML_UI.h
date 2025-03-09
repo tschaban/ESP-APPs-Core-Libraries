@@ -8,10 +8,17 @@ class ESPAPP_HTML_UI
 {
 private:
     ESPAPP_Core *System;
+    bool isMenuSet = true;
 
     void clearOrphantTags(String *site);
     void replaceTagTitle(String *item, const __FlashStringHelper *title);
+    void replaceTagTitle(String *item, const char *value);
+
     void replaceTagIcon(String *item, const __FlashStringHelper *icon);
+
+    void replaceTagValue(String *item, const __FlashStringHelper *value);
+    void replaceTagValue(String *item, const char *value);
+
     void replaceTagUrlParams(String *item, ESPAPP_HTTP_REQUEST *url, const char *parameters);
 
     void addRadioButtonOrCheckBoxFormItem(String *item, const __FlashStringHelper *type, const char *name, const char *label,
@@ -24,7 +31,9 @@ public:
     ~ESPAPP_HTML_UI();
 
     void setLang(String *site, const __FlashStringHelper *lang);
-    void setRefresh(String *site, const __FlashStringHelper *refresh);
+    void setRefresh(String *site, uint8_t refresh, const __FlashStringHelper *url = F("/"));
+    void removeMenu(void);
+    bool showMenu(void);
     void setTitle(String *site, const __FlashStringHelper *title);
     void setStyle(String *site, const __FlashStringHelper *css);
     void embedCSSFiles(String *site, const char *cssFiles[], size_t count);
@@ -119,6 +128,7 @@ public:
     void addSelectFormItemClose(String *item, const char *hint = (PGM_P)FPSTR(HTML_UI_INPUT_SKIP_ATTRIBUTE));
 
     void addParagraph(String *item, const __FlashStringHelper *text, bool indented = false);
+
 };
 
 #endif

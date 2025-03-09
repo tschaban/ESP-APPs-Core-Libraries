@@ -276,240 +276,211 @@ void ESPAPP_WirelessConnection::switchConfiguration()
 
 void ESPAPP_WirelessConnection::listener()
 {
-
-  if (ready)
+  // If network configuration is not set then exit
+  if (!ready)
   {
-    if (!System->connectionMode() == ESPAPP_NETWORK_CONNECTION_MODE_NO_CONNECTION)
+    return;
+  }
+
+  // If work offline mode is set then exit
+  if (System->connectionMode() == ESPAPP_NETWORK_CONNECTION_MODE_NO_CONNECTION)
+  {
+    return;
+  }
+
+  // Connection established
+  if (connected())
+  {
+    if (connections > 0)
     {
-      if (!connected())
+      connections = 0;
+      noOfFailures = 0;
+      delayStartTime = 0;
+
+#ifdef AFE_CONFIG_HARDWARE_LED
+      ledStartTime = 0;
+      Led->off();
+#endif
+
+#ifdef DEBUG
+      System->Msg->printBulletPoint(F("Connection established successfully"));
+      System->Msg->printBulletPoint(F("Setting hostname to: "));
+      System->Msg->printValue(System->configuration->deviceName);
+#endif
+
+      if (WirelessNetwork.hostname(System->configuration->deviceName))
       {
-        if (sleepMode)
-        {
-          if (millis() - sleepStartTime >= configuration->waitTimeSeries * 1000)
-          {
-            sleepMode = false;
-          }
-        }
-        else
-        {
-          if (delayStartTime == 0)
-          {
-            delayStartTime = millis();
-            if (connections == 0)
-            {
-
-              /* Checking if WiFi is configured */
-              if (strlen(configuration->primary.ssid) == 0 ||
-                  strlen(configuration->primary.password) == 0)
-              {
 #ifdef DEBUG
-                System->Msg->printError(
-                    F("is not configured. Going to configuration mode"),
-                    F("WIFI"));
+        System->Msg->printValue(F(" ... Success"));
 #endif
-                System->reboot(ESPAPP_NETWORK_CONNECTION_MODE_HOTSPOT);
-              }
-
-              if (isPrimaryConfiguration)
-              {
-                WirelessNetwork.begin(configuration->primary.ssid,
-                                      configuration->primary.password);
-              }
-              else
-              {
-                WirelessNetwork.begin(configuration->secondary.ssid,
-                                      configuration->secondary.password);
-              }
-
+      }
 #ifdef DEBUG
+      else
+      {
+        System->Msg->printValue(F(" ... Error"));
+      }
 
-              System->Msg->printInformation(
-                  F("Starting establishing WiFi connection"), F("WIFI"));
-              System->Msg->printBulletPoint(F("SSID: "));
-              Serial << (isPrimaryConfiguration ? configuration->primary.ssid
-                                                : configuration->secondary.ssid);
-
-              System->Msg->printBulletPoint(F("Auto Connected: "));
-              Serial << WirelessNetwork.getAutoConnect();
-
-              System->Msg->printBulletPoint(F("Auto ReConnected: "));
-              Serial << WirelessNetwork.getAutoReconnect();
-
-              System->Msg->printBulletPoint(F("Mode: "));
-              Serial << WirelessNetwork.getMode();
-
-#ifndef ESP32
-              System->Msg->printBulletPoint(F("Listen interval: "));
-              Serial << WirelessNetwork.getListenInterval();
-
-              System->Msg->printBulletPoint(F("Persistent: "));
-              Serial << WirelessNetwork.getPersistent();
-
-              System->Msg->printBulletPoint(F("PhyMode: "));
-              Serial << WirelessNetwork.getPhyMode();
-
-              System->Msg->printBulletPoint(F("Sleep Mode: "));
-              Serial << WirelessNetwork.getSleepMode();
-#endif // !ESP32
+      System->Msg->printHeader(2, 1, ESPAPP_MSG_HEADER_DEFAULT_LENGTH, ESPAPP_MSG_HEADER_TYPE_DASH);
+      System->Msg->printValue(F("Connection established"));
+      System->Msg->printBulletPoint(F("MAC: "));
+      Serial << WirelessNetwork.macAddress();
+      System->Msg->printBulletPoint(F("IP: "));
+      Serial << WirelessNetwork.localIP();
+#ifdef ESP32
+      System->Msg->printBulletPoint(F("IPv6: "));
+      Serial << WirelessNetwork.localIPv6();
 #endif
-            }
-          }
-
-#ifdef AFE_CONFIG_HARDWARE_LED
-          if (ledStartTime == 0)
-          {
-            ledStartTime = millis();
-          }
-
-          if (millis() > ledStartTime + 500)
-          {
-            Led->toggle();
-            ledStartTime = 0;
-          }
+      System->Msg->printBulletPoint(F("Subnet: "));
+      Serial << WirelessNetwork.subnetMask();
+#ifdef ESP32
+      Serial << F("/") << WirelessNetwork.subnetCIDR();
 #endif
+      System->Msg->printBulletPoint(F("Gateway: "));
+      Serial << WirelessNetwork.gatewayIP();
+#ifdef ESP32
+      System->Msg->printBulletPoint(F("Broadcast: "));
+      Serial << WirelessNetwork.broadcastIP();
+#endif
+      System->Msg->printBulletPoint(F("DNS1: "));
+      Serial << WirelessNetwork.dnsIP(0);
+      System->Msg->printBulletPoint(F("DNS2: "));
+      Serial << WirelessNetwork.dnsIP(1);
+#ifdef ESP32
+      System->Msg->printBulletPoint(F("Network ID: "));
+      Serial << WirelessNetwork.networkID();
+#endif
+      System->Msg->printBulletPoint(F("RSSI: "));
+      Serial << WirelessNetwork.RSSI();
+#ifdef ESP32
+      System->Msg->printBulletPoint(F("Hostname: "));
+      Serial << WirelessNetwork.getHostname();
+#else
+      System->Msg->printBulletPoint(F("Hostname: "));
+      Serial << WirelessNetwork.hostname();
+#endif
+      System->Msg->printHeader(1, 1, ESPAPP_MSG_HEADER_DEFAULT_LENGTH, ESPAPP_MSG_HEADER_TYPE_DASH);
+#endif
+    }
+    return;
+  }
 
-          if (millis() >
-              delayStartTime + (configuration->waitTimeConnections * 1000))
-          {
-            connections++;
-
-// yield();
-// delay(10);
+  // Sleep mode
+  if (sleepMode)
+  {
+    if (millis() - sleepStartTime >= configuration->sleepTimeout * 1000)
+    {
+      sleepMode = false;
 #ifdef DEBUG
-            System->Msg->printBulletPoint(F("Connecting to: "));
-
-            Serial << (isPrimaryConfiguration ? F("primary") : F("backup"))
-                   << F(" router. Attempt: ") << connections << F("/")
-                   << configuration->noConnectionAttempts << F(", IP(")
-                   << WirelessNetwork.localIP() << F(")") << F(" WLStatus=")
-                   << WirelessNetwork.status();
-            if (isBackupConfigurationSet)
-            {
-              Serial << F(", Failures counter: ") << noOfFailures + 1 << F("/")
-                     << configuration->noFailuresToSwitchNetwork;
-            }
+      System->Msg->printBulletPoint(F("Sleep timeout completed, resuming connection attempts"));
 #endif
-            delayStartTime = 0;
-          }
+    }
+    return;
+  }
 
-          if (connections == configuration->noConnectionAttempts)
-          {
-            sleepMode = true;
-            WirelessNetwork.disconnect();
-            sleepStartTime = millis();
-            delayStartTime = 0;
-
-#ifdef AFE_CONFIG_HARDWARE_LED
-            ledStartTime = 0;
-            Led->off();
-#endif
-
-            connections = 0;
+  // Starting connection
+  if (delayStartTime == 0)
+  {
+    delayStartTime = millis();
+    scecondsTimer = delayStartTime;
+    if (connections == 0)
+    {
+      if (strlen(configuration->primary.ssid) == 0 || strlen(configuration->primary.password) == 0)
+      {
 #ifdef DEBUG
-            System->Msg->printWarning(
-                F("Not able to connect.Going to sleep mode for "), F("WIFI"));
-            System->Msg->printValue(configuration->waitTimeSeries, F("sec."));
+        System->Msg->printError(F("WiFi not configured, switching to Hotspot mode"), F("WIFI"));
 #endif
+        System->reboot(ESPAPP_NETWORK_CONNECTION_MODE_HOTSPOT);
+        return;
+      }
 
-            /**
-             * @brief Switching configurations
-             *
-             */
-            if (isBackupConfigurationSet)
-            {
-              noOfFailures++;
-              if (noOfFailures == configuration->noFailuresToSwitchNetwork)
-              {
-                switchConfiguration();
-              }
-            } /* Endif: Switching configurations */
-          }
-        }
+      if (isPrimaryConfiguration)
+      {
+        WirelessNetwork.begin(configuration->primary.ssid, configuration->primary.password);
+#ifdef DEBUG
+        System->Msg->printBulletPoint(F("Attempting connection to primary network"));
+        System->Msg->printBulletPoint(F("SSID: "));
+        System->Msg->printValue(configuration->primary.ssid);
+#endif
       }
       else
       {
-        if (connections > 0)
-        {
-          connections = 0;
-          noOfFailures = 0;
-          delayStartTime = 0;
-
-#ifdef AFE_CONFIG_HARDWARE_LED
-          ledStartTime = 0;
-          Led->off();
-#endif
-
+        WirelessNetwork.begin(configuration->secondary.ssid, configuration->secondary.password);
 #ifdef DEBUG
-          System->Msg->printInformation(F("Setting hostname to: "), F("WIFI"));
-          System->Msg->printValue(System->configuration->deviceName);
+        System->Msg->printBulletPoint(F("Attempting connection to secondary network"));
+        System->Msg->printBulletPoint(F("SSID: "));
+        System->Msg->printValue(configuration->secondary.ssid);
 #endif
-
-          // yield();
-
-          if (WirelessNetwork.hostname(System->configuration->deviceName))
-          {
-// yield();
-#ifdef DEBUG
-
-            System->Msg->printValue(F(" ... Success"));
-          }
-          else
-          {
-            System->Msg->printValue(F(" ... Error"));
-#endif
-          }
-
-#ifdef DEBUG
-
-          System->Msg->printHeader(2, 1, ESPAPP_MSG_HEADER_DEFAULT_LENGTH, ESPAPP_MSG_HEADER_TYPE_DASH);
-          System->Msg->printValue(F("Connection established"));
-          System->Msg->printBulletPoint(F("MAC: "));
-          Serial << WirelessNetwork.macAddress();
-          System->Msg->printBulletPoint(F("IP: "));
-          Serial << WirelessNetwork.localIP();
-#ifdef ESP32
-          System->Msg->printBulletPoint(F("IPv6: "));
-          Serial << WirelessNetwork.localIPv6();
-#endif
-          System->Msg->printBulletPoint(F("Subnet: "));
-          Serial << WirelessNetwork.subnetMask();
-#ifdef ESP32
-          Serial << F("/") << WirelessNetwork.subnetCIDR();
-#endif
-          System->Msg->printBulletPoint(F("Gateway: "));
-          Serial << WirelessNetwork.gatewayIP();
-#ifdef ESP32
-          System->Msg->printBulletPoint(F("Broadcast: "));
-          Serial << WirelessNetwork.broadcastIP();
-#endif
-          System->Msg->printBulletPoint(F("DNS1: "));
-          Serial << WirelessNetwork.dnsIP(0);
-          System->Msg->printBulletPoint(F("DNS2: "));
-          Serial << WirelessNetwork.dnsIP(1);
-#ifdef ESP32
-          System->Msg->printBulletPoint(F("Network ID: "));
-          Serial << WirelessNetwork.networkID();
-#endif
-          System->Msg->printBulletPoint(F("RSSI: "));
-          Serial << WirelessNetwork.RSSI();
-#ifdef ESP32
-          System->Msg->printBulletPoint(F("Hostname: "));
-          Serial << WirelessNetwork.getHostname();
-#else
-          System->Msg->printBulletPoint(F("Hostname: "));
-          Serial << WirelessNetwork.hostname();
-#endif
-
-          //   System->Msg->printBulletPoint(F("LAN HTTP: http://"));
-          //    char deviceIdExtended[AFE_CONFIG_DEVICE_ID_SIZE];
-          //    Data->getDeviceID(deviceIdExtended, true);
-          //     Serial << deviceIdExtended << F(".local");
-
-          System->Msg->printHeader(1, 1, ESPAPP_MSG_HEADER_DEFAULT_LENGTH, ESPAPP_MSG_HEADER_TYPE_DASH);
-#endif
-        }
       }
     }
+  }
+
+#ifdef AFE_CONFIG_HARDWARE_LED
+  if (ledStartTime == 0)
+  {
+    ledStartTime = millis();
+  }
+
+  if (millis() > ledStartTime + 500)
+  {
+    Led->toggle();
+    ledStartTime = 0;
+  }
+#endif
+
+  // Setting timeout for connection
+  if (millis() > delayStartTime + (configuration->connectionTimeout * 1000))
+  {
+
+    delayStartTime = 0;
+    sleepMode = true;
+    WirelessNetwork.disconnect();
+    sleepStartTime = millis();
+
+#ifdef AFE_CONFIG_HARDWARE_LED
+    ledStartTime = 0;
+    Led->off();
+#endif
+
+    connections = 0;
+
+#ifdef DEBUG
+    System->Msg->printBulletPoint(F("Connection failed. Entering sleep mode for "));
+    System->Msg->printValue(configuration->sleepTimeout, F(" seconds"));
+#endif
+
+    if (isBackupConfigurationSet)
+    {
+      noOfFailures++;
+
+      if (noOfFailures >= configuration->failuresToSwitch)
+      {
+#ifdef DEBUG
+        System->Msg->printBulletPoint(F("Switching network configuration to "));
+        System->Msg->printValue(isPrimaryConfiguration ? F("secondary") : F("primary"));
+#endif
+        switchConfiguration();
+      }
+    }
+  }
+
+  // Displaying connection status and counting connection attempts
+  if (millis() > scecondsTimer + 1000)
+  {
+    scecondsTimer = millis();
+    connections++;
+#ifdef DEBUG
+    System->Msg->printBulletPoint(F("Establishing connection: "));
+    System->Msg->printValue(connections);
+    System->Msg->printValue(F("s, Status="));
+    System->Msg->printValue((int)WirelessNetwork.status());
+    if (isBackupConfigurationSet)
+    {
+      System->Msg->printValue(F("Failures: "));
+      System->Msg->printValue(noOfFailures + 1);
+      System->Msg->printValue(F("/ "));
+      System->Msg->printValue(configuration->failuresToSwitch);
+    }
+#endif
   }
 }
 
@@ -654,7 +625,7 @@ bool ESPAPP_WirelessConnection::readConfiguration(void)
 
     sprintf(configuration->secondary.ssid, doc["secondary"]["ssid"] | "");
     sprintf(configuration->secondary.password, doc["secondary"]["password"] | "");
-    configuration->secondary.isDHCP = doc["secondary"]["dhcp"] |true;
+    configuration->secondary.isDHCP = doc["secondary"]["dhcp"] | true;
     sprintf(configuration->secondary.ip, doc["secondary"]["ip"] | "");
     sprintf(configuration->secondary.gateway, doc["secondary"]["gateway"] | "");
     sprintf(configuration->secondary.subnet, doc["secondary"]["subnet"] | "");
@@ -662,10 +633,9 @@ bool ESPAPP_WirelessConnection::readConfiguration(void)
     sprintf(configuration->secondary.dns2, doc["secondary"]["dns2"] | "");
 
     configuration->mDNS = doc["mdns"] | true;
-    configuration->noConnectionAttempts = doc["connectioTimeout"] | 10;
-    configuration->waitTimeConnections = doc["sleepTimeout"] | 10;
-    configuration->waitTimeSeries = doc["sleepTimeout"] | 10;
-    configuration->noFailuresToSwitchNetwork = doc["failuresToSwitch"] | 2;
+    configuration->connectionTimeout = doc["connectionTimeout"] | ESPAPP_NETWORK_DEFAULT_CONNECTION_TIMEOUT;
+    configuration->sleepTimeout = doc["sleepTimeout"] | ESPAPP_NETWORK_DEFAULT_SLEEP_TIMEOUT;
+    configuration->failuresToSwitch = doc["failuresToSwitch"] | ESPAPP_NETWORK_DEFAULT_SWITCH_NETWORK_AFTER;
 
 #ifndef ESP32
     configuration->radioMode = doc["m"];
@@ -705,14 +675,12 @@ bool ESPAPP_WirelessConnection::readConfiguration(void)
 
     System->Msg->printBulletPoint(F("mDNS: "));
     System->Msg->printValue(configuration->mDNS);
-    System->Msg->printBulletPoint(F("No of connection attempts: "));
-    System->Msg->printValue(configuration->noConnectionAttempts);
-    System->Msg->printBulletPoint(F("Wait time between connection attempts: "));
-    System->Msg->printValue(configuration->waitTimeConnections);
-    System->Msg->printBulletPoint(F("Wait time between connection series: "));
-    System->Msg->printValue(configuration->waitTimeSeries);
-    System->Msg->printBulletPoint(F("No of failures to switch network: "));
-    System->Msg->printValue(configuration->noFailuresToSwitchNetwork);
+    System->Msg->printBulletPoint(F("Connection Timeout: "));
+    System->Msg->printValue(configuration->connectionTimeout);
+    System->Msg->printBulletPoint(F("Sleep Timeout: "));
+    System->Msg->printValue(configuration->sleepTimeout);
+    System->Msg->printBulletPoint(F("Failures to switch network: "));
+    System->Msg->printValue(configuration->failuresToSwitch);
 
 #ifndef ESP32
     System->Msg->printBulletPoint(F("Radio mode: "));

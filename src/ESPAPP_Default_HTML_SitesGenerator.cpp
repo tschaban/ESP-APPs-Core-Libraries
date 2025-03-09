@@ -22,45 +22,42 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
     bool success = false;
     this->HTMLResponse->clear();
 
-    /** Setting CSS and JS Files  */
-    const char *cssFiles[] = {
-        "/css?name=pure-min.css.gz", "/css?name=layout-v2.css"};
-
-    const char *jsFiles[] = {
-        "/js?name=responsive-menu-min.js.gz"};
+    this->configureSite();
 
     /** Header */
     this->UI->siteStart(this->HTMLResponse);
-    this->UI->embedCSSFiles(this->HTMLResponse, cssFiles, 2);
-    this->UI->embedJSFiles(this->HTMLResponse, jsFiles, 1);
 
     this->UI->startNavigationBlock(this->HTMLResponse);
 
     /** Menu */
     ESPAPP_HTTP_REQUEST *urlParams = new ESPAPP_HTTP_REQUEST;
 
-    // this->UI->startMenuSection(this->HTMLResponse, F("Menu"), FPSTR(HTML_UI_ICON_RIGHTWARDS_ARROW));
+    if (this->UI->showMenu())
+    {
 
-    this->UI->startNavigationList(this->HTMLResponse, F("Menu"), FPSTR(HTML_UI_ICON_RIGHTWARDS_ARROW));
+        this->UI->startNavigationList(this->HTMLResponse, F("Menu"), FPSTR(HTML_UI_ICON_RIGHTWARDS_ARROW));
 
-    this->UI->setUrlParams(urlParams, 0);
-    this->UI->addNavigationItem(this->HTMLResponse, F("File explorer"), urlParams, "", FPSTR(HTML_UI_NO_ICON));
-    this->UI->setUrlParams(urlParams, 1);
-    this->UI->addNavigationItem(this->HTMLResponse, F("Site template"), urlParams, "", FPSTR(HTML_UI_NO_ICON));
-    this->UI->setUrlParams(urlParams, 2, 1);
-    this->UI->addNavigationItem(this->HTMLResponse, F("Item 4"), urlParams, "", FPSTR(HTML_UI_ICON_ARROW));
-    this->UI->setUrlParams(urlParams, 3, 1, 1);
-    this->UI->addNavigationItem(this->HTMLResponse, F("Item 5"), urlParams, "", FPSTR(HTML_UI_NO_ICON));
-    this->UI->setUrlParams(urlParams, 4, 1, 1, 1);
-    this->UI->addNavigationItem(this->HTMLResponse, F("Item 6"), urlParams, "", FPSTR(HTML_UI_NO_ICON));
+        this->UI->setUrlParams(urlParams, 1);
+        this->UI->addNavigationItem(this->HTMLResponse, F("Index"), urlParams, "", FPSTR(HTML_UI_NO_ICON));
 
-    // External Link
-    this->UI->addNavigationItemExternal(this->HTMLResponse, F("Smart'my Dom"), F("https://www.smartnydom.pl"), FPSTR(HTML_UI_ICON_ARROW));
+        this->UI->setUrlParams(urlParams, ESPAPP_HTTP_SITE_FIRMWARE_COMMAND);
+        this->UI->addNavigationItem(this->HTMLResponse, F("Commands"), urlParams, "", FPSTR(HTML_UI_NO_ICON));
 
-    this->UI->endNavigationList(this->HTMLResponse);
+        this->UI->setUrlParams(urlParams, ESPAPP_HTTP_SITE_FILE_EXPLORER);
+        this->UI->addNavigationItem(this->HTMLResponse, F("FS Explorer"), urlParams, "", FPSTR(HTML_UI_NO_ICON));
+
+        this->UI->setUrlParams(urlParams, 2, 1);
+        this->UI->addNavigationItem(this->HTMLResponse, F("Dummy site: 1"), urlParams, "", FPSTR(HTML_UI_ICON_RIGHTWARDS_ARROW));
+        this->UI->setUrlParams(urlParams, 4, 1, 1, 1);
+        this->UI->addNavigationItem(this->HTMLResponse, F("Dummy site: 2"), urlParams, "", FPSTR(HTML_UI_ICON_ARROW));
+
+        // External Link
+        this->UI->addNavigationItemExternal(this->HTMLResponse, F("Smart'my Dom"), F("https://www.smartnydom.pl"), FPSTR(HTML_UI_ICON_ARROW));
+        this->UI->endNavigationList(this->HTMLResponse);
+       
+    }
 
     this->UI->endNavigationBlock(this->HTMLResponse);
-
     //** Body */
     this->UI->startBodySection(this->HTMLResponse);
 
@@ -112,7 +109,6 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
 
         count = 0;
         this->System->Flash->listFiles(this->Server->HTTPRequest->parameter1, files, 10, count);
-        
 
         for (size_t i = 0; i < count; i++)
         {
@@ -129,17 +125,27 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
 
         this->UI->closeSection(this->HTMLResponse);
 
-        /** Site configuration */
-        this->UI->setLang(this->HTMLResponse, F("pl"));
-        this->UI->setLogo(this->HTMLResponse, F("https://s.smartnydom.pl/i/esp32-firmware"));
-        this->UI->setSubtitle1(this->HTMLResponse, F("ESPAPP"));
-        this->UI->setSubtitle2(this->HTMLResponse, F("Version"));
-        this->UI->setURL(this->HTMLResponse, F("https://www.smartnydom.pl"));
-        this->UI->setLogoURL(this->HTMLResponse, F("https://s.smartnydom.pl/i/SD00-0000-0001"));
-
-        /** Site closure  */
-        this->UI->siteEnd(this->HTMLResponse);
         setHTTPResponseCode(ESPAPP_HTTP_RESPONSE_CODE_OK);
+        break;
+    }
+    case ESPAPP_HTTP_SITE_FIRMWARE_COMMAND: // Firmware commands
+    {
+        this->UI->openSection(this->HTMLResponse, F("Commands"), F("Firmware commands"));
+        this->UI->addParagraph(this->HTMLResponse, F("<a href=\"/?site=101&cmd=15\">Reboot device</a>"),true); // Refactor it
+        this->UI->closeSection(this->HTMLResponse);
+        this->setHTTPResponseCode(ESPAPP_HTTP_RESPONSE_CODE_OK);
+        break; 
+    }
+    case ESPAPP_HTTP_SITE_REBOOT:
+    {
+        this->UI->openSection(this->HTMLResponse, F("Rebooting"), F("Rebooting device"));
+        this->UI->addParagraph(this->HTMLResponse, F("Rebooting device in 10 seconds"));
+        this->UI->closeSection(this->HTMLResponse);
+
+        this->UI->setRefresh(this->HTMLResponse, 10, F("/"));
+        this->setHTTPResponseCode(ESPAPP_HTTP_RESPONSE_CODE_OK);
+
+        
         break;
     }
     default:
@@ -182,8 +188,7 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
         this->UI->addSelectOptionFormItem(this->HTMLResponse, "Option 1", "1", true);
         this->UI->addSelectOptionFormItem(this->HTMLResponse, "Option 2", "2", false);
         this->UI->addSelectOptionFormItem(this->HTMLResponse, "Option 3", "3", false);
-        this->UI->addSelectFormItemClose(this->HTMLResponse,  (PGM_P)F("That is a hint"));
-
+        this->UI->addSelectFormItemClose(this->HTMLResponse, (PGM_P)F("That is a hint"));
 
         this->UI->startList(this->HTMLResponse);
         this->UI->addListItem(this->HTMLResponse, (PGM_P)F("List item 1"));
@@ -191,8 +196,6 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
         this->UI->addListItem(this->HTMLResponse, (PGM_P)F("List item 3"));
         this->UI->addListItem(this->HTMLResponse, (PGM_P)F("List item 4"));
         this->UI->endList(this->HTMLResponse);
-        
-
 
         this->UI->endForm(this->HTMLResponse, FPSTR(HTML_UI_SUBMITT_BUTTON_SAVE));
 
@@ -202,26 +205,35 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
 
         this->UI->addParagraph(this->HTMLResponse, F("This is a paragraph"));
 
-
-
-
         this->UI->closeMessageSection(this->HTMLResponse);
 
-        /** Site configuration */
-        this->UI->setLang(this->HTMLResponse, F("pl"));
-        this->UI->setLogo(this->HTMLResponse, F("https://s.smartnydom.pl/i/esp32-firmware"));
-        this->UI->setSubtitle1(this->HTMLResponse, F("ESPAPP"));
-        this->UI->setSubtitle2(this->HTMLResponse, F("Version"));
-        this->UI->setURL(this->HTMLResponse, F("https://www.smartnydom.pl"));
-        this->UI->setLogoURL(this->HTMLResponse, F("https://s.smartnydom.pl/i/SD00-0000-0001"));
-
-        /** Site closure  */
-        this->UI->siteEnd(this->HTMLResponse);
         setHTTPResponseCode(ESPAPP_HTTP_RESPONSE_CODE_NOT_FOUND);
+
         success = true;
         break;
     }
     }
+
+    /** Setting CSS and JS Files  */
+    const char *cssFiles[] = {
+        "/css?name=pure-min.css.gz", "/css?name=layout-v2.css"};
+    const char *jsFiles[] = {
+        "/js?name=responsive-menu-min.js.gz"};
+    this->UI->embedCSSFiles(this->HTMLResponse, cssFiles, 2);
+    this->UI->embedJSFiles(this->HTMLResponse, jsFiles, 1);
+
+    /** Set site global parametrs */
+    this->UI->setLang(this->HTMLResponse, F("pl"));
+    this->UI->setLogo(this->HTMLResponse, F("https://s.smartnydom.pl/i/esp32-firmware"));
+    this->UI->setLang(this->HTMLResponse, F("pl"));
+    this->UI->setLogo(this->HTMLResponse, F("https://s.smartnydom.pl/i/esp32-firmware"));
+    this->UI->setSubtitle1(this->HTMLResponse, F("ESPAPP"));
+    this->UI->setSubtitle2(this->HTMLResponse, F("Version"));
+    this->UI->setURL(this->HTMLResponse, F("https://www.smartnydom.pl"));
+    this->UI->setLogoURL(this->HTMLResponse, F("https://s.smartnydom.pl/i/SD00-0000-0001"));
+
+    /** Site closure  */
+    this->UI->siteEnd(this->HTMLResponse);
 
 #ifdef DEBUG
     this->System->Msg->printBulletPoint(F("Site generated"));
@@ -233,6 +245,18 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
 void ESPAPP_HTML_SitesGenerator::setHTTPResponseCode(int responseCode)
 {
     this->Server->HTTPRequest->HTTPResponseCode = responseCode;
+}
+
+void ESPAPP_HTML_SitesGenerator::configureSite(void)
+{
+    switch (this->Server->HTTPRequest->siteId)
+    {
+    case ESPAPP_HTTP_SITE_REBOOT:
+    {
+        this->UI->removeMenu();
+        break;
+    }
+    }
 }
 
 #endif

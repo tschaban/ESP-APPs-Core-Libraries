@@ -29,8 +29,10 @@ const char HTML_UI_TAG_NAME[] PROGMEM = "{{n}}";
 const char HTML_UI_TAG_HINT[] PROGMEM = "{{h}}";
 
 /** HTML TAGS templates */
-const char HTML_UI_SITE_CSS_FILE_TAG[] PROGMEM = "<link rel=\"stylesheet\" href=\"{{c.a}}\">";
-const char HTML_UI_SITE_JS_FILE_TAG[] PROGMEM = "<script src=\"{{c.a}}\"></script>";
+const char HTML_UI_SITE_CSS_FILE_TAG[] PROGMEM = "<link rel=\"stylesheet\" href=\"{{v}}\">";
+const char HTML_UI_SITE_JS_FILE_TAG[] PROGMEM = "<script src=\"{{v}}\"></script>";
+const char HTML_UI_SITE_URL_TAG[] PROGMEM = "<a href=\"{{v}}\">{{t}}</a>";
+const char HTML_UI_SITE_REFRESH_TAG[] PROGMEM = "<meta http-equiv=\"refresh\" content=\"{{v}};URL='{{n}}'\">";
 
 /** Icons */
 const char HTML_UI_NO_ICON[] PROGMEM = "";
@@ -47,17 +49,17 @@ const char HTML_UI_SITE_FOOTER[] PROGMEM = "</div></div></body></html>";
 
 
 /** Navigation Block */
-const char HTML_UI_SITE_MENU_BLOCK_START[] PROGMEM = "<a href=\"#menu\" id=\"menuLink\" class=\"menu-link\"><span></span></a><div id=\"menu\"><header><img src=\"{{f.logo}}\"alt=\"{{s.title}}\"><small>{{f.subtitle-1}}<br/>{{f.subtitle-2}}</small></header>";
+const char HTML_UI_SITE_MENU_BLOCK_START[] PROGMEM = "<a href=\"#menu\" id=\"menuLink\" class=\"menu-link\"><span></span></a><div id=\"menu\"><header><img src=\"{{f.logo}}\" alt=\"{{s.title}}\"><small>{{f.subtitle-1}}<br/>{{f.subtitle-2}}</small></header>";
 const char HTML_UI_SITE_MENU_BLOCK_END[] PROGMEM = "</div>";
 
 const char HTML_UI_SITE_MENU_SECTION_START[] PROGMEM = "<div class=\"pure-menu\"><a class=\"pure-menu-heading\" href=\"#{{t}}\">{{i}}{{t}}</a><ul class=\"pure-menu-list\">";
 const char HTML_UI_SITE_MENU_SECTION_END[] PROGMEM = "</ul></div>";
 
 const char HTML_UI_SITE_MENU_SECTION_ITEM[] PROGMEM = "<li class=\"pure-menu-item\"><a href=\"/?{{mi.s}}{{mi.c}}{{mi.a}}{{mi.o}}{{mi.p}}\" class=\"pure-menu-link\">{{i}}{{t}}</a></li>";
-const char HTML_UI_SITE_MENU_SECTION_ITEM_EXTERNAL[] PROGMEM = "<li class=\"pure-menu-item\"><a href=\"{{s.u}}\" class=\"pure-menu-link\">{{i}}{{t}}</a></li>";
+const char HTML_UI_SITE_MENU_SECTION_ITEM_EXTERNAL[] PROGMEM = "<li class=\"pure-menu-item\"><a href=\"{{v}}\" class=\"pure-menu-link\">{{i}}{{t}}</a></li>";
 
 /** Section */
-const char HTML_UI_SECTION_START[] PROGMEM = "<div><h1 class=\"cs\">{{T}}</h1><section class=\"s\"><header><h2 class=\"st\">{{D}}</h2></header><div class=\"sc\">";
+const char HTML_UI_SECTION_START[] PROGMEM = "<div><h1 class=\"cs\">{{t}}</h1><section class=\"s\"><header><h2 class=\"st\">{{v}}</h2></header><div class=\"sc\">";
 const char HTML_UI_SECTION_END[] PROGMEM = "</div></section></div>";
 
 /** Forms */
@@ -95,25 +97,27 @@ const char HTML_UI_FORM_ITEM_PARAGRAPH[] PROGMEM = "<div class=\"pure-control-gr
 
 /** Form: Select */    
 const char HTML_UI_ITEM_SELECT_OPEN[] PROGMEM =
-        "<div class=\"pure-control-group\"><label>{{t}}</label><select name=\"{{n}}\">";
+        "<div class=\"pure-control-group\"><label>{{t}}</label><select name=\"{{v}}\">";
 const char HTML_UI_ITEM_SELECT_OPTION[] PROGMEM = "<option value=\"{{v}}\" {{i.s}}>{{t}}</option>";
-const char HTML_UI_ITEM_SELECT_CLOSE[] PROGMEM = "</select>{{h}}</div>";
+const char HTML_UI_ITEM_SELECT_CLOSE[] PROGMEM = "</select>{{v}}</div>";
 
 /** Lists */
 const char HTML_UI_ITEM_LIST_START[] PROGMEM = "<fieldset><ul class=\"lst\">";
 const char HTML_UI_ITEM_LIST_END[] PROGMEM = "</ul></fieldset>";
 const char HTML_UI_ITEM_LIST_ITEM[] PROGMEM = "<li class=\"m\">{{v}}</li>";
 
-/** Files explorer */
+/** Files explorer
+ * site must be in sync with ESPAPP_Parameters_HTTP_Server.h
+ */
 const char HTML_UI_FILE_EXPLORER_HEADER[] PROGMEM = "<table class=\"pure-table pure-table-horizontal\"><thead><tr><th>File name</th><th>Size</th><th>Acton</th></tr></thead><tbody>";
-const char HTML_UI_FILE_EXPLORER_FOLDER_ITEM[] PROGMEM = "<tr><td><a href=\"/?site=0&p1={{f.n}}\">{{f.n}}</a></td><td>{{f.s}} files</td><td>Delete</td></tr>";
-const char HTML_UI_FILE_EXPLORER_FILE_ITEM[] PROGMEM = "<tr><td>{{f.n}}</td><td>{{f.s}}B</td><td><form action=\"/?site=0&cmd=1\" method=\"POST\"><input type=\"hidden\" name=\"f\" value=\"{{f.n}}\"><input type=\"hidden\" name=\"directory\" value=\"{{f.d}}\"><button class=\"pure-button pure-button-primary\" type=\"submit\">Delete</button></form></td></tr>";
+const char HTML_UI_FILE_EXPLORER_FOLDER_ITEM[] PROGMEM = "<tr><td><a href=\"/?site=110&p1={{v}}\">{{v}}</a></td><td>{{t}} files</td><td></td></tr>";
+const char HTML_UI_FILE_EXPLORER_FILE_ITEM[] PROGMEM = "<tr><td>{{t}}</td><td>{{f.s}}B</td><td><form action=\"/?site=110&cmd=1\" method=\"POST\"><input type=\"hidden\" name=\"f\" value=\"{{t}}\"><input type=\"hidden\" name=\"directory\" value=\"{{v}}\"><button class=\"pure-button pure-button-primary\" type=\"submit\">Delete</button></form></td></tr>";
 const char HTML_UI_FILE_EXPLORER_FOOTER[] PROGMEM = "</tbody></table>";
 
 const char HTML_UI_FILE_EXPLORER_UPLOAD_FORM[] PROGMEM =
-    "<form action=\"/upload?site=0&cmd=0\" method=\"POST\" enctype=\"multipart/form-data\">"
+    "<form action=\"/upload?site=110&cmd=0\" method=\"POST\" enctype=\"multipart/form-data\">"
     "<input type=\"file\" name=\"uploadedFile\">"
-    "<input type=\"hidden\" name=\"directory\" value=\"{{f.d}}\">"
+    "<input type=\"hidden\" name=\"directory\" value=\"{{v}}\">"
     "<button class=\"pure-button pure-button-primary\" type=\"submit\">Upload</button>"
     "</form>";
 #endif

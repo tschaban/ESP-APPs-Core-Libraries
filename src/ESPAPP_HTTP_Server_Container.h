@@ -23,6 +23,7 @@ private:
     void handleFavicon(void);
     void handleCSS(void);
     void handleJS(void);
+    void handleCommand(void);
 
     
 #ifdef ESP32
