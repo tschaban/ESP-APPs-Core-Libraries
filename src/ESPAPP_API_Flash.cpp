@@ -16,11 +16,6 @@ ESPAPP_API_Flash::ESPAPP_API_Flash()
 bool ESPAPP_API_Flash::getJSON(const __FlashStringHelper *fileName, JsonDocument &doc)
 {
 
-  // Hardcoded JSON string for testing
-  // const char *input = "{\"p\":{\"s\":\"IoT World\",\"p\":\"iotiotiot\",\"d\":1,\"i\":\"\",\"g\":\"\",\"b\":\"\",\"d1\":\"8.8.8.8\",\"d2\":\"8.8.4.4\"},\"s\":{\"s\":\"\",\"p\":\"\",\"d\":1,\"i\":\"\",\"g\":\"\",\"b\":\"\",\"d1\":\"\",\"d2\":\"\"},\"n\":20,\"w\":1,\"ws\":1,\"nf\":2,\"m\":1}";
-  // DeserializationError error = deserializeJson(doc, input);
-  // return true;
-
   boolean success = false;
   File configFile;
   if (openFile(configFile, ESPAPP_OPEN_FILE_READING,
@@ -47,7 +42,7 @@ bool ESPAPP_API_Flash::getJSON(const __FlashStringHelper *fileName, JsonDocument
     if (!error)
     {
 #ifdef DEBUG
-      this->Msg->printBulletPoint(F("JSON Deserialised"));
+      this->Msg->printBulletPoint(F("JSON Deserialised: "));
 #endif
       success = true;
     }

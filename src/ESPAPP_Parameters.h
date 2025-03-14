@@ -53,12 +53,28 @@
 #define ESPAPP_NETWORK_DEFAULT_OUTPUT_POWER_MAX 20.5
 #endif
 
+/** WAN Checks: Defaults */
+#define ESPAPP_WAN_ACCSSS_IP "1.1.1.1"
+#define ESPAPP_WAN_ACCSSS_NO_OF_PING_ATTEMPTS 1
+#define ESPAPP_WAN_DEFAULT_CHECK_INTERVAL 600 // 10 minutes
+#define ESPAPP_WAN_DEFAULT_AUTO_CHECK true
+
+/** Time: defaults */
+#define ESPAPP_TIME_DEFAULT_TIMEZONE "CEST-1CEST,M3.5.0,M10.5.0/3"
+#define ESPAPP_TIME_DEFAULT_PRIMARY_NTP "0.pl.pool.ntp.org"
+#define ESPAPP_TIME_DEFAULT_SECONDARY_NTP "1.pl.pool.ntp.org"
+#define ESPAPP_TIME_DEFAULT_SYNC_INTERVAL 60 // 1 hour
+#define ESPAPP_TIME_DEFAULT_SYNC_TIMEOUT 10000 // 10 seconds
+
+
 /* HTTP Server */
 #include <ESPAPP_Parameters_HTTP_Server.h>
 
 /* File system */
 #include <ESPAPP_Parameters_FS.h>
 
+/* Events */
+//#include <ESPAPP_Parameters_Events.h>
 
 /* Data structures */
 
@@ -87,6 +103,31 @@ struct NETWORK
   float outputPower = ESPAPP_NETWORK_DEFAULT_OUTPUT_POWER_MAX;
 #endif
 };
+
+// Simple time structure with AM/PM indication
+struct TIME_INFO {
+  uint8_t hour;      // 1-12
+  uint8_t minute;    // 0-59
+  uint8_t second;    // 0-59
+  uint8_t day;       // 1-31
+  uint8_t month;     // 1-12
+  uint16_t year;     // Full year (e.g., 2025)
+  bool isAM;         // true if AM, false if PM
+  bool isValid;      // true if time has been synchronized
+};
+
+// Time configuration structure
+struct TIME_CONFIG {
+  char timezone[32] = ESPAPP_TIME_DEFAULT_TIMEZONE;
+  char primaryNTP[64] = ESPAPP_TIME_DEFAULT_PRIMARY_NTP;
+  char secondaryNTP[64] = ESPAPP_TIME_DEFAULT_SECONDARY_NTP;
+  uint16_t syncInterval = ESPAPP_TIME_DEFAULT_SYNC_INTERVAL; // in seconds
+  uint16_t syncTimeout = ESPAPP_TIME_DEFAULT_SYNC_TIMEOUT; // in milliseconds
+  bool autoSync = true;
+};
+
+
+
 
 typedef struct 
 {

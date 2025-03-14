@@ -1,20 +1,29 @@
 #include <ESPAPP_Core.h>
 
-ESPAPP_Core::ESPAPP_Core() {}
-ESPAPP_Core::~ESPAPP_Core() {}
+ESPAPP_Core::ESPAPP_Core()
+{
 
+#ifdef DEBUG
+  this->Events = new ESPAPP_EventManager(this->Msg);
+  this->Time = new ESPAPP_Time(this->Flash, this->Msg);
+#else
+  this->Time = new ESPAPP_Time(this->Flash);
+#endif
+
+  
+}
+ESPAPP_Core::~ESPAPP_Core() {}
 
 void ESPAPP_Core::reboot(uint8_t mode)
 {
- //@TODO: Implement this function
- // saveMode(mode);
-yield();
+  //@TODO: Implement this function
+  // saveMode(mode);
+  yield();
 #ifdef DEBUG
-  Msg->printHeader(2);
-  Msg->printValue(F("Rebooting device in 1sec"));
-  Msg->printHeader(1, 1);
+  this->Msg->printHeader(2);
+  this->Msg->printValue(F("Rebooting device"));
+  this->Msg->printHeader(1, 1);
 #endif
-  delay(1000);
   ESP.restart();
 }
 

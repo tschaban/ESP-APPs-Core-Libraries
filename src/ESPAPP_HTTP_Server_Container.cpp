@@ -72,8 +72,8 @@ void ESPAPP_HTTPServerContainer::handleCommand(void)
 {
     if (this->Server->HTTPRequest->siteId == ESPAPP_HTTP_SITE_REBOOT)
     {
-        this->Server->HTTPServer->close();
-        this->System->reboot();
+        this->System->Events->triggerEvent(EVENT_REBOOT);       
+    
     }
 }
 

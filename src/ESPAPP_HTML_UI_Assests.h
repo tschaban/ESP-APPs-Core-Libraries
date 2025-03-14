@@ -32,7 +32,7 @@ const char HTML_UI_TAG_HINT[] PROGMEM = "{{h}}";
 const char HTML_UI_SITE_CSS_FILE_TAG[] PROGMEM = "<link rel=\"stylesheet\" href=\"{{v}}\">";
 const char HTML_UI_SITE_JS_FILE_TAG[] PROGMEM = "<script src=\"{{v}}\"></script>";
 const char HTML_UI_SITE_URL_TAG[] PROGMEM = "<a href=\"{{v}}\">{{t}}</a>";
-const char HTML_UI_SITE_REFRESH_TAG[] PROGMEM = "<meta http-equiv=\"refresh\" content=\"{{v}};URL='{{n}}'\">";
+const char HTML_UI_SITE_REFRESH_TAG[] PROGMEM = "<meta http-equiv=\"refresh\" content=\"{{v}};URL='{{t}}'\">";
 
 /** Icons */
 const char HTML_UI_NO_ICON[] PROGMEM = "";

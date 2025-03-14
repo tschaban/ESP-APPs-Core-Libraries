@@ -64,6 +64,7 @@ private:
    */
   static boolean eventConnectionEstablished;
 
+
   /**
    * @brief it's set to true when disconects from the WiFi
    *
@@ -93,10 +94,9 @@ private:
    *
    */
   void switchConfiguration();
-
   bool readConfiguration(void);
   bool createdDefaultConfiguration(void);
-
+  void connectionEvent(void);
 
 public:
 #ifndef ESP32
@@ -131,23 +131,6 @@ public:
    */
   boolean connected();
 
-  /**
-   * @brief Returns true if device just connected to the network. It's set to
-   * true each
-   * time it connects
-   *
-   * @return boolean
-   */
-  boolean eventConnected();
-
-  /**
-   * @brief Returns true if device just disconnected from the network. It's set
-   * to true each
-   * time it disconnects
-   *
-   * @return boolean
-   */
-  boolean eventDisconnected();
 
   /**
    * @brief Method checks if device is connected to WiFi - if it's not then it
