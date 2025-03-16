@@ -19,7 +19,7 @@ void ESPAPP_HTML_UI::setRefresh(String *site, uint8_t refresh, const __FlashStri
 
 #ifdef DEBUG
     this->System->Msg->printInformation(F("Setting refresh"), F("HTTP"));
-    this->System->Msg->printBulletPoint (F("URL to redirect: "));
+    this->System->Msg->printBulletPoint(F("URL to redirect: "));
     this->System->Msg->printValue(url);
 #endif
 
@@ -37,7 +37,6 @@ void ESPAPP_HTML_UI::setRefresh(String *site, uint8_t refresh, const __FlashStri
     this->System->Msg->printBulletPoint(F("Timeout: "));
     this->System->Msg->printValue(timeout);
 #endif
-
 
     site->replace(F("{{s.refresh}}"), FPSTR(HTML_UI_SITE_REFRESH_TAG));
     this->replaceTagValue(site, timeout);
@@ -87,6 +86,11 @@ void ESPAPP_HTML_UI::setURL(String *site, const __FlashStringHelper *url)
 void ESPAPP_HTML_UI::setLogoURL(String *site, const __FlashStringHelper *logoURL)
 {
     site->replace(F("{{f.logo-url}}"), logoURL);
+}
+
+void ESPAPP_HTML_UI::setVersion(String *site, const __FlashStringHelper *version)
+{
+    site->replace(F("{{f.version}}"), version);
 }
 
 void ESPAPP_HTML_UI::embedCSSFiles(String *site, const char *cssFiles[], size_t count)
@@ -274,8 +278,8 @@ void ESPAPP_HTML_UI::addInputFormItem(String *item, const __FlashStringHelper *t
     if (strcmp(hint, (PGM_P)FPSTR(HTML_UI_INPUT_SKIP_ATTRIBUTE)) != 0)
     {
 
-        item->replace(FPSTR(HTML_UI_TAG_HINT), FPSTR(HTML_UI_FORM_ITEM_INPUT_HINT));
-        item->replace(FPSTR(HTML_UI_TAG_VALUE), hint);
+        this->replaceTagHint(item, FPSTR(HTML_UI_FORM_ITEM_INPUT_HINT));
+        this->replaceTagValue(item, hint);
     }
 
     /** Input Type: Number */
@@ -308,22 +312,21 @@ void ESPAPP_HTML_UI::addInputFormItem(String *item, const __FlashStringHelper *t
         {
             if (strcmp(min, (PGM_P)FPSTR(HTML_UI_INPUT_SKIP_ATTRIBUTE)) != 0 && strcmp(max, (PGM_P)FPSTR(HTML_UI_INPUT_SKIP_ATTRIBUTE)) != 0)
             {
-
-                item->replace(FPSTR(HTML_UI_TAG_HINT), FPSTR(HTML_UI_FORM_ITEM_INPUT_HINT));
-                item->replace(FPSTR(HTML_UI_TAG_VALUE), FPSTR(HTML_UI_FORM_ITEM_INPUT_HINT_RANGE_NUMBER));
+                this->replaceTagHint(item, FPSTR(HTML_UI_FORM_ITEM_INPUT_HINT));
+                this->replaceTagValue(item, FPSTR(HTML_UI_FORM_ITEM_INPUT_HINT_RANGE_NUMBER));
                 item->replace(F("{{l}}"), min);
                 item->replace(F("{{m}}"), max);
             }
             else if (strcmp(min, (PGM_P)FPSTR(HTML_UI_INPUT_SKIP_ATTRIBUTE)) != 0)
             {
-                item->replace(FPSTR(HTML_UI_TAG_HINT), FPSTR(HTML_UI_FORM_ITEM_INPUT_HINT));
-                item->replace(FPSTR(HTML_UI_TAG_VALUE), FPSTR(HTML_UI_FORM_ITEM_INPUT_HINT_MIN_NUMBER));
+                this->replaceTagHint(item, FPSTR(HTML_UI_FORM_ITEM_INPUT_HINT));
+                this->replaceTagValue(item, FPSTR(HTML_UI_FORM_ITEM_INPUT_HINT_MIN_NUMBER));
                 this->replaceTagValue(item, min);
             }
             else if (strcmp(max, (PGM_P)FPSTR(HTML_UI_INPUT_SKIP_ATTRIBUTE)) != 0)
             {
-                item->replace(FPSTR(HTML_UI_TAG_HINT), FPSTR(HTML_UI_FORM_ITEM_INPUT_HINT));
-                item->replace(FPSTR(HTML_UI_TAG_VALUE), FPSTR(HTML_UI_FORM_ITEM_INPUT_HINT_MAX_NUMBER));
+                this->replaceTagHint(item, FPSTR(HTML_UI_FORM_ITEM_INPUT_HINT));
+                this->replaceTagValue(item, FPSTR(HTML_UI_FORM_ITEM_INPUT_HINT_MAX_NUMBER));
                 this->replaceTagValue(item, max);
             }
         }
@@ -358,8 +361,8 @@ void ESPAPP_HTML_UI::addInputFormItem(String *item, const __FlashStringHelper *t
         {
             if (strcmp(min, (PGM_P)FPSTR(HTML_UI_INPUT_SKIP_ATTRIBUTE)) != 0 && strcmp(max, (PGM_P)FPSTR(HTML_UI_INPUT_SKIP_ATTRIBUTE)) != 0)
             {
-                item->replace(FPSTR(HTML_UI_TAG_HINT), FPSTR(HTML_UI_FORM_ITEM_INPUT_HINT));
-                item->replace(FPSTR(HTML_UI_TAG_VALUE), FPSTR(HTML_UI_FORM_ITEM_INPUT_HINT_RANGE_TEXT));
+                this->replaceTagHint(item, FPSTR(HTML_UI_FORM_ITEM_INPUT_HINT));
+                this->replaceTagValue(item, FPSTR(HTML_UI_FORM_ITEM_INPUT_HINT_RANGE_TEXT));
                 item->replace(F("{{l}}"), min);
                 item->replace(F("{{m}}"), max);
             }
@@ -382,7 +385,7 @@ void ESPAPP_HTML_UI::addInputFormItem(String *item, const __FlashStringHelper *t
     item->replace(F("{{ix}}"), FPSTR(HTML_UI_EMPTY_STRING));
     item->replace(F("{{ist}}"), FPSTR(HTML_UI_EMPTY_STRING));
     item->replace(F("{{is}}"), FPSTR(HTML_UI_EMPTY_STRING));
-    item->replace(FPSTR(HTML_UI_TAG_HINT), FPSTR(HTML_UI_EMPTY_STRING));
+    this->replaceTagHint(item, FPSTR(HTML_UI_EMPTY_STRING));
 }
 
 void ESPAPP_HTML_UI::addRadioButtonOrCheckBoxFormItem(String *item, const __FlashStringHelper *type, const char *name, const char *label,
@@ -400,12 +403,12 @@ void ESPAPP_HTML_UI::addRadioButtonOrCheckBoxFormItem(String *item, const __Flas
     item->replace(F("{{i.d}}"), disabled ? FPSTR(HTML_UI_FORM_ITEM_ATTRIBUTE_DISABLED) : FPSTR(HTML_UI_EMPTY_STRING));
     if (strcmp(hint, (PGM_P)FPSTR(HTML_UI_INPUT_SKIP_ATTRIBUTE)) != 0)
     {
-        item->replace(FPSTR(HTML_UI_TAG_HINT), FPSTR(HTML_UI_FORM_ITEM_INPUT_HINT));
-        item->replace(FPSTR(HTML_UI_TAG_VALUE), hint);
+        this->replaceTagHint(item, FPSTR(HTML_UI_FORM_ITEM_INPUT_HINT));
+        this->replaceTagValue(item, hint);
     }
     else
     {
-        item->replace(FPSTR(HTML_UI_TAG_HINT), FPSTR(HTML_UI_EMPTY_STRING));
+        this->replaceTagHint(item, FPSTR(HTML_UI_EMPTY_STRING));
     }
 }
 
@@ -504,6 +507,14 @@ void ESPAPP_HTML_UI::addFileExplorerFolderItem(String *site, const char *name, s
     site->concat(FPSTR(HTML_UI_FILE_EXPLORER_FOLDER_ITEM));
     this->replaceTagValue(site, name);
     site->replace(FPSTR(HTML_UI_TAG_TITLE), String(size));
+    if (strcmp(name,(PGM_P)FPSTR(path_root)) !=0 && size == 0)
+    {
+        this->replaceTagHint(site, FPSTR(HTML_UI_EMPTY_STRING));
+    }
+    else
+    {
+        this->replaceTagHint(site, FPSTR(HTML_UI_FORM_ITEM_ATTRIBUTE_DISABLED));
+    }
 }
 
 void ESPAPP_HTML_UI::addFileExplorerFileItem(String *site, const char *file, size_t size, const char *directory)
@@ -593,6 +604,16 @@ void ESPAPP_HTML_UI::replaceTagValue(String *item, const __FlashStringHelper *va
 void ESPAPP_HTML_UI::replaceTagValue(String *item, const char *value)
 {
     item->replace(FPSTR(HTML_UI_TAG_VALUE), value);
+}
+
+void ESPAPP_HTML_UI::replaceTagHint(String *item, const __FlashStringHelper *value)
+{
+    item->replace(FPSTR(HTML_UI_TAG_HINT), value);
+}
+
+void ESPAPP_HTML_UI::replaceTagHint(String *item, const char *value)
+{
+    item->replace(FPSTR(HTML_UI_TAG_HINT), value);
 }
 
 void ESPAPP_HTML_UI::setUrlParams(ESPAPP_HTTP_REQUEST *url, uint8_t siteId, uint8_t command, uint8_t action, uint8_t option)

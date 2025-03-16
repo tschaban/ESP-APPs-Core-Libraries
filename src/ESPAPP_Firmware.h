@@ -27,9 +27,8 @@ private:
   // Initialize event listeners
   void initializeEventListeners(void);
 
-
-      // Internal time event tracking
-      void checkTimeEvents(void);
+  // Internal time event tracking
+  void checkTimeEvents(void);
 
 public:
   ESPAPP_Core *System = new ESPAPP_Core();
@@ -61,7 +60,6 @@ public:
 
   bool init(void);
   void coreListener(void);
-
 };
 
 #endif

@@ -1,7 +1,7 @@
 #ifndef _ESPAPP_Default_HTML_SitesGenerator_h
 #define _ESPAPP_Default_HTML_SitesGenerator_h
 
-#ifndef ESPAPP_CUSTOM_HTML_SITES_GENERATORA
+#ifdef ESPAPP_CUSTOM_HTML_SITES_GENERATORA
 
 #include <ESPAPP_Core.h>
 #include <ESPAPP_Parameters_HTTP_Server.h>
@@ -17,7 +17,6 @@ private:
   ESPAPP_HTTPServer *Server;
   void setHTTPResponseCode(int responseCode = ESPAPP_HTTP_RESPONSE_CODE_OK);
   void configureSite(void);
-
 public:
   ESPAPP_HTML_SitesGenerator(ESPAPP_Core *_System, ESPAPP_HTTPServer *_HTTPServer, String *_HTMLResponse);
   ~ESPAPP_HTML_SitesGenerator();

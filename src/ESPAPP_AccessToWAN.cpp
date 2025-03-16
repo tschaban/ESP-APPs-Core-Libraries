@@ -16,7 +16,8 @@ bool ESPAPP_AccessToWAN::connected(void)
     return this->connectedToWAN;
 }
 
-void ESPAPP_AccessToWAN::setDisconnected(void) {
+void ESPAPP_AccessToWAN::setDisconnected(void)
+{
     this->connectedToWAN = false;
 }
 
@@ -25,7 +26,7 @@ bool ESPAPP_AccessToWAN::init(void)
 #ifdef DEBUG
     this->System->Msg->printInformation(F("Initializing WAN access configuration"), F("WAN"));
 #endif
-    
+
     bool success = this->readConfiguration();
 
     if (!success)
@@ -40,9 +41,10 @@ bool ESPAPP_AccessToWAN::init(void)
     if (this->configuration->autoCheck)
     {
         this->System->Events->scheduleEventIn(EVENT_WAN_CHECK, this->configuration->checkInterval, SCHEDULE_REPEAT, this->configuration->checkInterval);
-        this->System->Events->addEventListener(EVENT_WAN_CHECK, [this](void *data) { this->checkAccessToWAN(); });
+        this->System->Events->addEventListener(EVENT_WAN_CHECK, [this](void *data)
+                                               { 
+            if (this->System->getConnectionMode()== 2) {this->checkAccessToWAN(); } });
     }
-
 
     return success;
 }
@@ -131,7 +133,7 @@ void ESPAPP_AccessToWAN::checkAccessToWAN(void)
     {
         this->previousConnectionStatus = this->connectedToWAN;
         this->System->Events->triggerEvent(this->connectedToWAN ? EVENT_WAN_CONNECTED : EVENT_WAN_DISCONNECTED);
-    } 
+    }
 #ifdef DEBUG
     if (connectedToWAN)
     {

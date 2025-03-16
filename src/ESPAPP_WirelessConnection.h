@@ -64,7 +64,6 @@ private:
    */
   static boolean eventConnectionEstablished;
 
-
   /**
    * @brief it's set to true when disconects from the WiFi
    *
@@ -94,9 +93,13 @@ private:
    *
    */
   void switchConfiguration();
-  bool readConfiguration(void);
-  bool createdDefaultConfiguration(void);
+
   void connectionEvent(void);
+
+  bool readConfiguration(void);
+  bool createDefaultConfiguration(void);
+  bool saveConfiguration(void);
+  
 
 public:
 #ifndef ESP32
@@ -123,14 +126,7 @@ public:
   ESP8266WiFiClass WirelessNetwork;
 #endif // ESP32/ESP8266
 
-
-  /**
-   * @brief Return TRUE if device is connected to WiFi Access Point
-   *
-   * @return boolean
-   */
-  boolean connected();
-
+  uint8_t connection();
 
   /**
    * @brief Method checks if device is connected to WiFi - if it's not then it
@@ -168,6 +164,10 @@ public:
 #endif
 
 #endif
+
+  
+  
+
 };
 
 #endif // _ESPAPP_WirelessConnection_h

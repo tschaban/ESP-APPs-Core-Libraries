@@ -8,13 +8,12 @@ ESPAPP_Firmware::ESPAPP_Firmware()
 
 bool ESPAPP_Firmware::init(void)
 {
-  bool success = this->System->Flash->init();
+  bool success = this->System->init();
 
   if (success)
   {
     /** Initialize event listeners */
     this->initializeEventListeners();
-    this->System->Time->init();
 
     success = this->initializeNetwork();
 
@@ -44,7 +43,9 @@ void ESPAPP_Firmware::initializeEventListeners(void)
 
     this->System->Events->addEventListener(EVENT_SYNC_TIME,
                                            [this](void *data)
-                                           { this->System->Time->synchronize(); });
+                                           { 
+                                            if (this->API->Network->connection() == 2)
+                                              {this->System->Time->synchronize();} });
   }
 
   // Set up event handlers for timer events
@@ -163,7 +164,7 @@ void ESPAPP_Firmware::handleRebootEvent(void *data)
                                          [this](void *)
                                          { this->System->reboot(); });
 
-  uint16_t eventId1 = this->System->Events->scheduleEventIn(EVENT_CUSTOM_START + 1, 2);
+  uint16_t eventId1 = this->System->Events->scheduleEventIn(EVENT_CUSTOM_START + 1, 3);
 }
 
 void ESPAPP_Firmware::handleNetworkConnectedEvent(void *data)

@@ -37,12 +37,13 @@ public:
     bool init(void);
     void listener(void);
     void readHTTPRequest(void);
-    void readHTTPRequestDirectoryName(char *path);
+    void readDirectoryFromHTTPRequestParameter1(char *path);
     bool pushHTMLResponse();    
     
     void processUploadFile(void);
     bool fileUpladedSuccessfully(void);
     bool saveUploadedFile(void);
+    bool downloadFile(const char *directory, const char *filename);
     
     bool processCSSFileRequest(void);
     bool processJSFileRequest(void);

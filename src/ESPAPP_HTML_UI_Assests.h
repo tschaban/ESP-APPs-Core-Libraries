@@ -40,6 +40,10 @@ const char HTML_UI_ICON_RIGHTWARDS_ARROW[] PROGMEM = "&#10150; ";
 const char HTML_UI_ICON_ARROW[] PROGMEM = "&#8227; ";
 
 /* Sites structure */
+
+const char HTML_UI_SITE_WIFI_CONFIGURATION[] PROGMEM =
+    "<!DOCTYPE html><html><head><title>{{s.title}}</title><style>body{display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0;font-family:sans-serif;background-color:#777}form{border:1px solid #000;background-color:#fefefe;padding:2em;text-align:center}select,input,button{width:300px;margin-bottom:.8em;padding:.4em}form *{box-sizing:border-box}label{display:block;text-align:left;width:auto}</style></head><body><div><div>";
+
 const char HTML_UI_SITE_HEADER[] PROGMEM =
     "<!doctype html><html lang=\"{{s.lang}}\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><link href=\"https://fonts.googleapis.com/css2?family=Titillium+Web&display=swap\" rel=\"stylesheet\"><title>{{s.title}}</title>{{s.refresh}}{{s.css}}{{s.js}}</head><body><div id=\"layout\">";
 
@@ -49,7 +53,7 @@ const char HTML_UI_SITE_FOOTER[] PROGMEM = "</div></div></body></html>";
 
 
 /** Navigation Block */
-const char HTML_UI_SITE_MENU_BLOCK_START[] PROGMEM = "<a href=\"#menu\" id=\"menuLink\" class=\"menu-link\"><span></span></a><div id=\"menu\"><header><img src=\"{{f.logo}}\" alt=\"{{s.title}}\"><small>{{f.subtitle-1}}<br/>{{f.subtitle-2}}</small></header>";
+const char HTML_UI_SITE_MENU_BLOCK_START[] PROGMEM = "<a href=\"#menu\" id=\"menuLink\" class=\"menu-link\"><span></span></a><div id=\"menu\"><header><img src=\"{{f.logo}}\" alt=\"{{s.title}}\"><small>{{f.subtitle-1}}<br/>{{f.subtitle-2}}<br/>{{f.version}}</small></header>";
 const char HTML_UI_SITE_MENU_BLOCK_END[] PROGMEM = "</div>";
 
 const char HTML_UI_SITE_MENU_SECTION_START[] PROGMEM = "<div class=\"pure-menu\"><a class=\"pure-menu-heading\" href=\"#{{t}}\">{{i}}{{t}}</a><ul class=\"pure-menu-list\">";
@@ -64,7 +68,7 @@ const char HTML_UI_SECTION_END[] PROGMEM = "</div></section></div>";
 
 /** Forms */
 const char HTML_UI_FORM_START[] PROGMEM = "<form class=\"pure-form pure-form-aligned\" method=\"post\" action=\"/?{{mi.s}}{{mi.c}}{{mi.a}}{{mi.o}}{{mi.p}}\">";
-const char HTML_UI_FORM_END[] PROGMEM = "<div class=\"pure-controls\"><button type=\"submit\" class=\"pure-button pure-button-primary\">{{t}}</button></div></form>";
+const char HTML_UI_FORM_END[] PROGMEM = "<div class=\"pure-controls\"><button type=\"submit\" class=\"button-green pure-button\">{{t}}</button></div></form>";
 
 /** Form: input */
 const char HTML_UI_FORM_ITEM_INPUT[] PROGMEM =
@@ -109,15 +113,15 @@ const char HTML_UI_ITEM_LIST_ITEM[] PROGMEM = "<li class=\"m\">{{v}}</li>";
 /** Files explorer
  * site must be in sync with ESPAPP_Parameters_HTTP_Server.h
  */
-const char HTML_UI_FILE_EXPLORER_HEADER[] PROGMEM = "<table class=\"pure-table pure-table-horizontal\"><thead><tr><th>File name</th><th>Size</th><th>Acton</th></tr></thead><tbody>";
-const char HTML_UI_FILE_EXPLORER_FOLDER_ITEM[] PROGMEM = "<tr><td><a href=\"/?site=110&p1={{v}}\">{{v}}</a></td><td>{{t}} files</td><td></td></tr>";
-const char HTML_UI_FILE_EXPLORER_FILE_ITEM[] PROGMEM = "<tr><td>{{t}}</td><td>{{f.s}}B</td><td><form action=\"/?site=110&cmd=1\" method=\"POST\"><input type=\"hidden\" name=\"f\" value=\"{{t}}\"><input type=\"hidden\" name=\"directory\" value=\"{{v}}\"><button class=\"pure-button pure-button-primary\" type=\"submit\">Delete</button></form></td></tr>";
+const char HTML_UI_FILE_EXPLORER_HEADER[] PROGMEM = "<table class=\"pure-table pure-table-horizontal\"><thead><tr><th>File name</th><th>Size</th><th>Action</th></tr></thead><tbody>";
+const char HTML_UI_FILE_EXPLORER_FOLDER_ITEM[] PROGMEM = "<tr><td><a class=\"folder\" href=\"/?site=110&p1={{v}}\">{{v}}</a></td><td>{{t}} files</td><td><form action=\"/?site=110\" method=\"POST\"><input type=\"hidden\" name=\"d\" value=\"{{v}}\"><button {{h}} name=\"a\" value=\"4\" class=\"button-red pure-button\" type=\"submit\">Delete</button></form></td></tr>";
+const char HTML_UI_FILE_EXPLORER_FILE_ITEM[] PROGMEM = "<tr><td>{{t}}</td><td>{{f.s}} B</td><td><form action=\"/?site=110\" method=\"POST\"><input type=\"hidden\" name=\"f\" value=\"{{t}}\"><input type=\"hidden\" name=\"d\" value=\"{{v}}\"><button name=\"a\" value=\"1\" class=\"button-blue pure-button\" type=\"submit\">View</button> <button name=\"a\" value=\"2\" class=\"button-blue pure-button\" type=\"submit\">Download</button> <button name=\"a\" value=\"3\" class=\"button-red pure-button\" type=\"submit\">Delete</button></form></td></tr>";
 const char HTML_UI_FILE_EXPLORER_FOOTER[] PROGMEM = "</tbody></table>";
 
 const char HTML_UI_FILE_EXPLORER_UPLOAD_FORM[] PROGMEM =
-    "<form action=\"/upload?site=110&cmd=0\" method=\"POST\" enctype=\"multipart/form-data\">"
-    "<input type=\"file\" name=\"uploadedFile\">"
-    "<input type=\"hidden\" name=\"directory\" value=\"{{v}}\">"
-    "<button class=\"pure-button pure-button-primary\" type=\"submit\">Upload</button>"
+    "<form action=\"/upload?site=110\" method=\"POST\" enctype=\"multipart/form-data\">"
+    "<input type=\"file\" name=\"f\">"
+    "<input type=\"hidden\" name=\"d\" value=\"{{v}}\">"
+    "<button name=\"a\" value=\"0\" class=\"button-green pure-button\" type=\"submit\">Upload</button>"
     "</form>";
 #endif

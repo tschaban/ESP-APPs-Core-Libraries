@@ -11,8 +11,6 @@ ESPAPP_API_Flash::ESPAPP_API_Flash()
 }
 #endif
 
-// Improve performance of reading the files https://arduinojson.org/v6/how-to/improve-speed/
-
 bool ESPAPP_API_Flash::getJSON(const __FlashStringHelper *fileName, JsonDocument &doc)
 {
 
@@ -22,18 +20,9 @@ bool ESPAPP_API_Flash::getJSON(const __FlashStringHelper *fileName, JsonDocument
                fileName, ESPAPP_NONE, false))
   {
 
-#ifdef DEBUG
-    this->Msg->printBulletPoint(F("Reading file: "));
-    this->Msg->printValue(fileName);
-#endif
-
     size_t size = configFile.size();
     std::unique_ptr<char[]> buf(new char[size]);
     configFile.readBytes(buf.get(), size);
-
-#ifdef DEBUG
-    this->Msg->printBulletPoint(F("File in the buffer"));
-#endif
 
     DeserializationError error = deserializeJson(doc, buf.get());
 
@@ -41,15 +30,14 @@ bool ESPAPP_API_Flash::getJSON(const __FlashStringHelper *fileName, JsonDocument
 
     if (!error)
     {
-#ifdef DEBUG
-      this->Msg->printBulletPoint(F("JSON Deserialised: "));
-#endif
       success = true;
     }
 #ifdef DEBUG
     else
+    {
       this->Msg->printError(F("Deserialisation error: "), F("JSON"));
-    this->Msg->printValue(error.c_str());
+      this->Msg->printValue(error.c_str());
+    }
   }
 #endif
 
@@ -373,6 +361,7 @@ bool ESPAPP_API_Flash::readFSElements(const char *directory, ESPAPP_FILE files[]
 bool ESPAPP_API_Flash::uploadFile(const char *directory, const char *filename, const uint8_t *data, size_t length)
 {
 
+#ifdef DEBUG
   this->Msg->printInformation(F("Uploading file"), F("uploadFile"));
   this->Msg->printBulletPoint(F("Directory: "));
   this->Msg->printValue(directory);
@@ -380,35 +369,33 @@ bool ESPAPP_API_Flash::uploadFile(const char *directory, const char *filename, c
   this->Msg->printValue(filename);
   this->Msg->printBulletPoint(F("Data length: "));
   this->Msg->printValue(length);
-
-  char uploadDirectroy[strlen(directory) + 1];
-  char uploadFilename[strlen(uploadDirectroy) + strlen(filename) + 1];
-  sprintf(uploadDirectroy, "%s", directory);
-  sprintf(uploadFilename, "%s/%s", uploadDirectroy, filename);
-
-#ifdef DEBUG
-  this->Msg->printBulletPoint(F("Directory: "));
-  this->Msg->printValue(uploadDirectroy);
-  this->Msg->printBulletPoint(F("Upload path: "));
-  this->Msg->printValue(uploadFilename);
 #endif
 
+  sprintf(this->fileName, "%s%s", FPSTR(path_root), directory);
+
   // Ensure directory exists
-  if (!fileSystem.exists(uploadDirectroy))
+  if (!fileSystem.exists(this->fileName))
   {
-    fileSystem.mkdir(uploadDirectroy);
+    fileSystem.mkdir(this->fileName);
 #ifdef DEBUG
     this->Msg->printBulletPoint(F("Directory created: "));
-    this->Msg->printValue(uploadDirectroy);
+    this->Msg->printValue(this->fileName);
 #endif
   }
 
-  File file = fileSystem.open(uploadFilename, ESPAPP_OPEN_FILE_WRITING);
+  this->getPathToFile(this->fileName, directory, filename);
+
+#ifdef DEBUG
+  this->Msg->printBulletPoint(F("Path: "));
+  this->Msg->printValue(this->fileName);
+#endif
+
+  File file = fileSystem.open(this->fileName, ESPAPP_OPEN_FILE_WRITING);
   if (!file)
   {
 #ifdef DEBUG
     this->Msg->printError(F("File not saved: "), F("FS"));
-    this->Msg->printValue(uploadFilename);
+    this->Msg->printValue(this->fileName);
 #endif
     return false;
   }
@@ -416,26 +403,37 @@ bool ESPAPP_API_Flash::uploadFile(const char *directory, const char *filename, c
   file.close();
 #ifdef DEBUG
   this->Msg->printBulletPoint(F("File saved: "));
-  this->Msg->printValue(uploadFilename);
+  this->Msg->printValue(this->fileName);
 #endif
   return true;
 }
 
 bool ESPAPP_API_Flash::deleteFile(const char *directory, const char *path)
 {
+  this->getPathToFile(this->fileName, directory, path);
 
-  char deletePath[strlen(directory) + strlen(path) + 2];
-  sprintf(deletePath, "%s/%s", directory, path);
 #ifdef DEBUG
   this->Msg->printBulletPoint(F("Deleting file: "));
-  this->Msg->printValue(path);
+  this->Msg->printValue(this->fileName);
 #endif
-  if (fileSystem.exists(deletePath))
+  if (fileSystem.exists(this->fileName))
   {
-    return fileSystem.remove(deletePath);
+    return fileSystem.remove(this->fileName);
   }
   return false;
 }
+
+void ESPAPP_API_Flash::getPathToFile(char *path, const char *directory, const char *filename)
+{
+  sprintf(path, "%s", FPSTR(path_root));
+  if (strlen(directory) > 0)
+  {
+    sprintf(path, "%s%s%s", path, directory, FPSTR(path_root));
+  }
+  sprintf(path, "%s%s", path, filename);
+}
+
+/** Folders related  */
 
 bool ESPAPP_API_Flash::createFolder(const char *path)
 {
@@ -461,12 +459,15 @@ bool ESPAPP_API_Flash::createFolder(const char *path)
 
 bool ESPAPP_API_Flash::deleteFolder(const char *path)
 {
+
+  this->getPathToFile(this->fileName, "", path);
+
 #ifdef DEBUG
   this->Msg->printBulletPoint(F("Deleting folder: "));
-  this->Msg->printValue(path);
+  this->Msg->printValue(this->fileName);
 #endif
 
-  File dir = fileSystem.open(path);
+  File dir = fileSystem.open(this->fileName);
   if (!dir || !dir.isDirectory())
   {
     return false;
@@ -480,7 +481,7 @@ bool ESPAPP_API_Flash::deleteFolder(const char *path)
 
   if (isEmpty)
   {
-    return fileSystem.rmdir(path);
+    return fileSystem.rmdir(this->fileName);
   }
   return false;
 }

@@ -8,88 +8,108 @@
     <title>ESP Device</title>
     <link rel="stylesheet" href="/css?name=pure-min.css.gz">
     <link rel="stylesheet" href="/css?name=layout-v2.css">
-    <link rel="stylesheet" href="/css?name=grids-responsive-min.css.gz">
-    <script src="/js?name=responsive-menu.js"></script>
+    <link rel="stylesheet" href="/css?name=pure-custom.css">
+    <script src="/js?name=responsive-menu-min.js.gz"></script>
 </head>
 
 <body>
-    <div id="layout"><a href="#men" id="menuLink" class="menu-link"><span></span></a>
+    <div id="layout"><a href="#menu" id="menuLink" class="menu-link"><span></span></a>
         <div id="menu">
+            <header><img src="https://s.smartnydom.pl/i/esp32-firmware"
+                    alt="ESP Device"><small>ESPAPP<br />Version</small></header>
             <div class="pure-menu"><a class="pure-menu-heading" href="#Menu">&#10150; Menu</a>
                 <ul class="pure-menu-list">
-                    <li class="pure-menu-item"><a href="/?site=0&" class="pure-menu-link">File explorer</a></li>
-                    <li class="pure-menu-item"><a href="/?site=1&" class="pure-menu-link">Site template</a></li>
-                    <li class="pure-menu-item"><a href="/?site=2&cmd=1&" class="pure-menu-link">&#8227; Item 4</a></li>
-                    <li class="pure-menu-item"><a href="/?site=3&cmd=1&action=1&" class="pure-menu-link">Item 5</a></li>
-                    <li class="pure-menu-item"><a href="/?site=4&cmd=1&action=1&option=1&" class="pure-menu-link">Item
-                            6</a></li>
+                    <li class="pure-menu-item"><a href="/?site=1&" class="pure-menu-link">Index</a></li>
+                    <li class="pure-menu-item"><a href="/?site=100&" class="pure-menu-link">Commands</a></li>
+                    <li class="pure-menu-item"><a href="/?site=110&" class="pure-menu-link">FS Explorer</a></li>
+                    <li class="pure-menu-item"><a href="/?site=2&cmd=1&" class="pure-menu-link">&#10150; Dummy site:
+                            1</a></li>
+                    <li class="pure-menu-item"><a href="/?site=4&cmd=1&action=1&option=1&"
+                            class="pure-menu-link">&#8227; Dummy site: 2</a></li>
                     <li class="pure-menu-item"><a href="https://www.smartnydom.pl" class="pure-menu-link">&#8227;
                             Smart'my Dom</a></li>
                 </ul>
             </div>
         </div>
-        <div id="main">
-            <div class="posts">
-                <h1 class="content-subhead">Files explorer</h1>
-                <section class="post">
-                    <header class="post-header">
-                        <h2 class="post-title">Files list</h2>
+        <div id="main" class="c">
+            <div>
+                <h1 class="cs">UI Elements</h1>
+                <section class="s">
+                    <header>
+                        <h2 class="st">This is an example of UI elements</h2>
                     </header>
-                    <div class="post-description">
-                        <table class="pure-table pure-table-horizontal">
-                            <tr>
-                                <th>File name</th>
-                                <th>Size</th>
-                                <th>Acton</th>
-                            </tr>
-                            <tr>
-                                <td><a href="/?site=0&p1=cfg">cfg</a></td>
-                                <td>0 files</td>
-                                <td>Delete</td>
-                            </tr>
-                            <tr>
-                                <td><a href="/?site=0&p1=data">data</a></td>
-                                <td>0 files</td>
-                                <td>Delete</td>
-                            </tr>
-                            <tr>
-                                <td><a href="/?site=0&p1=ui">ui</a></td>
-                                <td>4 files</td>
-                                <td>Delete</td>
-                            </tr>
-                            <tr>
-                                <td>.token</td>
-                                <td>0B</td>
-                                <td>
-                                    <form action="/?site=0&cmd=1" method="POST"><input type="hidden" name="f"
-                                            value=".token"><input type="hidden" name="directory" value="/"><button
-                                            class="pure-button pure-button-primary" type="submit">Delete</button></form>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>layout-v2.css</td>
-                                <td>5983B</td>
-                                <td>
-                                    <form action="/?site=0&cmd=1" method="POST"><input type="hidden" name="f"
-                                            value="layout-v2.css"><input type="hidden" name="directory"
-                                            value="/"><button class="pure-button pure-button-primary"
-                                            type="submit">Delete</button></form>
-                                </td>
-                            </tr>
-                        </table>
+                    <div class="sc">
+                        <form class="pure-form pure-form-aligned" method="post" action="/?site=1&cmd=200&">
+                            <div class="pure-control-group"><label>Text filed: Simple</label><input name="text1"
+                                    type="text" value="Text"></div>
+                            <div class="pure-control-group"><label>Text filed: Min</label><input name="text2"
+                                    type="text" value="Min 1 char" minlength="1" size="30"><span
+                                    class="pure-form-message-inline">(Min: 1 chars)</span></div>
+                            <div class="pure-control-group"><label>Text filed: Max</label><input name="text3"
+                                    type="text" value="Max 30 char" maxlength="30" size="30"><span
+                                    class="pure-form-message-inline">(Max: 30 chars)</span></div>
+                            <div class="pure-control-group"><label>Text filed: Range</label><input name="text4"
+                                    type="text" value="Range: 20-30" minlength="20" maxlength="30" size="30"><span
+                                    class="pure-form-message-inline">(Range: 20 - 30 chars)</span></div>
+                            <div class="pure-control-group"><label>Text filed</label><input name="text5" type="text"
+                                    value="With custom hint" size="30"><span
+                                    class="pure-form-message-inline">Custom</span></div>
+                            <div class="pure-control-group"><label>Password</label><input name="password"
+                                    type="password" value="1234567890" maxlength="16" size="16"><span
+                                    class="pure-form-message-inline">(Max: 16 chars)</span></div>
+                            <div class="pure-control-group"><label>Number filed</label><input name="number"
+                                    type="number" value="1000"></div>
+                            <div class="pure-control-group"><label></label><input name="checkbox1" type="checkbox"
+                                    value="1" /> Checkbox 1</div>
+                            <div class="pure-control-group"><label></label><input name="checkbox2" type="checkbox"
+                                    value="1" checked="checked" disabled="disabled" /> Checkbox 2<span
+                                    class="pure-form-message-inline"></span></div>
+                            <div class="pure-control-group"><label></label><input name="checkbox3" type="checkbox"
+                                    value="1" checked="checked" /> Checkbox 3<span class="pure-form-message-inline">Hint
+                                    text</span></div>
+                            <div class="pure-control-group"><label></label><input name="radio" type="radio" value="1" />
+                                Radio 1</div>
+                            <div class="pure-control-group"><label></label><input name="radio" type="radio" value="2" />
+                                Radio 2<span class="pure-form-message-inline"></span></div>
+                            <div class="pure-control-group"><label></label><input name="radio" type="radio" value="3"
+                                    checked="checked" /> Radio 3<span class="pure-form-message-inline">Hint text</span>
+                            </div>
+                            <p>This is a Normal paragraph</p>
+                            <div class="pure-control-group"><label></label>This is a Intended paragraph</div>
+                            <div class="pure-control-group"><label>Select filed: Simple</label><select name="select1">
+                                    <option value="1">Option 1</option>
+                                    <option value="2" selected="selected">Option 2</option>
+                                    <option value="3">Option 3</option>
+                                </select></div>
+                            <div class="pure-control-group"><label>Select filed: Hint</label><select name="select2">
+                                    <option value="1" selected="selected">Option 1</option>
+                                    <option value="2">Option 2</option>
+                                    <option value="3">Option 3</option>
+                                </select>That is a hint</div>
+                            <fieldset>
+                                <ul class="lst">
+                                    <li class="m">List item 1</li>
+                                    <li class="m">List item 2</li>
+                                    <li class="m">List item 3</li>
+                                    <li class="m">List item 4</li>
+                                </ul>
+                            </fieldset>
+                            <div class="pure-controls"><button type="submit"
+                                    class="button-green pure-button">Save</button></div>
+                        </form>
                     </div>
                 </section>
             </div>
-            <div class="posts">
-                <h1 class="content-subhead">Upload file</h1>
-                <section class="post">
-                    <header class="post-header">
-                        <h2 class="post-title">Upload file to the current folder</h2>
+            <div>
+                <h1 class="cs">This is Message Section</h1>
+                <section class="s">
+                    <header>
+                        <h2 class="st">This is an example of message section</h2>
                     </header>
-                    <div class="post-description">
-                        <form action="/upload?site=0&cmd=0" method="POST" enctype="multipart/form-data"><input
-                                type="file" name="uploadedFile"><input type="hidden" name="directory" value="/"><button
-                                class="pure-button pure-button-primary" type="submit">Upload</button></form>
+                    <div class="sc">
+                        <ul class="lst">
+                            <p>This is a paragraph</p>
+                        </ul>
                     </div>
                 </section>
             </div>

@@ -44,15 +44,11 @@ bool ESPAPP_HTTPServer::pushHTMLResponse()
   return true;
 }
 
-void ESPAPP_HTTPServer::readHTTPRequestDirectoryName(char *path)
+void ESPAPP_HTTPServer::readDirectoryFromHTTPRequestParameter1(char *path) // readHTTPRequestDirectoryName
 {
   if (this->HTTPServer->hasArg(FPSTR(ESPAPP_FORM_INPUT_NAME_DIRECTORY)))
   {
-    sprintf(path, "%s%s", FPSTR(path_root), this->HTTPServer->arg(FPSTR(ESPAPP_FORM_INPUT_NAME_DIRECTORY)).c_str());
-  }
-  else
-  {
-    sprintf(path, "%s", FPSTR(path_root));
+    sprintf(path, "%s", this->HTTPServer->arg(FPSTR(ESPAPP_FORM_INPUT_NAME_DIRECTORY)).c_str());
   }
 
 #ifdef DEBUG
@@ -172,7 +168,7 @@ bool ESPAPP_HTTPServer::saveUploadedFile(void)
   uploadFile.filename.toCharArray(uploadFileName, uploadFile.filename.length() + 1);
 
   char directory[ESPAPP_FILE_MAX_FILE_NAME_LENGTH];
-  this->readHTTPRequestDirectoryName(directory);
+  this->readDirectoryFromHTTPRequestParameter1(directory);
 
 #ifdef DEBUG
   this->System->Msg->printBulletPoint(F("Save to directory: "));
@@ -194,6 +190,40 @@ bool ESPAPP_HTTPServer::saveUploadedFile(void)
   }
 #endif
   return success;
+}
+
+bool ESPAPP_HTTPServer::downloadFile(const char *directory, const char *filename)
+{
+
+  this->System->Flash->getPathToFile(this->System->Flash->fileName, directory, filename);
+#ifdef DEBUG
+  this->System->Msg->printBulletPoint(F("Downloading file: "));
+  this->System->Msg->printValue(this->System->Flash->fileName);
+#endif
+
+  if (this->System->Flash->fileSystem.exists(this->System->Flash->fileName))
+  {
+    File downloadFile = this->System->Flash->fileSystem.open(this->System->Flash->fileName, ESPAPP_OPEN_FILE_READING);
+    if (downloadFile)
+    {
+      this->HTTPServer->sendHeader("Content-Disposition", "attachment; filename=\"" + String(filename) + "\"");
+      this->HTTPServer->sendHeader("Content-Type", "application/octet-stream");
+      this->HTTPServer->sendHeader("Connection", "close");
+      this->HTTPServer->streamFile(downloadFile, "application/octet-stream");
+      downloadFile.close();
+
+      // Skip normal HTML generation since we're sending a file
+      return true;
+    }
+  }
+#ifdef DEBUG
+  else
+  {
+    this->System->Msg->printError(F("File not found: "), F("File Explorer"));
+    this->System->Msg->printValue(filename);
+  }
+#endif
+  return false;
 }
 
 bool ESPAPP_HTTPServer::processFaviconRequest(void)
@@ -234,14 +264,13 @@ bool ESPAPP_HTTPServer::processCSSFileRequest(void)
     {
       this->HTTPServer->streamFile(cssFile, "text/css");
       cssFile.close();
-      
-     // if (gzip)
-     // {
-     //   this->HTTPServer->sendHeader(F("Content-Encoding"), F("gzip"));
-     // }
 
+      // if (gzip)
+      // {
+      //   this->HTTPServer->sendHeader(F("Content-Encoding"), F("gzip"));
+      // }
 
-      #ifdef DEBUG
+#ifdef DEBUG
       this->System->Msg->printBulletPoint(F("CSS file streamed successfully"));
 #endif
     }
@@ -295,14 +324,13 @@ bool ESPAPP_HTTPServer::processJSFileRequest(void)
     {
       this->HTTPServer->streamFile(jsFile, "application/javascript");
       jsFile.close();
-      
-     // if (gzip)
-     // {
-     //   this->HTTPServer->sendHeader(F("Content-Encoding"), F("gzip"));
-     // }
 
+      // if (gzip)
+      // {
+      //   this->HTTPServer->sendHeader(F("Content-Encoding"), F("gzip"));
+      // }
 
-      #ifdef DEBUG
+#ifdef DEBUG
       this->System->Msg->printBulletPoint(F("JS file streamed successfully"));
 #endif
     }

@@ -44,11 +44,16 @@ public:
 #endif
 
   fs::LittleFSFS &fileSystem = LittleFS;
+  
+  /** Can be used in many places as allocated memory */
+  char fileName[ESPAPP_FILE_MAX_FILE_NAME_LENGTH];
 
   bool init(void);
   bool initialized(void);
   bool getJSON(const __FlashStringHelper *fileName, JsonDocument &doc);
   bool saveJSON(const __FlashStringHelper *fileName, JsonDocument &doc);
+
+  void getPathToFile(char *path, const char *directory, const char *filename);
 
   bool deleteFile(const char *directory, const char *path);
   bool deleteFolder(const char *path);

@@ -18,12 +18,19 @@ struct CORE_CONFIGURATION
 class ESPAPP_Core
 {
 private:
-    /* data */
+    uint8_t connectionMode = ESPAPP_NETWORK_CONNECTION_MODE_NO_CONNECTION;
+
+    bool readConnectionModeConfiguration(void);
+    bool createDefaultConnectionModeConfiguration(void);
+    bool saveConnectionModeConfiguration(void);
+
 public:
     CORE_CONFIGURATION *configuration = new CORE_CONFIGURATION;
 
     ESPAPP_Core();
     ~ESPAPP_Core();
+
+    ESPAPP_Time *Time;
 
 #ifdef DEBUG
     ESPAPP_SerialMessages *Msg = new ESPAPP_SerialMessages();
@@ -37,14 +44,14 @@ public:
 #else
     ESPAPP_EventManager *Events = new ESPAPP_EventManager();
 #endif
-
-    ESPAPP_Time *Time;
+    
+    bool init(void);
 
     /* Method reboots device to specyfic mode  define by MODE_.. */
-    void reboot(uint8_t mode = ESPAPP_NETWORK_CONNECTION_MODE_CLIENT);
+    void reboot(void);
 
-    /* Method returns current device mode */
-    uint8_t connectionMode(void);
+    uint8_t getConnectionMode(void);
+    bool setConnectionMode(uint8_t mode);
 };
 
 #endif

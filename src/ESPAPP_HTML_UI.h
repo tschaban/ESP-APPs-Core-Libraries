@@ -19,6 +19,9 @@ private:
     void replaceTagValue(String *item, const __FlashStringHelper *value);
     void replaceTagValue(String *item, const char *value);
 
+    void replaceTagHint(String *item, const __FlashStringHelper *value);
+    void replaceTagHint(String *item, const char *value);
+
     void replaceTagUrlParams(String *item, ESPAPP_HTTP_REQUEST *url, const char *parameters);
 
     void addRadioButtonOrCheckBoxFormItem(String *item, const __FlashStringHelper *type, const char *name, const char *label,
@@ -46,7 +49,8 @@ public:
     void setURL(String *site, const __FlashStringHelper *url);
     void setLogoURL(String *site, const __FlashStringHelper *logoURL);
     void setUrlParams(ESPAPP_HTTP_REQUEST *url, uint8_t siteId = ESPAPP_NONE, uint8_t command = ESPAPP_NONE, uint8_t action = ESPAPP_NONE, uint8_t option = ESPAPP_NONE);
-
+    void setVersion(String *site, const __FlashStringHelper *version);
+    
     /** Site level */
     void siteStart(String *site);
     void siteEnd(String *site);
