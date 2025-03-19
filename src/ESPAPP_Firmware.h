@@ -9,6 +9,7 @@
 #include <ESPAPP_WirelessConnection.h>
 #include <ESPAPP_AccessToWAN.h>
 #include <ESPAPP_HTTP_Server_Container.h>
+#include <ESPAPP_FileDownloader.h>
 
 class ESPAPP_Firmware //: public ESPAPPCoreHardware
 {
@@ -38,6 +39,7 @@ public:
   {
     ESPAPP_WirelessConnection *Network;
     ESPAPP_AccessToWAN *WAN;
+    ESPAPP_FileDownloader *Downloader;
 
     // ESPAPPJSONRPC *REST = new ESPAPPJSONRPC();
   };

@@ -3,6 +3,7 @@
 ESPAPP_Firmware::ESPAPP_Firmware()
 {
   this->API->Network = new ESPAPP_WirelessConnection(System);
+  this->API->Downloader = new ESPAPP_FileDownloader(System);
   Web = new ESPAPP_HTTPServerContainer(System);
 };
 
