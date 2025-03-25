@@ -1,0 +1,29 @@
+{
+  "configuration": [
+    {
+      "name": "UI",
+      "version": "1.0.0",
+      "description": "UI library for ESP-APPs",
+      "baseUrl": "/espapp/ui",
+      "targetFolder": "/srv",
+      "files": [
+        {
+          "name": "responsive-menu-min.js.gz",
+          "target": "responsive-menu-min.js.gz"
+        },
+        {
+          "name": "pure-min.css.gz",
+          "target": "pure-min.css.gz"
+        },
+        {
+          "name": "pure-custom.css",
+          "target": "pure-custom.css"
+        },
+        {
+          "name": "layout-v2.css",
+          "target": "layout-v2.css"
+        }
+      ]
+    }
+  ]
+}

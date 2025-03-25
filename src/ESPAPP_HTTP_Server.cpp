@@ -60,7 +60,15 @@ void ESPAPP_HTTPServer::readDirectoryFromHTTPRequestParameter1(char *path) // re
 void ESPAPP_HTTPServer::readHTTPRequest(void)
 {
 
-  this->HTTPRequest->siteId = this->HTTPServer->hasArg(F("site")) ? this->HTTPServer->arg(F("site")).toInt() : ESPAPP_NONE;
+  if (this->System->getOperatingMode() == ESPAPP_OPERATING_MODE::FIRST_TIME_BOOT)
+  {
+    this->HTTPRequest->siteId = this->HTTPServer->hasArg(F("site")) ? this->HTTPServer->arg(F("site")).toInt() : ESPAPP_HTTP_SITE_WIFI_CONFIGURATION;
+  }
+  else
+  {
+    this->HTTPRequest->siteId = this->HTTPServer->hasArg(F("site")) ? this->HTTPServer->arg(F("site")).toInt() : ESPAPP_NONE;
+  }
+  
   this->HTTPRequest->command = this->HTTPServer->hasArg(F("cmd")) ? this->HTTPServer->arg(F("cmd")).toInt() : ESPAPP_NONE;
   this->HTTPRequest->action = this->HTTPServer->hasArg(F("action")) ? this->HTTPServer->arg(F("action")).toInt() : ESPAPP_NONE;
   this->HTTPRequest->option = this->HTTPServer->hasArg(F("option")) ? this->HTTPServer->arg(F("option")).toInt() : ESPAPP_NONE;

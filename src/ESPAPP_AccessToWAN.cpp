@@ -58,7 +58,7 @@ bool ESPAPP_AccessToWAN::readConfiguration(void)
 #endif
 
     StaticJsonDocument<256> doc;
-    success = this->System->Flash->getJSON(F("/cfg/wanCheck.json"), doc);
+    success = this->System->Flash->getJSON(F("/etc/wanCheck.json"), doc);
 
     if (success)
     {
@@ -107,7 +107,7 @@ bool ESPAPP_AccessToWAN::saveConfiguration(void)
     doc["interval"] = this->configuration->checkInterval;
     doc["autoCheck"] = this->configuration->autoCheck;
 
-    return this->System->Flash->saveJSON(F("/cfg/wanCheck.json"), doc);
+    return this->System->Flash->saveJSON(F("/etc/wanCheck.json"), doc);
 }
 
 uint16_t ESPAPP_AccessToWAN::getCheckInterval(void)

@@ -70,7 +70,7 @@ bool ESPAPP_Time::readConfiguration(void)
 #endif
 
     StaticJsonDocument<512> doc;
-    success = this->Flash->getJSON(F("/cfg/time.json"), doc);
+    success = this->Flash->getJSON(F("/etc/time.json"), doc);
 
     if (success)
     {
@@ -142,7 +142,7 @@ bool ESPAPP_Time::saveConfiguration(void)
     doc["autoSync"] = this->configuration->autoSync;
     doc["sync"] = this->configuration->syncTimeout;
 
-    return this->Flash->saveJSON(F("/cfg/time.json"), doc);
+    return this->Flash->saveJSON(F("/etc/time.json"), doc);
 }
 
 void ESPAPP_Time::setTimeZone(const char *tz_info)

@@ -3,8 +3,16 @@
 
 #include <ESPAPP_Parameters.h>
 #include <ESPAPP_API_Flash.h>
+#include <ESPAPP_API_Files.h>
 #include <ESPAPP_EventManager.h>
 #include <ESPAPP_Time.h>
+
+#ifdef ESP32 // @TODO it'll be better not having here WiFi it's just neede to make the DeviceId
+#include <WiFi.h>
+#else // ESP8266
+#include <ESP8266WiFi.h>
+#endif // ESP32/ESP8266
+
 
 #ifdef DEBUG
 #include <ESPAPP_SerialMessages.h>
@@ -18,11 +26,8 @@ struct CORE_CONFIGURATION
 class ESPAPP_Core
 {
 private:
-    uint8_t connectionMode = ESPAPP_NETWORK_CONNECTION_MODE_NO_CONNECTION;
-
-    bool readConnectionModeConfiguration(void);
-    bool createDefaultConnectionModeConfiguration(void);
-    bool saveConnectionModeConfiguration(void);
+    ESPAPP_NETWORK_CONNECTION_MODE *connectionMode = new ESPAPP_NETWORK_CONNECTION_MODE;
+    ESPAPP_OPERATING_MODE *operatingMode = new ESPAPP_OPERATING_MODE;
 
 public:
     CORE_CONFIGURATION *configuration = new CORE_CONFIGURATION;
@@ -35,8 +40,10 @@ public:
 #ifdef DEBUG
     ESPAPP_SerialMessages *Msg = new ESPAPP_SerialMessages();
     ESPAPP_API_Flash *Flash = new ESPAPP_API_Flash(Msg);
+    ESPAPP_API_Files *File = new ESPAPP_API_Files(Flash, Msg);
 #else
     ESPAPP_API_Flash *Flash = new ESPAPP_API_Flash();
+    ESPAPP_API_Files *File = new ESPAPP_API_Files(Flash);
 #endif
 
 #ifdef DEBUG
@@ -44,14 +51,19 @@ public:
 #else
     ESPAPP_EventManager *Events = new ESPAPP_EventManager();
 #endif
-    
+
     bool init(void);
 
     /* Method reboots device to specyfic mode  define by MODE_.. */
     void reboot(void);
 
-    uint8_t getConnectionMode(void);
-    bool setConnectionMode(uint8_t mode);
+    ESPAPP_OPERATING_MODE getOperatingMode(void);
+    bool setOperatingMode(ESPAPP_OPERATING_MODE mode);
+
+    ESPAPP_NETWORK_CONNECTION_MODE getConnectionMode(void);
+    bool setConnectionMode(ESPAPP_NETWORK_CONNECTION_MODE mode);
+
+    void getDeviceID(char *id, boolean extended = false);
 };
 
 #endif

@@ -31,8 +31,7 @@ private:
                 const __FlashStringHelper *path, uint8_t id = ESPAPP_NONE,
                 boolean createIfNotExists = true);
 
-  bool openFile(File &openedFile, const char *mode, const char *path, uint8_t id,
-                boolean createIfNotExists = true);
+  
 
   bool readFSElements(const char *directory, ESPAPP_FILE files[], size_t capacity, size_t &count, bool includeFiles, bool includeFolders);
 
@@ -65,6 +64,9 @@ public:
   bool listFiles(const char *directory, ESPAPP_FILE files[], size_t capacity, size_t &count);
 
   bool uploadFile(const char *directory, const char *filename, const uint8_t *data, size_t length);
+
+  bool openFile(File &openedFile, const char *mode, const char *path, uint8_t id = ESPAPP_NONE,
+    boolean createIfNotExists = true);
 };
 
 #endif // _ESPAPP_API_FLASH_h

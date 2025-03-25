@@ -3,7 +3,6 @@
 ESPAPP_Firmware::ESPAPP_Firmware()
 {
   this->API->Network = new ESPAPP_WirelessConnection(System);
-  this->API->Downloader = new ESPAPP_FileDownloader(System);
   Web = new ESPAPP_HTTPServerContainer(System);
 };
 
@@ -70,6 +69,11 @@ void ESPAPP_Firmware::initializeEventListeners(void)
   this->System->Events->addEventListener(EVENT_NETWORK_CONNECTED,
                                          [this](void *data)
                                          { this->handleNetworkConnectedEvent(data); });
+
+  /** Firmware events */
+  this->System->Events->addEventListener(EVENT_DOWNLOAD_UI_COMPONENTS,
+                                         [this](void *data)
+                                         { this->handleDownloadUIComponentsEvent(data); });
 }
 
 bool ESPAPP_Firmware::initializeNetwork(void)
@@ -174,4 +178,27 @@ void ESPAPP_Firmware::handleNetworkConnectedEvent(void *data)
   this->System->Msg->printInformation(F("Network connected event handle"), F("SYSTEM EVENT"));
 #endif
   this->System->Events->triggerEvent(EVENT_SYNC_TIME);
+}
+
+void ESPAPP_Firmware::handleDownloadUIComponentsEvent(void *data)
+{
+#ifdef DEBUG
+  this->System->Msg->printInformation(F("Download UI components event handled"), F("SYSTEM EVENT"));
+#endif
+
+  this->System->Events->addEventListener(EVENT_CUSTOM_START + 2,
+                                         [this](void *)
+                                         { 
+                                        
+                                          ESPAPP_FirmwareInstalator *Instalator = new ESPAPP_FirmwareInstalator(System);
+                                          InstallationStats stats;
+                                          Instalator->install("http://files.smartnydom.pl/espapp/config/ui-configuration.json", stats);
+                                          delete Instalator;
+
+
+                                        });
+
+  uint16_t eventId1 = this->System->Events->scheduleEventIn(EVENT_CUSTOM_START + 2, 3);
+
+
 }

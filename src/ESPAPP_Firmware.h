@@ -9,7 +9,7 @@
 #include <ESPAPP_WirelessConnection.h>
 #include <ESPAPP_AccessToWAN.h>
 #include <ESPAPP_HTTP_Server_Container.h>
-#include <ESPAPP_FileDownloader.h>
+#include <ESPAPP_FirmwareInstalator.h>
 
 class ESPAPP_Firmware //: public ESPAPPCoreHardware
 {
@@ -24,6 +24,8 @@ private:
   void handleDayEvent(void *data);
   void handleRebootEvent(void *data);
   void handleNetworkConnectedEvent(void *data);
+  void handleDownloadUIComponentsEvent(void *data);
+    
 
   // Initialize event listeners
   void initializeEventListeners(void);
@@ -39,8 +41,6 @@ public:
   {
     ESPAPP_WirelessConnection *Network;
     ESPAPP_AccessToWAN *WAN;
-    ESPAPP_FileDownloader *Downloader;
-
     // ESPAPPJSONRPC *REST = new ESPAPPJSONRPC();
   };
 

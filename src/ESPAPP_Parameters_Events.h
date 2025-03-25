@@ -25,6 +25,10 @@ enum ESPAPP_EVENT
     EVENT_TIMER_HOUR,
     EVENT_TIMER_DAY,
 
+     
+    /** Firmwaware: Events */
+    EVENT_DOWNLOAD_UI_COMPONENTS,
+
     // Custom events start from 100 to avoid conflicts with system events
     EVENT_CUSTOM_START = 100
 };

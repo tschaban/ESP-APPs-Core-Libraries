@@ -12,16 +12,20 @@
 #define ESPAPP_OPEN_FILE_APPEND "a"
 
 /* File informing that system file is read */
-#define ESPAPP_FILE_SYSTEM_INITIALIZED "/.token"
+#define ESPAPP_FILE_SYSTEM_INITIALIZED ".token"
 
 #define ESPAPP_FILE_MAX_FILE_NAME_LENGTH 30
 #define ESPAPP_FILE_MAX_SIZE 10*1024 // 10kB
 
 /* Directories */
 const char path_root[] PROGMEM = "/";
-const char path_configuration[] PROGMEM = "/cfg";
-const char path_data[] PROGMEM = "/data";
-const char path_ui[] PROGMEM = "/ui";
-const char *const ESPAPP_DIRECTORIES[] PROGMEM = {path_configuration, path_data, path_ui};
+
+const char path_configuration[] PROGMEM = "/etc";
+const char path_data[] PROGMEM = "/var";
+const char path_ui[] PROGMEM = "/srv";
+const char path_temp[] PROGMEM = "/tmp";
+const char path_sys[] PROGMEM = "/sys";
+const char path_boot[] PROGMEM = "/boot";
+const char *const ESPAPP_DIRECTORIES[] PROGMEM = {path_boot, path_configuration, path_ui, path_sys, path_temp, path_data};
 
 #endif // _ESPAPP_Parameters_FS_h

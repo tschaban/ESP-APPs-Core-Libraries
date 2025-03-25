@@ -19,15 +19,7 @@ bool ESPAPP_WirelessConnection::init(void)
 #endif
 
   /** Read network configuration  */
-  this->ready = this->readConfiguration();
-
-  if (!this->ready)
-  {
-#ifdef DEBUG
-    this->System->Msg->printWarning(F("Failed to read network configuration, creating default"), F("WIFI"));
-#endif
-    this->ready = createDefaultConfiguration();
-  }
+  this->ready = this->System->File->read(configuration);
 
   if (this->ready)
   {
@@ -95,7 +87,7 @@ bool ESPAPP_WirelessConnection::init(void)
 
 #endif
 
-    if (this->System->getConnectionMode() == ESPAPP_NETWORK_CONNECTION_MODE_ACCESS_POINT)
+    if (this->System->getConnectionMode() == ESPAPP_NETWORK_CONNECTION_MODE::ACCESS_POINT)
     {
 #ifdef DEBUG
       this->System->Msg->printInformation(F("Starting Hotspot..."), F("WIFI"));
@@ -200,6 +192,8 @@ void ESPAPP_WirelessConnection::switchConfiguration()
 #endif
     }
 
+    // @TODO chyba trzeba sprawdzic DNSjak powyzsze
+
     this->WirelessNetwork.config(ip, gateway, subnet, dns1, dns2);
 #ifdef DEBUG
     this->System->Msg->printInformation(F("Fixed IP set"), F("WIFI"));
@@ -213,8 +207,7 @@ void ESPAPP_WirelessConnection::switchConfiguration()
   else if ((this->isPrimaryConfiguration && this->configuration->primary.isDHCP) ||
            (!this->isPrimaryConfiguration && this->configuration->secondary.isDHCP))
   {
-    this->WirelessNetwork.config((uint32_t)0x00000000, (uint32_t)0x00000000,
-                                 (uint32_t)0x00000000);
+    this->WirelessNetwork.config((uint32_t)0x00000000, (uint32_t)0x00000000, (uint32_t)0x00000000);
   }
 
   /**
@@ -296,7 +289,7 @@ void ESPAPP_WirelessConnection::listener()
   }
 
   // If work offline mode is set then exit
-  if (this->System->getConnectionMode() == ESPAPP_NETWORK_CONNECTION_MODE_NO_CONNECTION)
+  if (this->System->getConnectionMode() == ESPAPP_NETWORK_CONNECTION_MODE::OFFLINE)
   {
     return;
   }
@@ -305,7 +298,7 @@ void ESPAPP_WirelessConnection::listener()
   this->connectionEvent();
 
   /** Connection is esthablished to the WiFi Router */
-  if (this->connection() == ESPAPP_NETWORK_CONNECTION_MODE_CLIENT)
+  if (this->connection() == ESPAPP_NETWORK_CONNECTION_MODE::CLIENT)
   {
     /** Update mDNS */
     if (this->configuration->mDNS)
@@ -331,7 +324,7 @@ void ESPAPP_WirelessConnection::listener()
     return;
   }
 
-  if (this->connection() == ESPAPP_NETWORK_CONNECTION_MODE_NO_CONNECTION)
+  if (this->connection() == ESPAPP_NETWORK_CONNECTION_MODE::OFFLINE)
   {
     /** Sleep Mode */
     if (this->sleepMode)
@@ -358,7 +351,7 @@ void ESPAPP_WirelessConnection::listener()
 #ifdef DEBUG
           this->System->Msg->printError(F("WiFi not configured, switching to Hotspot mode"), F("WIFI"));
 #endif
-          this->System->setConnectionMode(ESPAPP_NETWORK_CONNECTION_MODE_ACCESS_POINT);
+          this->System->setConnectionMode(ESPAPP_NETWORK_CONNECTION_MODE::ACCESS_POINT);
           this->System->Events->triggerEvent(EVENT_REBOOT);
           return;
         }
@@ -460,6 +453,18 @@ void ESPAPP_WirelessConnection::connectionEvent(void)
   if (ESPAPP_WirelessConnection::eventConnectionEstablished == true)
   {
 
+    /**
+     @TODO Workaround for DNS issue
+    IPAddress dns1(8, 8, 8, 8);
+    IPAddress dns2(8, 8, 4, 4);
+
+#ifdef DEBUG
+    this->System->Msg->printWarning(F("Setting Fixed DNS"), F("WIFI"));
+#endif
+
+    this->WirelessNetwork.config(this->WirelessNetwork.localIP(), this->WirelessNetwork.gatewayIP(), this->WirelessNetwork.subnetMask(), dns1, dns2);
+      */
+
 #ifdef DEBUG
     this->System->Msg->printHeader(2, 1, ESPAPP_MSG_HEADER_DEFAULT_LENGTH, ESPAPP_MSG_HEADER_TYPE_DASH);
     this->System->Msg->printBulletPoint(F("Connection established successfully"));
@@ -521,26 +526,23 @@ void ESPAPP_WirelessConnection::connectionEvent(void)
     {
       // @TODO imlement this
       // char _mDNSDeviceID[AFE_CONFIG_DEVICE_ID_SIZE + 4]; // extended deviceId "afe-1234-5678"
-      char _mDNSDeviceID[20]; // extended deviceId "afe-1234-5678"
-      //  Data->getDeviceID(_mDNSDeviceID, true);
+      char _mDNSDeviceID[ESPAPP_DEVICE_ID_LENGTH]; // extended deviceId "afe-1234-5678"
+      this->System->getDeviceID(_mDNSDeviceID, true);
 
-      //  if (MDNS.begin(_mDNSDeviceID)) {
-      if (MDNS.begin("_mDNSDeviceID"))
+      if (MDNS.begin(_mDNSDeviceID))
       {
 #ifdef DEBUG
-        Serial << endl
-               << F("INFO: mDNS: Responder started: ") << _mDNSDeviceID;
+        this->System->Msg->printBulletPoint(F("mDNS responder started at: "));
+        this->System->Msg->printValue(_mDNSDeviceID);
 #endif
 
         MDNS.addService("http", "tcp", 80);
 #ifdef DEBUG
-        Serial << endl
-               << F("INFO: mDNS: HTTP service added");
+        this->System->Msg->printBulletPoint(F("mDNS service added: http"));
       }
       else
       {
-        Serial << endl
-               << F("ERROR: mDNS: Responder not set");
+        this->System->Msg->printError(F("mDNS responder failed to start"), F("WIFI"));
 #endif
       }
     }
@@ -602,203 +604,20 @@ void ESPAPP_WirelessConnection::onWiFiAPStationConnected(
 #endif
 #endif
 
-bool ESPAPP_WirelessConnection::readConfiguration(void)
-{
-
-  bool success = false;
-
-#ifdef DEBUG
-  this->System->Msg->printInformation(F("Reading network configuration"), F("WIFI"));
-#endif
-
-  /* Read configuration */
-  StaticJsonDocument<1000> doc;
-  success = this->System->Flash->getJSON(F("/cfg/network.json"), doc);
-
-  if (success)
-  {
-    sprintf(this->configuration->primary.ssid, doc["primary"]["ssid"] | "");
-    sprintf(this->configuration->primary.password, doc["primary"]["password"] | "");
-    this->configuration->primary.isDHCP = doc["primary"]["dhcp"] | true;
-    sprintf(this->configuration->primary.ip, doc["primary"]["ip"] | "");
-    sprintf(this->configuration->primary.gateway, doc["primary"]["gateway"] | "");
-    sprintf(this->configuration->primary.subnet, doc["primary"]["subnet"] | "");
-    sprintf(this->configuration->primary.dns1, doc["primary"]["dns1"] | "");
-    sprintf(this->configuration->primary.dns2, doc["primary"]["dns2"] | "");
-
-    sprintf(this->configuration->secondary.ssid, doc["secondary"]["ssid"] | "");
-    sprintf(this->configuration->secondary.password, doc["secondary"]["password"] | "");
-    this->configuration->secondary.isDHCP = doc["secondary"]["dhcp"] | true;
-    sprintf(this->configuration->secondary.ip, doc["secondary"]["ip"] | "");
-    sprintf(this->configuration->secondary.gateway, doc["secondary"]["gateway"] | "");
-    sprintf(this->configuration->secondary.subnet, doc["secondary"]["subnet"] | "");
-    sprintf(this->configuration->secondary.dns1, doc["secondary"]["dns1"] | "");
-    sprintf(this->configuration->secondary.dns2, doc["secondary"]["dns2"] | "");
-
-    this->configuration->mDNS = doc["mdns"] | true;
-    this->configuration->connectionTimeout = doc["connectionTimeout"] | ESPAPP_NETWORK_DEFAULT_CONNECTION_TIMEOUT;
-    this->configuration->sleepTimeout = doc["sleepTimeout"] | ESPAPP_NETWORK_DEFAULT_SLEEP_TIMEOUT;
-    this->configuration->failuresToSwitch = doc["failuresToSwitch"] | ESPAPP_NETWORK_DEFAULT_SWITCH_NETWORK_AFTER;
-
-#ifndef ESP32
-    this->configuration->radioMode = doc["m"];
-    this->configuration->outputPower = doc["op"];
-#endif
-
-#ifdef DEBUG
-    this->System->Msg->printBulletPoint(F("Primary SSID: "));
-    this->System->Msg->printValue(this->configuration->primary.ssid);
-    this->System->Msg->printBulletPoint(F("Primary IP: "));
-    this->System->Msg->printValue(this->configuration->primary.ip);
-    this->System->Msg->printBulletPoint(F("Primary Gateway: "));
-    this->System->Msg->printValue(this->configuration->primary.gateway);
-    this->System->Msg->printBulletPoint(F("Primary Subnet: "));
-    this->System->Msg->printValue(this->configuration->primary.subnet);
-    this->System->Msg->printBulletPoint(F("Primary DNS1: "));
-    this->System->Msg->printValue(this->configuration->primary.dns1);
-    this->System->Msg->printBulletPoint(F("Primary DNS2: "));
-    this->System->Msg->printValue(this->configuration->primary.dns2);
-    this->System->Msg->printBulletPoint(F("Primary DHCP: "));
-    this->System->Msg->printValue(this->configuration->primary.isDHCP);
-
-    this->System->Msg->printBulletPoint(F("Secondary SSID: "));
-    this->System->Msg->printValue(this->configuration->secondary.ssid);
-    this->System->Msg->printBulletPoint(F("Secondary IP: "));
-    this->System->Msg->printValue(this->configuration->secondary.ip);
-    this->System->Msg->printBulletPoint(F("Secondary Gateway: "));
-    this->System->Msg->printValue(this->configuration->secondary.gateway);
-    this->System->Msg->printBulletPoint(F("Secondary Subnet: "));
-    this->System->Msg->printValue(this->configuration->secondary.subnet);
-    this->System->Msg->printBulletPoint(F("Secondary DNS1: "));
-    this->System->Msg->printValue(this->configuration->secondary.dns1);
-    this->System->Msg->printBulletPoint(F("Secondary DNS2: "));
-    this->System->Msg->printValue(this->configuration->secondary.dns2);
-    this->System->Msg->printBulletPoint(F("Secondary DHCP: "));
-    this->System->Msg->printValue(this->configuration->secondary.isDHCP);
-
-    this->System->Msg->printBulletPoint(F("mDNS: "));
-    this->System->Msg->printValue(this->configuration->mDNS);
-    this->System->Msg->printBulletPoint(F("Connection Timeout: "));
-    this->System->Msg->printValue(this->configuration->connectionTimeout);
-    this->System->Msg->printBulletPoint(F("Sleep Timeout: "));
-    this->System->Msg->printValue(this->configuration->sleepTimeout);
-    this->System->Msg->printBulletPoint(F("Failures to switch network: "));
-    this->System->Msg->printValue(this->configuration->failuresToSwitch);
-
-#ifndef ESP32
-    this->System->Msg->printBulletPoint(F("Radio mode: "));
-    this->System->Msg->printValue(this->configuration->radioMode);
-    this->System->Msg->printBulletPoint(F("Output power: "));
-    this->System->Msg->printValue(this->configuration->outputPower);
-#endif
-  }
-  else
-  {
-    this->System->Msg->printError(F("Problem with loading network configuration"), F("WIFI"));
-#endif // DEBUG
-  }
-
-  return success;
-}
-
-bool ESPAPP_WirelessConnection::createDefaultConfiguration(void)
-{
-#ifdef DEBUG
-  this->System->Msg->printInformation(F("Creating default network configuration"), F("WIFI"));
-#endif
-
-  // Set default values for primary network
-  sprintf(this->configuration->primary.ssid, "");
-  sprintf(this->configuration->primary.password, "");
-  this->configuration->primary.isDHCP = ESPAPP_NETWORK_DEFAULT_DHCP;
-  sprintf(this->configuration->primary.ip, "");
-  sprintf(this->configuration->primary.gateway, "%s", F(ESPAPP_NETWORK_DEFAULT_GATEWAY));
-  sprintf(this->configuration->primary.subnet, "%s", F(ESPAPP_NETWORK_DEFAULT_SUBNET));
-  sprintf(this->configuration->primary.dns1, "%s", F(ESPAPP_NETWORK_DEFAULT_DNS1));
-  sprintf(this->configuration->primary.dns2, "%s", F(ESPAPP_NETWORK_DEFAULT_DNS2));
-
-  // Set default values for secondary network
-  sprintf(this->configuration->secondary.ssid, "");
-  sprintf(this->configuration->secondary.password, "");
-  this->configuration->secondary.isDHCP = ESPAPP_NETWORK_DEFAULT_DHCP;
-  sprintf(this->configuration->secondary.ip, "");
-  sprintf(this->configuration->secondary.gateway, "%s", F(ESPAPP_NETWORK_DEFAULT_GATEWAY));
-  sprintf(this->configuration->secondary.subnet, "%s", F(ESPAPP_NETWORK_DEFAULT_SUBNET));
-  sprintf(this->configuration->secondary.dns1, "%s", F(ESPAPP_NETWORK_DEFAULT_DNS1));
-  sprintf(this->configuration->secondary.dns2, "%s", F(ESPAPP_NETWORK_DEFAULT_DNS2));
-
-  // Set default values for other network settings
-  this->configuration->mDNS = ESPAPP_NETWORK_DEFAULT_MDNS;
-  this->configuration->connectionTimeout = ESPAPP_NETWORK_DEFAULT_CONNECTION_TIMEOUT;
-  this->configuration->sleepTimeout = ESPAPP_NETWORK_DEFAULT_SLEEP_TIMEOUT;
-  this->configuration->failuresToSwitch = ESPAPP_NETWORK_DEFAULT_SWITCH_NETWORK_AFTER;
-
-#ifndef ESP32
-  this->configuration->radioMode = 3;                                         // WIFI_PHY_MODE_11N by default
-  this->configuration->outputPower = ESPAPP_NETWORK_DEFAULT_OUTPUT_POWER_MAX; // Default output power in dBm
-#endif
-
-  return saveConfiguration();
-}
-
-bool ESPAPP_WirelessConnection::saveConfiguration(void)
-{
-#ifdef DEBUG
-  this->System->Msg->printInformation(F("Saving network configuration"), F("WIFI"));
-#endif
-
-  StaticJsonDocument<1000> doc;
-
-  // Primary network configuration
-  JsonObject primary = doc.createNestedObject("primary");
-  primary["ssid"] = this->configuration->primary.ssid;
-  primary["password"] = this->configuration->primary.password;
-  primary["dhcp"] = this->configuration->primary.isDHCP;
-  primary["ip"] = this->configuration->primary.ip;
-  primary["gateway"] = this->configuration->primary.gateway;
-  primary["subnet"] = this->configuration->primary.subnet;
-  primary["dns1"] = this->configuration->primary.dns1;
-  primary["dns2"] = this->configuration->primary.dns2;
-
-  // Secondary network configuration
-  JsonObject secondary = doc.createNestedObject("secondary");
-  secondary["ssid"] = this->configuration->secondary.ssid;
-  secondary["password"] = this->configuration->secondary.password;
-  secondary["dhcp"] = this->configuration->secondary.isDHCP;
-  secondary["ip"] = this->configuration->secondary.ip;
-  secondary["gateway"] = this->configuration->secondary.gateway;
-  secondary["subnet"] = this->configuration->secondary.subnet;
-  secondary["dns1"] = this->configuration->secondary.dns1;
-  secondary["dns2"] = this->configuration->secondary.dns2;
-
-  // Other network settings
-  doc["mdns"] = this->configuration->mDNS;
-  doc["connectionTimeout"] = this->configuration->connectionTimeout;
-  doc["sleepTimeout"] = this->configuration->sleepTimeout;
-  doc["failuresToSwitch"] = this->configuration->failuresToSwitch;
-
-#ifndef ESP32
-  doc["m"] = this->configuration->radioMode;
-  doc["op"] = this->configuration->outputPower;
-#endif
-
-  return this->System->Flash->saveJSON(F("/cfg/network.json"), doc);
-}
-
 uint8_t ESPAPP_WirelessConnection::connection()
 {
 
   if (ESPAPP_WirelessConnection::isConnected)
   {
-    return ESPAPP_NETWORK_CONNECTION_MODE_CLIENT;
+    return ESPAPP_NETWORK_CONNECTION_MODE::CLIENT;
   } // Check if device is in access point mode
   else if (this->WirelessNetwork.getMode() == WIFI_AP || this->WirelessNetwork.getMode() == WIFI_AP_STA)
   {
-    return ESPAPP_NETWORK_CONNECTION_MODE_ACCESS_POINT;
+    return ESPAPP_NETWORK_CONNECTION_MODE::ACCESS_POINT;
   }
   // Not connected to any network
   else
   {
-    return ESPAPP_NETWORK_CONNECTION_MODE_NO_CONNECTION;
+    return ESPAPP_NETWORK_CONNECTION_MODE::OFFLINE;
   }
 }

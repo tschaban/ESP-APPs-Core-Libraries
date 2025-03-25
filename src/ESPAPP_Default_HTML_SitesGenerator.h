@@ -7,6 +7,8 @@
 #include <ESPAPP_Parameters_HTTP_Server.h>
 #include <ESPAPP_HTML_UI.h>
 #include <ESPAPP_HTTP_Server.h>
+#include <ESPAPP_FirmwareInstalator.h>
+
 
 class ESPAPP_HTML_SitesGenerator
 {

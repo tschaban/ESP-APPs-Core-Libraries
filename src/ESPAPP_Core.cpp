@@ -22,11 +22,13 @@ bool ESPAPP_Core::init(void)
 
   if (success)
   {
-    success = this->readConnectionModeConfiguration();
-    if (!success)
+    success = this->File->read(connectionMode);
+
+    if (success)
     {
-      success = this->createDefaultConnectionModeConfiguration();
+      success = this->File->read(operatingMode);
     }
+
     this->Time->init();
   }
   return success;
@@ -44,73 +46,20 @@ void ESPAPP_Core::reboot()
   ESP.restart();
 }
 
-bool ESPAPP_Core::readConnectionModeConfiguration(void)
+ESPAPP_NETWORK_CONNECTION_MODE ESPAPP_Core::getConnectionMode(void)
 {
-  bool success = false;
-
-#ifdef DEBUG
-  this->Msg->printInformation(F("Reading connection mode configuration"), F("WIFI"));
-#endif
-
-  StaticJsonDocument<256> doc;
-  success = this->Flash->getJSON(F("/cfg/connectionMode.json"), doc);
-
-  if (success)
-  {
-    this->connectionMode = doc["mode"] | ESPAPP_NETWORK_CONNECTION_MODE_NO_CONNECTION;
-
-#ifdef DEBUG
-    this->Msg->printBulletPoint(F("Connection mode: "));
-    this->Msg->printValue(this->connectionMode);
-#endif
-  }
-#ifdef DEBUG
-  else
-  {
-    this->Msg->printError(F("Failed to load connection mode configuration"), F("WIFI"));
-  }
-#endif
-
-  return success;
+  return *this->connectionMode;
 }
 
-bool ESPAPP_Core::createDefaultConnectionModeConfiguration(void)
+bool ESPAPP_Core::setConnectionMode(ESPAPP_NETWORK_CONNECTION_MODE mode)
 {
 #ifdef DEBUG
-  this->Msg->printInformation(F("Creating default connection mode configuration"), F("WIFI"));
-#endif
-
-  // Set default connection mode config values
-  this->connectionMode = ESPAPP_NETWORK_CONNECTION_MODE_ACCESS_POINT;
-
-  return saveConnectionModeConfiguration();
-}
-
-bool ESPAPP_Core::saveConnectionModeConfiguration(void)
-{
-#ifdef DEBUG
-  this->Msg->printInformation(F("Saving connection mode configuration: "), F("WIFI"));
-  this->Msg->printValue(this->connectionMode);
-#endif
-  StaticJsonDocument<256> doc;
-  doc["mode"] = this->connectionMode;
-  return this->Flash->saveJSON(F("/cfg/connectionMode.json"), doc);
-}
-
-uint8_t ESPAPP_Core::getConnectionMode(void)
-{
-  return this->connectionMode;
-}
-
-bool ESPAPP_Core::setConnectionMode(uint8_t mode)
-{
-#ifdef DEBUG
-  this->Msg->printInformation(F("Setting connection mode"), F("WIFI"));
+  this->Msg->printInformation(F("Setting connection mode"), F("KERNEL"));
   this->Msg->printBulletPoint(F("New mode: "));
   this->Msg->printValue(mode);
 #endif
 
-  if (this->connectionMode == mode)
+  if (*this->connectionMode == mode)
   {
 #ifdef DEBUG
     this->Msg->printBulletPoint(F("Mode unchanged, skipping save"));
@@ -118,6 +67,40 @@ bool ESPAPP_Core::setConnectionMode(uint8_t mode)
     return true; // No change needed, return success
   }
 
-  this->connectionMode = mode;
-  return saveConnectionModeConfiguration();
+  *this->connectionMode = mode;
+  return this->File->save(this->connectionMode);
+}
+
+ESPAPP_OPERATING_MODE ESPAPP_Core::getOperatingMode(void)
+{
+  return *this->operatingMode;
+}
+
+bool ESPAPP_Core::setOperatingMode(ESPAPP_OPERATING_MODE mode)
+{
+#ifdef DEBUG
+  this->Msg->printInformation(F("Setting Operating mode"), F("KERNEL"));
+  this->Msg->printBulletPoint(F("New mode: "));
+  this->Msg->printValue(mode);
+#endif
+
+  if (*this->operatingMode == mode)
+  {
+#ifdef DEBUG
+    this->Msg->printBulletPoint(F("Mode unchanged, skipping save"));
+#endif
+    return true; // No change needed, return success
+  }
+
+  *this->operatingMode = mode;
+  return this->File->save(this->operatingMode);
+}
+
+void ESPAPP_Core::getDeviceID(char *id, boolean extended)
+{
+  byte m[6];
+  WiFi.macAddress(m);
+  sprintf(id, "%s%x%x%x%x-%x%x%x%x",
+          (extended ? (PGM_P)F(ESPAPP_DEVICE_ID_PREFIX) : (PGM_P)F(ESPAPP_EMPTY_STRING)), m[0],
+          m[5], m[1], m[4], m[2], m[3], m[3], m[2]);
 }

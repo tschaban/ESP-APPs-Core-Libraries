@@ -5,6 +5,7 @@
 
 /* Form constants */
 const char HTML_UI_EMPTY_STRING[] PROGMEM = "";
+const char HTML_UI_SLASH_CHAR[] PROGMEM = "/";
 
 /** Form input: types */
 const char HTML_UI_INPUT_TYPE_NUMBER[] PROGMEM = "number";
@@ -17,8 +18,21 @@ const char HTML_UI_INPUT_TYPE_RADIO[] PROGMEM = "radio";
 const char HTML_UI_INPUT_SKIP_ATTRIBUTE[] PROGMEM = "?";
 const char HTML_UI_FORM_ITEM_ATTRIBUTE_CHECKED[] PROGMEM = " checked=\"checked\"";
 const char HTML_UI_FORM_ITEM_ATTRIBUTE_DISABLED[] PROGMEM = " disabled=\"disabled\"";
-
 const char HTML_UI_SUBMITT_BUTTON_SAVE[] PROGMEM = "Save";
+
+/** Form items: name tags */
+const char HTML_UI_FORM_INPUT_COMMON_0[] PROGMEM = "c0";
+const char HTML_UI_FORM_INPUT_COMMON_1[] PROGMEM = "c1";
+const char HTML_UI_FORM_INPUT_COMMON_2[] PROGMEM = "c2";
+const char HTML_UI_FORM_INPUT_COMMON_3[] PROGMEM = "c3";
+const char HTML_UI_FORM_INPUT_COMMON_4[] PROGMEM = "c4";
+const char HTML_UI_FORM_INPUT_COMMON_5[] PROGMEM = "c5";
+const char HTML_UI_FORM_INPUT_COMMON_6[] PROGMEM = "c6";
+const char HTML_UI_FORM_INPUT_COMMON_7[] PROGMEM = "c7";
+const char HTML_UI_FORM_INPUT_COMMON_8[] PROGMEM = "c8";
+const char HTML_UI_FORM_INPUT_COMMON_9[] PROGMEM = "c9";
+
+
 
 /** TAGS */
 const char HTML_UI_TAG_TYPE[] PROGMEM = "{{it}}";
@@ -41,7 +55,7 @@ const char HTML_UI_ICON_ARROW[] PROGMEM = "&#8227; ";
 
 /* Sites structure */
 
-const char HTML_UI_SITE_WIFI_CONFIGURATION[] PROGMEM =
+const char HTML_UI_SITE_HEADER_LIGHT[] PROGMEM =
     "<!DOCTYPE html><html><head><title>{{s.title}}</title><style>body{display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0;font-family:sans-serif;background-color:#777}form{border:1px solid #000;background-color:#fefefe;padding:2em;text-align:center}select,input,button{width:300px;margin-bottom:.8em;padding:.4em}form *{box-sizing:border-box}label{display:block;text-align:left;width:auto}</style></head><body><div><div>";
 
 const char HTML_UI_SITE_HEADER[] PROGMEM =
@@ -53,7 +67,7 @@ const char HTML_UI_SITE_FOOTER[] PROGMEM = "</div></div></body></html>";
 
 
 /** Navigation Block */
-const char HTML_UI_SITE_MENU_BLOCK_START[] PROGMEM = "<a href=\"#menu\" id=\"menuLink\" class=\"menu-link\"><span></span></a><div id=\"menu\"><header><img src=\"{{f.logo}}\" alt=\"{{s.title}}\"><small>{{f.subtitle-1}}<br/>{{f.subtitle-2}}<br/>{{f.version}}</small></header>";
+const char HTML_UI_SITE_MENU_BLOCK_START[] PROGMEM = "<a href=\"#menu\" id=\"menuLink\" class=\"menu-link\"><span></span></a><div id=\"menu\"><header><img src=\"{{f.logo}}\" alt=\"{{s.title}}\"><small>{{f.subtitle-1}}<br>{{f.subtitle-2}}<br>{{f.version}}</small></header>";
 const char HTML_UI_SITE_MENU_BLOCK_END[] PROGMEM = "</div>";
 
 const char HTML_UI_SITE_MENU_SECTION_START[] PROGMEM = "<div class=\"pure-menu\"><a class=\"pure-menu-heading\" href=\"#{{t}}\">{{i}}{{t}}</a><ul class=\"pure-menu-list\">";
@@ -93,7 +107,7 @@ const char HTML_UI_FORM_ITEM_INPUT_HINT_RANGE_NUMBER[] PROGMEM = "(Range: {{l}} 
 
 /** Form: Radiobutton and Checkbox */
 const char HTML_UI_FORM_ITEM_CHECK_OR_RADIO_BOX[] PROGMEM =
-    "<div class=\"pure-control-group\"><label></label><input name=\"{{n}}\" type=\"{{it}}\" value=\"{{v}}\"{{i.c}}{{i.d}} /> {{t}}{{h}}</div>";
+    "<div class=\"pure-control-group\"><label></label><input name=\"{{n}}\" type=\"{{it}}\" value=\"{{v}}\"{{i.c}}{{i.d}}> {{t}}{{h}}</div>";
 
 /** Form: Paragraph */
 const char HTML_UI_ITEM_PARAGRAPH[] PROGMEM = "<p>{{v}}</p>";

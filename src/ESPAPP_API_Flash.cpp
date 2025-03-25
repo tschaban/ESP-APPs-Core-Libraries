@@ -67,7 +67,10 @@ bool ESPAPP_API_Flash::init(void)
 
   if (fileSystemReady)
   {
-    fileSystemReady = fileExist(ESPAPP_FILE_SYSTEM_INITIALIZED);
+
+    sprintf(this->fileName, "%s%s%s", FPSTR(path_boot), FPSTR(path_root), F(ESPAPP_FILE_SYSTEM_INITIALIZED));
+
+    fileSystemReady = fileExist(this->fileName);
 #ifdef DEBUG
     this->Msg->printBulletPoint(F("Files structure exists"));
 #endif
@@ -131,14 +134,15 @@ bool ESPAPP_API_Flash::formatFileSystem(void)
   if (success)
   {
 
-    char folderToCreate[ESPAPP_FILE_MAX_FILE_NAME_LENGTH];
     for (uint8_t i = 0; i < sizeof(ESPAPP_DIRECTORIES) / sizeof(ESPAPP_DIRECTORIES[0]); i++)
     {
-      strcpy_P(folderToCreate, (char *)pgm_read_dword(&(ESPAPP_DIRECTORIES[i])));
-      this->createFolder(folderToCreate);
+      strcpy_P(this->fileName, (char *)pgm_read_dword(&(ESPAPP_DIRECTORIES[i])));
+      this->createFolder(this->fileName);
     }
 
-    fileSystem.open(F(ESPAPP_FILE_SYSTEM_INITIALIZED), ESPAPP_OPEN_FILE_WRITING).close();
+    sprintf(this->fileName, "%s%s%s", FPSTR(path_boot), FPSTR(path_root), F(ESPAPP_FILE_SYSTEM_INITIALIZED));
+    fileSystem.open(this->fileName, ESPAPP_OPEN_FILE_WRITING).close();
+
 #ifdef DEBUG
     this->Msg->printBulletPoint(F("Completed"));
   }

@@ -14,7 +14,7 @@ void ESPAPP_HTML_UI::setLang(String *site, const __FlashStringHelper *lang)
     site->replace(F("{{s.lang}}"), lang);
 }
 
-void ESPAPP_HTML_UI::setRefresh(String *site, uint8_t refresh, const __FlashStringHelper *url)
+void ESPAPP_HTML_UI::setRefresh(String *site, uint8_t refresh, const char *url)
 {
 
 #ifdef DEBUG
@@ -234,6 +234,10 @@ void ESPAPP_HTML_UI::closeMessageSection(String *site)
     this->closeSection(site);
 }
 
+void ESPAPP_HTML_UI::addMessageItem(String *site, const char *item) {
+    this->addListItem(site, item);
+}
+
 /** Form */
 
 void ESPAPP_HTML_UI::startForm(String *site, ESPAPP_HTTP_REQUEST *url, const char *parameters)
@@ -249,7 +253,7 @@ void ESPAPP_HTML_UI::endForm(String *site, const __FlashStringHelper *submiButto
 }
 
 void ESPAPP_HTML_UI::addInputFormItem(String *item, const __FlashStringHelper *type,
-                                      const char *name, const char *label,
+                                      const __FlashStringHelper *name, const char *label,
                                       const char *value, const char *size,
                                       const char *min, const char *max,
                                       const char *step, const char *hint,
@@ -388,7 +392,7 @@ void ESPAPP_HTML_UI::addInputFormItem(String *item, const __FlashStringHelper *t
     this->replaceTagHint(item, FPSTR(HTML_UI_EMPTY_STRING));
 }
 
-void ESPAPP_HTML_UI::addRadioButtonOrCheckBoxFormItem(String *item, const __FlashStringHelper *type, const char *name, const char *label,
+void ESPAPP_HTML_UI::addRadioButtonOrCheckBoxFormItem(String *item, const __FlashStringHelper *type, const __FlashStringHelper *name, const char *label,
                                                       const char *value, boolean checked,
                                                       const char *hint,
                                                       boolean disabled)
@@ -412,7 +416,7 @@ void ESPAPP_HTML_UI::addRadioButtonOrCheckBoxFormItem(String *item, const __Flas
     }
 }
 
-void ESPAPP_HTML_UI::addCheckBoxFormItem(String *item, const char *name,
+void ESPAPP_HTML_UI::addCheckBoxFormItem(String *item, const __FlashStringHelper *name,
                                          const char *label,
                                          const char *value, boolean checked,
                                          const char *hint,
@@ -423,7 +427,7 @@ void ESPAPP_HTML_UI::addCheckBoxFormItem(String *item, const char *name,
 }
 
 void ESPAPP_HTML_UI::addRadioButtonFormItem(
-    String *item, const char *name, const char *label, const char *value,
+    String *item, const __FlashStringHelper *name, const char *label, const char *value,
     boolean checked, const char *hint, boolean disabled)
 {
     this->addRadioButtonOrCheckBoxFormItem(item, FPSTR(HTML_UI_INPUT_TYPE_RADIO), name, label, value, checked, hint,
@@ -462,7 +466,7 @@ void ESPAPP_HTML_UI::addSelectFormItemClose(String *item, const char *hint)
     }
 }
 
-void ESPAPP_HTML_UI::addParagraph(String *item, const __FlashStringHelper *text, bool indented)
+void ESPAPP_HTML_UI::addParagraphTag(String *item, bool indented)
 {
     if (indented)
     {
@@ -472,7 +476,18 @@ void ESPAPP_HTML_UI::addParagraph(String *item, const __FlashStringHelper *text,
     {
         item->concat(FPSTR(HTML_UI_ITEM_PARAGRAPH));
     }
-    item->replace(FPSTR(HTML_UI_TAG_VALUE), text);
+}
+
+void ESPAPP_HTML_UI::addParagraph(String *item, const __FlashStringHelper *text, bool indented)
+{
+    this->addParagraphTag(item, indented);
+    this->replaceTagValue(item, text);
+}
+
+void ESPAPP_HTML_UI::addParagraph(String *item, const char *text, bool indented)
+{
+    this->addParagraphTag(item, indented);
+    this->replaceTagValue(item, text);
 }
 
 void ESPAPP_HTML_UI::startList(String *site)
@@ -507,7 +522,7 @@ void ESPAPP_HTML_UI::addFileExplorerFolderItem(String *site, const char *name, s
     site->concat(FPSTR(HTML_UI_FILE_EXPLORER_FOLDER_ITEM));
     this->replaceTagValue(site, name);
     site->replace(FPSTR(HTML_UI_TAG_TITLE), String(size));
-    if (strcmp(name,(PGM_P)FPSTR(path_root)) !=0 && size == 0)
+    if (strcmp(name, (PGM_P)FPSTR(path_root)) != 0 && size == 0)
     {
         this->replaceTagHint(site, FPSTR(HTML_UI_EMPTY_STRING));
     }

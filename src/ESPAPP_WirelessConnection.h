@@ -3,10 +3,8 @@
 #ifndef _ESPAPP_WirelessConnection_h
 #define _ESPAPP_WirelessConnection_h
 
-//#include <ESPAPP_Parameters.h>
 #include <ArduinoJson.h>
 #include <ESPAPP_Core.h>
-
 #ifdef AFE_CONFIG_HARDWARE_LED
 #include <AFE-LED.h>
 #endif // AFE_CONFIG_HARDWARE_LED
@@ -95,11 +93,6 @@ private:
   void switchConfiguration();
 
   void connectionEvent(void);
-
-  bool readConfiguration(void);
-  bool createDefaultConfiguration(void);
-  bool saveConfiguration(void);
-  
 
 public:
 #ifndef ESP32
