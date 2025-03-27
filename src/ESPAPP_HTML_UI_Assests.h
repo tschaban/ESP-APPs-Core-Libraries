@@ -32,8 +32,6 @@ const char HTML_UI_FORM_INPUT_COMMON_7[] PROGMEM = "c7";
 const char HTML_UI_FORM_INPUT_COMMON_8[] PROGMEM = "c8";
 const char HTML_UI_FORM_INPUT_COMMON_9[] PROGMEM = "c9";
 
-
-
 /** TAGS */
 const char HTML_UI_TAG_TYPE[] PROGMEM = "{{it}}";
 const char HTML_UI_TAG_TITLE[] PROGMEM = "{{t}}";
@@ -52,6 +50,7 @@ const char HTML_UI_SITE_REFRESH_TAG[] PROGMEM = "<meta http-equiv=\"refresh\" co
 const char HTML_UI_NO_ICON[] PROGMEM = "";
 const char HTML_UI_ICON_RIGHTWARDS_ARROW[] PROGMEM = "&#10150; ";
 const char HTML_UI_ICON_ARROW[] PROGMEM = "&#8227; ";
+const char HTML_UI_ICON_DISK[] PROGMEM ="&#128190; ";
 
 /* Sites structure */
 
@@ -62,6 +61,7 @@ const char HTML_UI_SITE_HEADER[] PROGMEM =
     "<!doctype html><html lang=\"{{s.lang}}\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><link href=\"https://fonts.googleapis.com/css2?family=Titillium+Web&display=swap\" rel=\"stylesheet\"><title>{{s.title}}</title>{{s.refresh}}{{s.css}}{{s.js}}</head><body><div id=\"layout\">";
 
 const char HTML_UI_SITE_BODY_START[] PROGMEM = "<div id=\"main\" class=\"c\">";
+
 
 const char HTML_UI_SITE_FOOTER[] PROGMEM = "</div></div></body></html>";
 
@@ -138,4 +138,5 @@ const char HTML_UI_FILE_EXPLORER_UPLOAD_FORM[] PROGMEM =
     "<input type=\"hidden\" name=\"d\" value=\"{{v}}\">"
     "<button name=\"a\" value=\"0\" class=\"button-green pure-button\" type=\"submit\">Upload</button>"
     "</form>";
+
 #endif

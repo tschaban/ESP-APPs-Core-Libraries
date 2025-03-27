@@ -33,7 +33,6 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
         case ESPAPP_HTTP_SITE_WIFI_CONFIGURATION:
         {
             this->UI->setUrlParams(urlParams, ESPAPP_HTTP_SITE_REBOOT);
-
             this->UI->startForm(this->HTMLResponse, urlParams, (PGM_P)FPSTR(HTML_UI_EMPTY_STRING));
             this->UI->addParagraph(this->HTMLResponse, F("WiFi Configuration"));
             this->UI->addSelectFormItemOpen(this->HTMLResponse, FPSTR(HTML_UI_FORM_INPUT_COMMON_0), F(""));
@@ -88,7 +87,6 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
             success = this->System->File->read(configuration);
             char _redirectLink[ESPAPP_DEVICE_ID_LENGTH + 13]; // + http://.local
 
-
             if (success)
             {
 
@@ -120,15 +118,15 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
             this->UI->openSection(this->HTMLResponse, F("Rebooting"), F("Rebooting device"));
             if (success)
             {
-                
+
                 char _redirectLink[ESPAPP_DEVICE_ID_LENGTH + 13]; // + http://.local
                 this->System->getDeviceID(_redirectLink, true);
                 sprintf(_redirectLink, "http://%s.local", _redirectLink);
-                
+
                 this->UI->addParagraph(this->HTMLResponse, F("Configuration saved"));
                 this->UI->addParagraph(this->HTMLResponse, F("Connecting to the WiFi Router"));
                 this->UI->addParagraph(this->HTMLResponse, F("If you are not redirected, please click <a href=\"{{v}}\">here</a>"));
-                this->UI->replaceTagValue(this->HTMLResponse, _redirectLink);                
+                this->UI->replaceTagValue(this->HTMLResponse, _redirectLink);
             }
             else
             {
@@ -138,7 +136,6 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
 
                 this->UI->addParagraph(this->HTMLResponse, F("Something went wrong: configuration NOT saved"));
                 this->UI->addParagraph(this->HTMLResponse, F("Restarting in Hotspot mode"));
-                
             }
 
             this->UI->addParagraph(this->HTMLResponse, F("You have 10 seconds to streatch your legs"));
@@ -152,6 +149,8 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
             break;
         }
         default:
+            this->siteNotFound(this->HTMLResponse);
+            success = true;
             break;
         }
     }
@@ -197,21 +196,19 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
             this->UI->addNavigationItem(this->HTMLResponse, F("Index"), urlParams, "", FPSTR(HTML_UI_NO_ICON));
 
             this->UI->setUrlParams(urlParams, ESPAPP_HTTP_SITE_FIRMWARE_COMMAND);
-            this->UI->addNavigationItem(this->HTMLResponse, F("Commands"), urlParams, "", FPSTR(HTML_UI_NO_ICON));
+            this->UI->addNavigationItem(this->HTMLResponse, F("Actions"), urlParams, "", FPSTR(HTML_UI_NO_ICON));
 
             this->UI->setUrlParams(urlParams, ESPAPP_HTTP_SITE_SYSTEM_PARAMETERS);
             this->UI->addNavigationItem(this->HTMLResponse, F("System"), urlParams, "", FPSTR(HTML_UI_ICON_ARROW));
 
             this->UI->setUrlParams(urlParams, ESPAPP_HTTP_SITE_FILE_EXPLORER);
-            this->UI->addNavigationItem(this->HTMLResponse, F("FS Explorer"), urlParams, "", FPSTR(HTML_UI_NO_ICON));
+            this->UI->addNavigationItem(this->HTMLResponse, F("Explorer"), urlParams, "", FPSTR(HTML_UI_ICON_DISK));
 
-            this->UI->setUrlParams(urlParams, 2, 1);
-            this->UI->addNavigationItem(this->HTMLResponse, F("Dummy site: 1"), urlParams, "", FPSTR(HTML_UI_ICON_RIGHTWARDS_ARROW));
-            this->UI->setUrlParams(urlParams, 4, 1, 1, 1);
-            this->UI->addNavigationItem(this->HTMLResponse, F("Dummy site: 2"), urlParams, "", FPSTR(HTML_UI_ICON_ARROW));
+            this->UI->setUrlParams(urlParams, ESPAPP_HTTP_SITE_TOPOGRAPHY, 1, 1, 1);
+            this->UI->addNavigationItem(this->HTMLResponse, F("Topography"), urlParams, "", FPSTR(HTML_UI_ICON_RIGHTWARDS_ARROW));
 
             // External Link
-            this->UI->addNavigationItemExternal(this->HTMLResponse, F("Smart'my Dom"), F("https://www.smartnydom.pl"), FPSTR(HTML_UI_ICON_ARROW));
+            this->UI->addNavigationItemExternal(this->HTMLResponse, F("SmartnyDom"), F("https://www.smartnydom.pl"), FPSTR(HTML_UI_ICON_ARROW));
             this->UI->endNavigationList(this->HTMLResponse);
         }
 
@@ -314,7 +311,7 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
             this->UI->openSection(this->HTMLResponse, F("Commands"), F("Firmware commands"));
             this->UI->addParagraph(this->HTMLResponse, F("<a href=\"/?site=101&cmd=10&action=2\">Reboot device (Client Mode)</a>"), true);       // Refactor it
             this->UI->addParagraph(this->HTMLResponse, F("<a href=\"/?site=101&cmd=10&action=1\">Reboot device (Access Point Mode)</a>"), true); // Refactor it
-            this->UI->addParagraph(this->HTMLResponse, F("<a href=\"/?site=103\">Install UI Components</a>"), true);  // Refactor it
+            this->UI->addParagraph(this->HTMLResponse, F("<a href=\"/?site=103\">Install UI Components</a>"), true);                             // Refactor it
             this->UI->closeSection(this->HTMLResponse);
             this->setHTTPResponseCode(ESPAPP_HTTP_RESPONSE_CODE_OK);
             success = true;
@@ -353,20 +350,19 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
             success = true;
             break;
         }
-        case ESPAPP_HTTP_SITE_DOWNLOAD_UI_COMPONENTS: 
+        case ESPAPP_HTTP_SITE_DOWNLOAD_UI_COMPONENTS:
         {
-            
-            #ifdef DEBUG
-            this->System->Msg->printInformation(F("Download UI components event handled"), F("SYSTEM EVENT"));
-          #endif
-          
-            //ESPAPP_FirmwareInstalator *Instalator = new ESPAPP_FirmwareInstalator(System);
-            //InstallationStats stats;
-            //Instalator->install("https://api.smartnydom.pl/espapp/ui-configuration.json", stats);
-            //Instalator->install("http://192.168.2.146:8080/static/covid/data.json", stats);
-            //Instalator->install("http://files.smartnydom.pl/espapp/config/ui-configuration.json", stats);          
-            //delete Instalator;
 
+#ifdef DEBUG
+            this->System->Msg->printInformation(F("Download UI components event handled"), F("SYSTEM EVENT"));
+#endif
+
+            // ESPAPP_FirmwareInstalator *Instalator = new ESPAPP_FirmwareInstalator(System);
+            // InstallationStats stats;
+            // Instalator->install("https://api.smartnydom.pl/espapp/ui-configuration.json", stats);
+            // Instalator->install("http://192.168.2.146:8080/static/covid/data.json", stats);
+            // Instalator->install("http://files.smartnydom.pl/espapp/config/ui-configuration.json", stats);
+            // delete Instalator;
 
             this->UI->openSection(this->HTMLResponse, F("UI Components"), F("Downloading UI components"));
             this->UI->addParagraph(this->HTMLResponse, F("Downloading UI components..."));
@@ -378,13 +374,12 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
             success = true;
             break;
         }
-        default:
+        case ESPAPP_HTTP_SITE_TOPOGRAPHY:
         {
 
-            this->UI->setUrlParams(urlParams, 1, 200);
+            this->UI->setUrlParams(urlParams, 1, ESPAPP_HTTP_SITE_TOPOGRAPHY);
 
-            this->UI->openSection(this->HTMLResponse, F("UI Elements"), F("This is an example of UI elements"));
-
+            this->UI->openSection(this->HTMLResponse, F("UI Topography"), F("This is an example of UI elements"));
             this->UI->startForm(this->HTMLResponse, urlParams, (PGM_P)FPSTR(HTML_UI_EMPTY_STRING));
 
             this->UI->addInputFormItem(this->HTMLResponse, FPSTR(HTML_UI_INPUT_TYPE_TEXT), F("text1"), "Text filed: Simple", "Text");
@@ -437,7 +432,6 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
 
             this->UI->openMessageSection(this->HTMLResponse, F("This is Message Section"), F("This is an example of message section"));
 
-
             this->UI->addMessageItem(this->HTMLResponse, "This is a message item 1");
             this->UI->addMessageItem(this->HTMLResponse, "This is a message item 2");
             this->UI->addMessageItem(this->HTMLResponse, "This is a message item 3");
@@ -446,6 +440,13 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
 
             setHTTPResponseCode(ESPAPP_HTTP_RESPONSE_CODE_NOT_FOUND);
 
+            this->setHTTPResponseCode(ESPAPP_HTTP_RESPONSE_CODE_OK);
+            success = true;
+            break;
+        }
+        default:
+        {
+            this->siteNotFound(this->HTMLResponse);
             success = true;
             break;
         }
@@ -497,6 +498,14 @@ void ESPAPP_HTML_SitesGenerator::configureSite(void)
         break;
     }
     }
+}
+
+void ESPAPP_HTML_SitesGenerator::siteNotFound(String *site)
+{
+    this->UI->openSection(site, F("Error: 404"), F("Site not found"));
+    this->UI->addParagraph(site, F("Site not found"));
+    this->UI->closeSection(site);
+    this->setHTTPResponseCode(ESPAPP_HTTP_RESPONSE_CODE_NOT_FOUND);
 }
 
 #endif

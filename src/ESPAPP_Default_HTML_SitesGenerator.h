@@ -20,6 +20,8 @@ private:
   void setHTTPResponseCode(int responseCode = ESPAPP_HTTP_RESPONSE_CODE_OK);
   void configureSite(void);
 
+  void siteNotFound(String *site);
+
 public:
   ESPAPP_HTML_SitesGenerator(ESPAPP_Core *_System, ESPAPP_HTTPServer *_HTTPServer, String *_HTMLResponse);
   ~ESPAPP_HTML_SitesGenerator();
