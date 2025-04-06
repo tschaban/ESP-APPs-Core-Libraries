@@ -54,6 +54,8 @@ public:
     void setLogoURL(String *site, const __FlashStringHelper *logoURL);
     void setUrlParams(ESPAPP_HTTP_REQUEST *url, uint8_t siteId = ESPAPP_NONE, uint8_t command = ESPAPP_NONE, uint8_t action = ESPAPP_NONE, uint8_t option = ESPAPP_NONE);
     void setVersion(String *site, const __FlashStringHelper *version);
+    void setFreeHeap(String *site);
+    void setWANAccess(String *site, boolean access);
 
     /** Site level */
     void siteStart(String *site);

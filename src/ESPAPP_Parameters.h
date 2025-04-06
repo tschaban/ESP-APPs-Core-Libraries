@@ -4,6 +4,8 @@
 #include <Arduino.h>
 
 #include <ESPAPP_Parameters_HTML_UI.h>
+ 
+#define ESPAPP_CUSTOM_HTML_SITES_GENERATOR
 
 #define ESPAPP_NONE 255
 #define ESPAPP_EMPTY_STRING ""

@@ -4,97 +4,60 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Titillium+Web&display=swap" rel="stylesheet">
     <title>ESP Device</title>
     <link rel="stylesheet" href="/css?name=pure-min.css.gz">
-    <link rel="stylesheet" href="/css?name=layout.css.gz">
+    <link rel="stylesheet" href="/css?name=layout-v2.css">
+    <link rel="stylesheet" href="/css?name=pure-custom.css">
+    <script src="/js?name=responsive-menu-min.js.gz"></script>
 </head>
 
 <body>
-    <div id="layout" class="pure-g">
-        <div class="sidebar pure-u-1 pure-u-md-1-4">
-            <div class="header">
-                <h1 class="brand-title">ESPAPP</h1>
-                <h2 class="brand-tagline">Version</h2>
-                <nav class="nav">
-                    <ul class="nav-list">
-                        <li class="nav-item"><a class="pure-button" href="/?site=0&">File explorer</a></li>
-                        <li class="nav-item"><a class="pure-button" href="/?site=1&">Site template</a></li>
-                        <li class="nav-item"><a class="pure-button" href="/?site=2&cmd=1&">&#8227; Item 4</a></li>
-                        <li class="nav-item"><a class="pure-button" href="/?site=3&cmd=1&action=1&">Item 5</a></li>
-                        <li class="nav-item"><a class="pure-button" href="/?site=4&cmd=1&action=1&option=1&">Item 6</a>
-                        </li>
-                        <li class="nav-item"><a class="pure-button" href="https://www.smartnydom.pl">&#8227; Smart'my
-                                Dom</a></li>
-                    </ul>
-                </nav>
+    <div id="layout"><a href="#menu" id="menuLink" class="menu-link"><span></span></a>
+        <div id="menu">
+            <header><img src="https://s.smartnydom.pl/i/esp32-firmware" alt="ESP Device"><small>ESPAPP<br>Version:
+                    4.0.0<br>Build: 1000</small></header>
+            <div class="pure-menu"><a class="pure-menu-heading" href="#Menu">&#10150; Menu</a>
+                <ul class="pure-menu-list">
+                    <li class="pure-menu-item"><a href="/?site=1&" class="pure-menu-link">Index</a></li>
+                    <li class="pure-menu-item"><a href="/?site=100&" class="pure-menu-link">Actions</a></li>
+                    <li class="pure-menu-item"><a href="/?site=102&" class="pure-menu-link">&#8227; System</a></li>
+                    <li class="pure-menu-item"><a href="/?site=110&" class="pure-menu-link">&#128190; Explorer</a></li>
+                    <li class="pure-menu-item"><a href="/?site=254&cmd=1&action=1&option=1&"
+                            class="pure-menu-link">&#10150; Topography</a></li>
+                    <li class="pure-menu-item"><a href="https://www.smartnydom.pl" class="pure-menu-link">&#8227;
+                            SmartnyDom</a></li>
+                </ul>
             </div>
         </div>
-        <div class="content pure-u-1 pure-u-md-3-4">
+        <div id="main" class="c">
+            <header style="text-align: right;">Connection to WAN: Yes | Free Heap: Heap: 122kb | Firmware: 1.0.0 | Restart</header>
             <div>
-                <div class="posts">
-                    <h1 class="content-subhead">Files explorer</h1>
-                    <section class="post">
-                        <header class="post-header">
-                            <h2 class="post-title">Files list</h2>
-                        </header>
-                        <div class="post-description">
-                            <table class="pure-table pure-table-horizontal">
-                                <tr>
-                                    <th>File name</th>
-                                    <th>Size</th>
-                                    <th>Acton</th>
-                                </tr>
-                                <tr>
-                                    <td><a href="/?site=0&p1=cfg">cfg</a></td>
-                                    <td>1 files</td>
-                                    <td>Delete</td>
-                                </tr>
-                                <tr>
-                                    <td><a href="/?site=0&p1=data">data</a></td>
-                                    <td>0 files</td>
-                                    <td>Delete</td>
-                                </tr>
-                                <tr>
-                                    <td><a href="/?site=0&p1=ui">ui</a></td>
-                                    <td>2 files</td>
-                                    <td>Delete</td>
-                                </tr>
-                                <tr>
-                                    <td>.token</td>
-                                    <td>0B</td>
-                                    <td>
-                                        <form action="/?site=0&cmd=1" method="POST"><input type="hidden" name="f"
-                                                value=".token"><input type="hidden" name="directory" value="/"><button
-                                                class="pure-button pure-button-primary" type="submit">Delete</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
-                    </section>
-                </div>
-                <div class="posts">
-                    <h1 class="content-subhead">Upload file</h1>
-                    <section class="post">
-                        <header class="post-header">
-                            <h2 class="post-title">Upload file to the current folder</h2>
-                        </header>
-                        <div class="post-description">
-                            <form action="/upload?site=0&cmd=0" method="POST" enctype="multipart/form-data"><input
-                                    type="file" name="uploadedFile"><input type="hidden" name="directory"
-                                    value="/"><button class="pure-button pure-button-primary"
-                                    type="submit">Upload</button></form>
-                        </div>
-                    </section>
-                </div>
-                <div class="footer">
-                    <div class="pure-menu pure-menu-horizontal">
-                        <ul>
-                            <li class="pure-menu-item"><a href="" class="pure-menu-link">About</a></li>
-                            <li class="pure-menu-item"><a href="" class="pure-menu-link">GitHub</a></li>
+                <h1 class="cs"></h1>
+                <section class="s">
+                    <header>
+                        <h2 class="st"></h2>
+                    </header>
+                    <div class="sc">
+                        <ul class="lst">
+                            <li class="m">Firmware initialized successfully.
+                            </li>
+                            <li class="m">Firmware version: 1.0.0
+                            </li>
                         </ul>
                     </div>
-                </div>
+                </section>
+            </div>
+            <div>
+                <h1 class="cs">Error: 404</h1>
+                <section class="s">
+                    <header>
+                        <h2 class="st">Site not found</h2>
+                    </header>
+                    <div class="sc">
+                        <p>Site not found</p>
+                    </div>
+                </section>
             </div>
         </div>
     </div>

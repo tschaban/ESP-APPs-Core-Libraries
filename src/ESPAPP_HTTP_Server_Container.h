@@ -3,13 +3,7 @@
 
 #include <ESPAPP_Core.h>
 #include <ESPAPP_HTTP_Server.h>
-
-
-#ifdef ESPAPP_CUSTOM_HTML_SITES_GENERATORA
-#include <ESPAPP_HTML_SitesGenerator.h>
-#else
 #include <ESPAPP_Default_HTML_SitesGenerator.h>
-#endif
 
 class ESPAPP_HTTPServerContainer
 {

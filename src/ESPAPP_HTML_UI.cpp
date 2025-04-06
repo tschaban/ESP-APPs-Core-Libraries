@@ -90,7 +90,19 @@ void ESPAPP_HTML_UI::setLogoURL(String *site, const __FlashStringHelper *logoURL
 
 void ESPAPP_HTML_UI::setVersion(String *site, const __FlashStringHelper *version)
 {
-    site->replace(F("{{f.version}}"), version);
+    site->replace(F(HTML_UI_TAG_FIRMWARE_VERSION), version);
+}
+
+void ESPAPP_HTML_UI::setFreeHeap(String *site)
+{
+    char freeHeap[8];
+    sprintf(freeHeap, "%dkB", ESP.getFreeHeap() / 1024);
+    site->replace(F(HTML_UI_TAG_FREE_HEAP), freeHeap);
+}
+
+void ESPAPP_HTML_UI::setWANAccess(String *site, boolean access)
+{
+    site->replace(F(HTML_UI_TAG_WAN_YES_NO), (access ? F("Yes") : F("No")));
 }
 
 void ESPAPP_HTML_UI::embedCSSFiles(String *site, const char *cssFiles[], size_t count)
@@ -130,6 +142,8 @@ void ESPAPP_HTML_UI::clearOrphantTags(String *site)
     site->replace(F("{{menu}}"), FPSTR(HTML_UI_EMPTY_STRING));
     site->replace(F("{{f.url}}"), FPSTR(HTML_UI_EMPTY_STRING));
     site->replace(F("{{f.logo-url}}"), FPSTR(HTML_UI_EMPTY_STRING));
+
+    this->setFreeHeap(site);
 }
 
 //------------------------------------------------------------

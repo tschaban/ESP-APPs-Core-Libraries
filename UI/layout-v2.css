@@ -228,10 +228,18 @@ Hides the menu at `48em`, but modify this based on your app's needs.
 /* Moved from the layout */
 
 .c {
-    margin: 3em auto;
+    margin: 0em auto;
     padding: 0 2em;
     max-width: 980px;
     line-height: 1.6em;
+}
+
+/* Header for main block */
+.h {
+    text-align: right;
+    min-height: 3em;
+    padding-left: 3em;
+    font-size: 90%;
 }
 
 .cs {

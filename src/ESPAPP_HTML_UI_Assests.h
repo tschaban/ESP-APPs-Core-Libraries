@@ -40,6 +40,10 @@ const char HTML_UI_TAG_VALUE[] PROGMEM = "{{v}}";
 const char HTML_UI_TAG_NAME[] PROGMEM = "{{n}}";
 const char HTML_UI_TAG_HINT[] PROGMEM = "{{h}}";
 
+#define HTML_UI_TAG_FREE_HEAP "{{f.h}}"
+#define HTML_UI_TAG_FIRMWARE_VERSION "{{f.v}}"
+#define HTML_UI_TAG_WAN_YES_NO "{{f.w}}"
+
 /** HTML TAGS templates */
 const char HTML_UI_SITE_CSS_FILE_TAG[] PROGMEM = "<link rel=\"stylesheet\" href=\"{{v}}\">";
 const char HTML_UI_SITE_JS_FILE_TAG[] PROGMEM = "<script src=\"{{v}}\"></script>";
@@ -60,14 +64,14 @@ const char HTML_UI_SITE_HEADER_LIGHT[] PROGMEM =
 const char HTML_UI_SITE_HEADER[] PROGMEM =
     "<!doctype html><html lang=\"{{s.lang}}\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><link href=\"https://fonts.googleapis.com/css2?family=Titillium+Web&display=swap\" rel=\"stylesheet\"><title>{{s.title}}</title>{{s.refresh}}{{s.css}}{{s.js}}</head><body><div id=\"layout\">";
 
-const char HTML_UI_SITE_BODY_START[] PROGMEM = "<div id=\"main\" class=\"c\">";
+const char HTML_UI_SITE_BODY_START[] PROGMEM = "<div id=\"main\" class=\"c\"><header class=\"h\">WAN: {{f.w}} | Free Mem: {{f.h}} | Firmware: {{f.v}} | <a href=\"/?site=101&cmd=10&action=2\">Restart</a></header>";
 
 
 const char HTML_UI_SITE_FOOTER[] PROGMEM = "</div></div></body></html>";
 
 
 /** Navigation Block */
-const char HTML_UI_SITE_MENU_BLOCK_START[] PROGMEM = "<a href=\"#menu\" id=\"menuLink\" class=\"menu-link\"><span></span></a><div id=\"menu\"><header><img src=\"{{f.logo}}\" alt=\"{{s.title}}\"><small>{{f.subtitle-1}}<br>{{f.subtitle-2}}<br>{{f.version}}</small></header>";
+const char HTML_UI_SITE_MENU_BLOCK_START[] PROGMEM = "<a href=\"#menu\" id=\"menuLink\" class=\"menu-link\"><span></span></a><div id=\"menu\"><header><img src=\"{{f.logo}}\" alt=\"{{s.title}}\"><small>{{f.subtitle-1}}<br>{{f.subtitle-2}}<br>{{f.v}}</small></header>";
 const char HTML_UI_SITE_MENU_BLOCK_END[] PROGMEM = "</div>";
 
 const char HTML_UI_SITE_MENU_SECTION_START[] PROGMEM = "<div class=\"pure-menu\"><a class=\"pure-menu-heading\" href=\"#{{t}}\">{{i}}{{t}}</a><ul class=\"pure-menu-list\">";

@@ -41,7 +41,9 @@ public:
     ESPAPP_INSTALL_STATUS install(const char* configUrl, InstallationStats& stats);
     
     // Get text description of install status
+    #ifdef DEBUG
     const char* getStatusText(ESPAPP_INSTALL_STATUS status);
+    #endif
     
 
   

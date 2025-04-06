@@ -1,7 +1,5 @@
 #include "ESPAPP_Default_HTML_SitesGenerator.h"
 
-#ifndef ESPAPP_CUSTOM_HTML_SITES_GENERATORA
-
 ESPAPP_HTML_SitesGenerator::ESPAPP_HTML_SitesGenerator(ESPAPP_Core *_System, ESPAPP_HTTPServer *_HTTPServer, String *_HTMLResponse)
 {
     this->System = _System;
@@ -9,6 +7,10 @@ ESPAPP_HTML_SitesGenerator::ESPAPP_HTML_SitesGenerator(ESPAPP_Core *_System, ESP
     this->Server = _HTTPServer;
     /** While initialized site gets it default sceleton */
     this->UI = new ESPAPP_HTML_UI(_System);
+
+#ifdef ESPAPP_CUSTOM_HTML_SITES_GENERATOR
+    this->CustomSiteGenerator = new ESPAPP_HTML_Custom_Sites_Generator(_System, this->Server, this->UI);
+#endif
 };
 
 ESPAPP_HTML_SitesGenerator::~ESPAPP_HTML_SitesGenerator() {};
@@ -23,8 +25,6 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
     this->HTMLResponse->clear();
 
     /** Menu */
-    ESPAPP_HTTP_REQUEST *urlParams = new ESPAPP_HTTP_REQUEST; // @TODO store it in class?
-
     if (this->System->getOperatingMode() == ESPAPP_OPERATING_MODE::FIRST_TIME_BOOT)
     {
         this->HTMLResponse->concat(FPSTR(HTML_UI_SITE_HEADER_LIGHT));
@@ -32,8 +32,15 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
         {
         case ESPAPP_HTTP_SITE_WIFI_CONFIGURATION:
         {
+#ifdef ESPAPP_CUSTOM_HTML_SITES_GENERATOR
+            ESPAPP_HTTP_REQUEST *urlParams = new ESPAPP_HTTP_REQUEST;
             this->UI->setUrlParams(urlParams, ESPAPP_HTTP_SITE_REBOOT);
             this->UI->startForm(this->HTMLResponse, urlParams, (PGM_P)FPSTR(HTML_UI_EMPTY_STRING));
+#else
+            this->UI->setUrlParams(this->urlParams, ESPAPP_HTTP_SITE_REBOOT);
+            this->UI->startForm(this->HTMLResponse, this->urlParams, (PGM_P)FPSTR(HTML_UI_EMPTY_STRING));
+#endif
+
             this->UI->addParagraph(this->HTMLResponse, F("WiFi Configuration"));
             this->UI->addSelectFormItemOpen(this->HTMLResponse, FPSTR(HTML_UI_FORM_INPUT_COMMON_0), F(""));
 
@@ -158,7 +165,7 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
     else
     {
 
-        /** Formatting HTTP Request for File Explorere */
+        /** Formatting HTTP Request for File Explorer */
         if (this->Server->HTTPRequest->siteId == ESPAPP_HTTP_SITE_FILE_EXPLORER)
         {
 
@@ -187,32 +194,19 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
 
         this->UI->startNavigationBlock(this->HTMLResponse);
 
+        /** Generating site MENU */
         if (this->UI->showMenu())
         {
 
-            this->UI->startNavigationList(this->HTMLResponse, F("Menu"), FPSTR(HTML_UI_ICON_RIGHTWARDS_ARROW));
-
-            this->UI->setUrlParams(urlParams, 1);
-            this->UI->addNavigationItem(this->HTMLResponse, F("Index"), urlParams, "", FPSTR(HTML_UI_NO_ICON));
-
-            this->UI->setUrlParams(urlParams, ESPAPP_HTTP_SITE_FIRMWARE_COMMAND);
-            this->UI->addNavigationItem(this->HTMLResponse, F("Actions"), urlParams, "", FPSTR(HTML_UI_NO_ICON));
-
-            this->UI->setUrlParams(urlParams, ESPAPP_HTTP_SITE_SYSTEM_PARAMETERS);
-            this->UI->addNavigationItem(this->HTMLResponse, F("System"), urlParams, "", FPSTR(HTML_UI_ICON_ARROW));
-
-            this->UI->setUrlParams(urlParams, ESPAPP_HTTP_SITE_FILE_EXPLORER);
-            this->UI->addNavigationItem(this->HTMLResponse, F("Explorer"), urlParams, "", FPSTR(HTML_UI_ICON_DISK));
-
-            this->UI->setUrlParams(urlParams, ESPAPP_HTTP_SITE_TOPOGRAPHY, 1, 1, 1);
-            this->UI->addNavigationItem(this->HTMLResponse, F("Topography"), urlParams, "", FPSTR(HTML_UI_ICON_RIGHTWARDS_ARROW));
-
-            // External Link
-            this->UI->addNavigationItemExternal(this->HTMLResponse, F("SmartnyDom"), F("https://www.smartnydom.pl"), FPSTR(HTML_UI_ICON_ARROW));
-            this->UI->endNavigationList(this->HTMLResponse);
+#ifdef ESPAPP_CUSTOM_HTML_SITES_GENERATOR
+            this->CustomSiteGenerator->addMenu(this->HTMLResponse);
+#else
+            this->addMenu(this->HTMLResponse);
+#endif
         }
 
         this->UI->endNavigationBlock(this->HTMLResponse);
+
         //** Body */
         this->UI->startBodySection(this->HTMLResponse);
 
@@ -327,11 +321,10 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
             this->UI->addParagraph(this->HTMLResponse, F("If you are not redirected to the main page, please click <a href=\"/\">here</a>"));
             this->UI->closeSection(this->HTMLResponse);
 
-            this->UI->setRefresh(this->HTMLResponse, 10, (PGM_P)F("/"));
+            this->UI->setRefresh(this->HTMLResponse, 10, (PGM_P)FPSTR(HTML_UI_SLASH_CHAR));
             this->setHTTPResponseCode(ESPAPP_HTTP_RESPONSE_CODE_OK);
 
             this->System->setConnectionMode((ESPAPP_NETWORK_CONNECTION_MODE)this->Server->HTTPRequest->action);
-
             this->System->Events->triggerEvent(EVENT_REBOOT);
             success = true;
             break;
@@ -376,13 +369,14 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
             success = true;
             break;
         }
+#ifndef ESPAPP_CUSTOM_HTML_SITES_GENERATOR
         case ESPAPP_HTTP_SITE_TOPOGRAPHY:
         {
 
-            this->UI->setUrlParams(urlParams, 1, ESPAPP_HTTP_SITE_TOPOGRAPHY);
+            this->UI->setUrlParams(this->urlParams, 1, ESPAPP_HTTP_SITE_TOPOGRAPHY);
 
             this->UI->openSection(this->HTMLResponse, F("UI Topography"), F("This is an example of UI elements"));
-            this->UI->startForm(this->HTMLResponse, urlParams, (PGM_P)FPSTR(HTML_UI_EMPTY_STRING));
+            this->UI->startForm(this->HTMLResponse, this->urlParams, (PGM_P)FPSTR(HTML_UI_EMPTY_STRING));
 
             this->UI->addInputFormItem(this->HTMLResponse, FPSTR(HTML_UI_INPUT_TYPE_TEXT), F("text1"), "Text filed: Simple", "Text");
             this->UI->addInputFormItem(this->HTMLResponse, FPSTR(HTML_UI_INPUT_TYPE_TEXT), F("text2"), "Text filed: Min", "Min 1 char", "30", "1");
@@ -446,9 +440,20 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
             success = true;
             break;
         }
+#endif
         default:
         {
+
+#ifdef ESPAPP_CUSTOM_HTML_SITES_GENERATOR
+            success = this->CustomSiteGenerator->processHTTPRequest(this->HTMLResponse);
+            if (!success)
+            {
+                this->siteNotFound(this->HTMLResponse);
+            }
+#else
             this->siteNotFound(this->HTMLResponse);
+#endif
+
             success = true;
             break;
         }
@@ -463,20 +468,23 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
         this->UI->embedJSFiles(this->HTMLResponse, jsFiles, 1);
     }
 
-    /** Set site global parametrs */
-    this->UI->setLang(this->HTMLResponse, F("pl"));
-    this->UI->setLogo(this->HTMLResponse, F("https://s.smartnydom.pl/i/esp32-firmware"));
-    this->UI->setLang(this->HTMLResponse, F("pl"));
-    this->UI->setLogo(this->HTMLResponse, F("https://s.smartnydom.pl/i/esp32-firmware"));
-    this->UI->setSubtitle1(this->HTMLResponse, F("ESPAPP"));
-    this->UI->setSubtitle2(this->HTMLResponse, F("Version: 4.0.0"));
-    this->UI->setURL(this->HTMLResponse, F("https://www.smartnydom.pl"));
-    this->UI->setLogoURL(this->HTMLResponse, F("https://s.smartnydom.pl/i/SD00-0000-0001"));
+/** Set site global parametrs */
+#ifdef ESPAPP_CUSTOM_HTML_SITES_GENERATOR
+    this->CustomSiteGenerator->setSiteGlobalAttributes(this->HTMLResponse);
+#else
+    this->setSiteGlobalAttributes(this->HTMLResponse);
+#endif
 
-    this->UI->setVersion(this->HTMLResponse, F("Build: 1000"));
+    this->UI->setLang(this->HTMLResponse, F("pl"));
+    this->UI->setVersion(this->HTMLResponse, F("1.0.0"));
+    this->UI->setWANAccess(this->HTMLResponse, 1); // @TODO not implemented yet
 
     /** Site closure  */
     this->UI->siteEnd(this->HTMLResponse);
+
+#ifdef ESPAPP_CUSTOM_HTML_SITES_GENERATOR
+    this->CustomSiteGenerator->clearOrphantTags(this->HTMLResponse);
+#endif
 
 #ifdef DEBUG
     this->System->Msg->printBulletPoint(F("Site generated"));
@@ -513,9 +521,41 @@ void ESPAPP_HTML_SitesGenerator::configureSite(void)
 void ESPAPP_HTML_SitesGenerator::siteNotFound(String *site)
 {
     this->UI->openSection(site, F("Error: 404"), F("Site not found"));
-    this->UI->addParagraph(site, F("Site not found"));
+    this->UI->addParagraph(site, F("OMG you are lost!"), true);
+    this->UI->addParagraph(site, F("Please go back to the main page"), true);    
     this->UI->closeSection(site);
     this->setHTTPResponseCode(ESPAPP_HTTP_RESPONSE_CODE_NOT_FOUND);
+}
+
+#ifndef ESPAPP_CUSTOM_HTML_SITES_GENERATOR
+
+void ESPAPP_HTML_SitesGenerator::addMenu(String *site)
+{
+    /** Generate sample menu for the site */
+    this->UI->startNavigationList(this->HTMLResponse, F("Menu"), FPSTR(HTML_UI_ICON_RIGHTWARDS_ARROW));
+    this->UI->setUrlParams(this->urlParams, 1);
+    this->UI->addNavigationItem(this->HTMLResponse, F("Index"), this->urlParams, "", FPSTR(HTML_UI_NO_ICON));
+    this->UI->setUrlParams(this->urlParams, ESPAPP_HTTP_SITE_FIRMWARE_COMMAND);
+    this->UI->addNavigationItem(this->HTMLResponse, F("Actions"), this->urlParams, "", FPSTR(HTML_UI_NO_ICON));
+    this->UI->setUrlParams(this->urlParams, ESPAPP_HTTP_SITE_SYSTEM_PARAMETERS);
+    this->UI->addNavigationItem(this->HTMLResponse, F("System"), this->urlParams, "", FPSTR(HTML_UI_ICON_ARROW));
+    this->UI->setUrlParams(this->urlParams, ESPAPP_HTTP_SITE_FILE_EXPLORER);
+    this->UI->addNavigationItem(this->HTMLResponse, F("Explorer"), this->urlParams, "", FPSTR(HTML_UI_ICON_DISK));
+    this->UI->setUrlParams(this->urlParams, ESPAPP_HTTP_SITE_TOPOGRAPHY, 1, 1, 1);
+    this->UI->addNavigationItem(this->HTMLResponse, F("Topography"), this->urlParams, "", FPSTR(HTML_UI_ICON_RIGHTWARDS_ARROW));
+    // External Link
+    this->UI->addNavigationItemExternal(this->HTMLResponse, F("SmartnyDom"), F("https://www.smartnydom.pl"), FPSTR(HTML_UI_ICON_ARROW));
+    this->UI->endNavigationList(this->HTMLResponse);
+}
+
+void ESPAPP_HTML_SitesGenerator::setSiteGlobalAttributes(String *site)
+{
+    this->UI->setLogo(this->HTMLResponse, F("https://s.smartnydom.pl/i/esp32-firmware"));
+    this->UI->setLogo(this->HTMLResponse, F("https://s.smartnydom.pl/i/esp32-firmware"));
+    this->UI->setSubtitle1(this->HTMLResponse, F("ESPAPP"));
+    this->UI->setSubtitle2(this->HTMLResponse, F("Version: 4.0.0"));
+    this->UI->setURL(this->HTMLResponse, F("https://www.smartnydom.pl"));
+    this->UI->setLogoURL(this->HTMLResponse, F("https://s.smartnydom.pl/i/SD00-0000-0001"));
 }
 
 #endif
