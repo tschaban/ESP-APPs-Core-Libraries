@@ -15,47 +15,61 @@
 <body>
     <div id="layout"><a href="#menu" id="menuLink" class="menu-link"><span></span></a>
         <div id="menu">
-            <header><img src="https://s.smartnydom.pl/i/esp32-firmware" alt="ESP Device"><small>ESPAPP<br>Version:
-                    4.0.0<br>Build: 1000</small></header>
-            <div class="pure-menu"><a class="pure-menu-heading" href="#Menu">&#10150; Menu</a>
+            <header><img src="https://s.smartnydom.pl/i/esp32-firmware" alt="ESP Device"><small>NxtBike
+                    Computer<br>Version: 2.0.0<br>1.0.0</small></header>
+            <div class="pure-menu"><a class="pure-menu-heading" href="#Index">&#10150; Index</a>
                 <ul class="pure-menu-list">
-                    <li class="pure-menu-item"><a href="/?site=1&" class="pure-menu-link">Index</a></li>
-                    <li class="pure-menu-item"><a href="/?site=100&" class="pure-menu-link">Actions</a></li>
-                    <li class="pure-menu-item"><a href="/?site=102&" class="pure-menu-link">&#8227; System</a></li>
-                    <li class="pure-menu-item"><a href="/?site=110&" class="pure-menu-link">&#128190; Explorer</a></li>
-                    <li class="pure-menu-item"><a href="/?site=254&cmd=1&action=1&option=1&"
-                            class="pure-menu-link">&#10150; Topography</a></li>
-                    <li class="pure-menu-item"><a href="https://www.smartnydom.pl" class="pure-menu-link">&#8227;
-                            SmartnyDom</a></li>
+                    <li class="pure-menu-item"><a href="/?" class="pure-menu-link">Main</a></li>
+                    <li class="pure-menu-item"><a href="/?site=110&" class="pure-menu-link">&#128190; Files explorer</a>
+                    </li>
+                    <li class="pure-menu-item"><a href="/?site=100&" class="pure-menu-link">&#8227; Commands</a></li>
+                    <li class="pure-menu-item"><a href="/?site=102&" class="pure-menu-link">&#8227; Firmware</a></li>
                 </ul>
             </div>
         </div>
         <div id="main" class="c">
-            <header style="text-align: right;">Connection to WAN: Yes | Free Heap: Heap: 122kb | Firmware: 1.0.0 | Restart</header>
+            <header class="h">WAN: Yes | Free Mem: 211kB | Firmware: 1.0.0 | <a
+                    href="/?site=101&cmd=10&action=2">Restart</a></header>
             <div>
-                <h1 class="cs"></h1>
+                <h1 class="cs">Files explorer</h1>
                 <section class="s">
                     <header>
-                        <h2 class="st"></h2>
+                        <h2 class="st">Files list</h2>
                     </header>
                     <div class="sc">
-                        <ul class="lst">
-                            <li class="m">Firmware initialized successfully.
-                            </li>
-                            <li class="m">Firmware version: 1.0.0
-                            </li>
-                        </ul>
+                        <table class="pure-table pure-table-horizontal">
+                            <thead>
+                                <tr>
+                                    <th>File name</th>
+                                    <th>Size</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><a class="folder" href="/?site=110&p1=/">/</a></td>
+                                    <td>0 files</td>
+                                    <td>
+                                        <form action="/?site=110" method="POST"><input type="hidden" name="d"
+                                                value="/"><button disabled="disabled" name="a" value="4"
+                                                class="button-red pure-button" type="submit">Delete</button></form>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </section>
             </div>
             <div>
-                <h1 class="cs">Error: 404</h1>
+                <h1 class="cs">Upload file</h1>
                 <section class="s">
                     <header>
-                        <h2 class="st">Site not found</h2>
+                        <h2 class="st">Upload file to the current folder</h2>
                     </header>
                     <div class="sc">
-                        <p>Site not found</p>
+                        <form action="/upload?site=110" method="POST" enctype="multipart/form-data"><input type="file"
+                                name="f"><input type="hidden" name="d" value="srv"><button name="a" value="0"
+                                class="button-green pure-button" type="submit">Upload</button></form>
                     </div>
                 </section>
             </div>

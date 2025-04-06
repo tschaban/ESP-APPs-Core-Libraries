@@ -7,6 +7,18 @@
 const char HTML_UI_EMPTY_STRING[] PROGMEM = "";
 const char HTML_UI_SLASH_CHAR[] PROGMEM = "/";
 
+/** CSS & JS Files
+ * Warn: Max length of css (css_core) and js (js_menu) files is used by HTML_UI
+ */
+
+const char css_core[] PROGMEM =   "pm.css.gz";
+const char css_custom[] PROGMEM = "pcm.css.gz";
+const char css_layout[] PROGMEM = "lm.css";
+const char *const HTML_UI_CSS[] PROGMEM = {css_core,css_custom,css_layout};
+
+const char js_menu[] PROGMEM = "rmm.js.gz";
+const char *const HTML_UI_JS[] PROGMEM = {js_menu};
+
 /** Form input: types */
 const char HTML_UI_INPUT_TYPE_NUMBER[] PROGMEM = "number";
 const char HTML_UI_INPUT_TYPE_TEXT[] PROGMEM = "text";
@@ -43,10 +55,13 @@ const char HTML_UI_TAG_HINT[] PROGMEM = "{{h}}";
 #define HTML_UI_TAG_FREE_HEAP "{{f.h}}"
 #define HTML_UI_TAG_FIRMWARE_VERSION "{{f.v}}"
 #define HTML_UI_TAG_WAN_YES_NO "{{f.w}}"
+#define HTML_UI_TAG_CSS "{{s.c}}"
+#define HTML_UI_TAG_JS "{{s.js}}"
+
 
 /** HTML TAGS templates */
-const char HTML_UI_SITE_CSS_FILE_TAG[] PROGMEM = "<link rel=\"stylesheet\" href=\"{{v}}\">";
-const char HTML_UI_SITE_JS_FILE_TAG[] PROGMEM = "<script src=\"{{v}}\"></script>";
+const char HTML_UI_SITE_CSS_FILE_TAG[] PROGMEM = "<link rel=\"stylesheet\" href=\"/css?name={{v}}\">";
+const char HTML_UI_SITE_JS_FILE_TAG[] PROGMEM = "<script src=\"/js?name={{v}}\"></script>";
 const char HTML_UI_SITE_URL_TAG[] PROGMEM = "<a href=\"{{v}}\">{{t}}</a>";
 const char HTML_UI_SITE_REFRESH_TAG[] PROGMEM = "<meta http-equiv=\"refresh\" content=\"{{v}};URL='{{t}}'\">";
 
@@ -59,10 +74,13 @@ const char HTML_UI_ICON_DISK[] PROGMEM ="&#128190; ";
 /* Sites structure */
 
 const char HTML_UI_SITE_HEADER_LIGHT[] PROGMEM =
-    "<!DOCTYPE html><html><head><title>{{s.title}}</title><style>body{display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0;font-family:sans-serif;background-color:#777}form{border:1px solid #000;background-color:#fefefe;padding:2em;text-align:center}select,input,button{width:300px;margin-bottom:.8em;padding:.4em}form *{box-sizing:border-box}label{display:block;text-align:left;width:auto}</style></head><body><div><div>";
+    "<!DOCTYPE html><html><head><title>{{s.title}}</title>{{s.c}}</head><body><div><div>";
 
+const char HTML_UI_SITE_LIGHT_CSS[] PROGMEM = "<style>body{display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0;font-family:sans-serif;background-color:#777}form{border:1px solid #000;background-color:#fefefe;padding:2em;text-align:center}select,input,button{width:300px;margin-bottom:.8em;padding:.4em}form *{box-sizing:border-box}label{display:block;text-align:left;width:auto}</style>";    
+
+    
 const char HTML_UI_SITE_HEADER[] PROGMEM =
-    "<!doctype html><html lang=\"{{s.lang}}\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><link href=\"https://fonts.googleapis.com/css2?family=Titillium+Web&display=swap\" rel=\"stylesheet\"><title>{{s.title}}</title>{{s.refresh}}{{s.css}}{{s.js}}</head><body><div id=\"layout\">";
+    "<!doctype html><html lang=\"{{s.lang}}\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><link href=\"https://fonts.googleapis.com/css2?family=Titillium+Web&display=swap\" rel=\"stylesheet\"><title>{{s.title}}</title>{{s.refresh}}{{s.c}}{{s.js}}</head><body><div id=\"layout\">";
 
 const char HTML_UI_SITE_BODY_START[] PROGMEM = "<div id=\"main\" class=\"c\"><header class=\"h\">WAN: {{f.w}} | Free Mem: {{f.h}} | Firmware: {{f.v}} | <a href=\"/?site=101&cmd=10&action=2\">Restart</a></header>";
 

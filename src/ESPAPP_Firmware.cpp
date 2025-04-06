@@ -200,6 +200,8 @@ void ESPAPP_Firmware::handleDownloadUIComponentsEvent(void *data)
                                           Instalator->install("http://files.smartnydom.pl/espapp/config/ui-configuration.json", stats);
                                           delete Instalator;
 
+                                          this->System->Events->removeEventListeners(EVENT_CUSTOM_START + 2);
+
 
                                         });
 

@@ -2,13 +2,17 @@
 #define _ESPAPP_HTML_UI_H_
 
 #include <ESPAPP_Core.h>
-#include <ESPAPP_HTML_UI_Assests.h>
+#include <ESPAPP_HTML_UI_Assets.h>
 
 class ESPAPP_HTML_UI
 {
 private:
     ESPAPP_Core *System;
     bool isMenuSet = true;
+
+    String cssLinks;
+    String jsLinks;
+    
 
     void clearOrphantTags(String *site);
     void replaceTagTitle(String *item, const __FlashStringHelper *title);
@@ -42,9 +46,9 @@ public:
     void removeMenu(void);
     bool showMenu(void);
     void setTitle(String *site, const __FlashStringHelper *title);
-    void setStyle(String *site, const __FlashStringHelper *css);
-    void embedCSSFiles(String *site, const char *cssFiles[], size_t count);
-    void embedJSFiles(String *site, const char *jsFiles[], size_t count);
+    void setStyle(String *site, const __FlashStringHelper *css); // @TODO is this used?
+    void embedCSSFiles(String *site);
+    void embedJSFiles(String *site);
     void setLogo(String *site, const __FlashStringHelper *logo);
     void setSubtitle1(String *site, const __FlashStringHelper *subtitle1);
     void setSubtitle2(String *site, const __FlashStringHelper *subtitle2);

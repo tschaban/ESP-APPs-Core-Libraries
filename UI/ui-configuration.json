@@ -8,20 +8,20 @@
       "targetFolder": "/srv",
       "files": [
         {
-          "name": "responsive-menu-min.js.gz",
-          "target": "responsive-menu-min.js.gz"
+          "name": "rmm.js.gz",
+          "target": "rmm.js.gz"
         },
         {
-          "name": "pure-min.css.gz",
-          "target": "pure-min.css.gz"
+          "name": "pm.css.gz",
+          "target": "pm.css.gz"
         },
         {
-          "name": "pure-custom.css",
-          "target": "pure-custom.css"
+          "name": "pcm.css.gz",
+          "target": "pcm.css.gz"
         },
         {
-          "name": "layout-v2.css",
-          "target": "layout-v2.css"
+          "name": "lm.css",
+          "target": "lm.css"
         }
       ]
     }

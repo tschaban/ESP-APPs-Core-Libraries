@@ -3,6 +3,8 @@
 ESPAPP_HTML_UI::ESPAPP_HTML_UI(ESPAPP_Core *_System)
 {
     System = _System;
+    cssLinks.reserve((sizeof(HTML_UI_CSS) / sizeof(HTML_UI_CSS[0])) * (strlen_P(HTML_UI_SITE_CSS_FILE_TAG) - 5 + strlen_P(css_core) + 1)); // max 3 CSS files * 5 = {{v}} + max length of css_core + 1 = null terminator
+    jsLinks.reserve((sizeof(HTML_UI_JS) / sizeof(HTML_UI_JS[0])) * (strlen_P(HTML_UI_SITE_JS_FILE_TAG) - 5 + strlen_P(js_menu) + 1)); // max 3 JS files * 5 = {{v}} + max length of js_menu + 1 = null terminator
 }
 
 ESPAPP_HTML_UI::~ESPAPP_HTML_UI()
@@ -105,28 +107,29 @@ void ESPAPP_HTML_UI::setWANAccess(String *site, boolean access)
     site->replace(F(HTML_UI_TAG_WAN_YES_NO), (access ? F("Yes") : F("No")));
 }
 
-void ESPAPP_HTML_UI::embedCSSFiles(String *site, const char *cssFiles[], size_t count)
-{
-    String cssLinks;
-    for (size_t i = 0; i < count; i++)
+void ESPAPP_HTML_UI::embedCSSFiles(String *site)
+{        
+    for (uint8_t i = 0; i < sizeof(HTML_UI_CSS) / sizeof(HTML_UI_CSS[0]); i++)
     {
-        String cssTag = FPSTR(HTML_UI_SITE_CSS_FILE_TAG);
-        this->replaceTagValue(&cssTag, cssFiles[i]);
-        cssLinks += cssTag;
+        this->cssLinks.concat(FPSTR(HTML_UI_SITE_CSS_FILE_TAG));
+        this->replaceTagValue(&this->cssLinks, (char *)pgm_read_dword(&(HTML_UI_CSS[i])));
     }
-    site->replace(F("{{s.css}}"), cssLinks);
+
+    site->replace(F(HTML_UI_TAG_CSS), this->cssLinks);
+    this->cssLinks.clear();
 }
 
-void ESPAPP_HTML_UI::embedJSFiles(String *site, const char *jsFiles[], size_t count)
-{
-    String jsLinks;
-    for (size_t i = 0; i < count; i++)
+void ESPAPP_HTML_UI::embedJSFiles(String *site)
+{ 
+    for (uint8_t i = 0; i < sizeof(HTML_UI_JS) / sizeof(HTML_UI_JS[0]); i++)
     {
-        String jsTag = FPSTR(HTML_UI_SITE_JS_FILE_TAG);
-        this->replaceTagValue(&jsTag, jsFiles[i]);
-        jsLinks += jsTag;
+        this->jsLinks.concat(FPSTR(HTML_UI_SITE_JS_FILE_TAG));
+        this->replaceTagValue(&this->jsLinks, (char *)pgm_read_dword(&(HTML_UI_JS[i])));
     }
-    site->replace(F("{{s.js}}"), jsLinks);
+
+    site->replace(F(HTML_UI_TAG_JS), this->jsLinks);
+    this->jsLinks.clear();
+ 
 }
 
 void ESPAPP_HTML_UI::clearOrphantTags(String *site)
@@ -134,8 +137,8 @@ void ESPAPP_HTML_UI::clearOrphantTags(String *site)
     site->replace(F("{{s.lang}}"), F("en"));
     site->replace(F("{{s.refresh}}"), FPSTR(HTML_UI_EMPTY_STRING));
     site->replace(F("{{s.title}}"), F(ESPAPP_DEFAULT_DEVICE_NAME));
-    site->replace(F("{{s.css}}"), FPSTR(HTML_UI_EMPTY_STRING));
-    site->replace(F("{{s.js}}"), FPSTR(HTML_UI_EMPTY_STRING));
+    site->replace(F(HTML_UI_TAG_CSS), FPSTR(HTML_UI_EMPTY_STRING));
+    site->replace(F(HTML_UI_TAG_JS), FPSTR(HTML_UI_EMPTY_STRING));
     site->replace(F("{{f.logo}}"), FPSTR(HTML_UI_EMPTY_STRING));
     site->replace(F("{{f.subtitle-1}}"), FPSTR(HTML_UI_EMPTY_STRING));
     site->replace(F("{{f.subtitle-2}}"), FPSTR(HTML_UI_EMPTY_STRING));

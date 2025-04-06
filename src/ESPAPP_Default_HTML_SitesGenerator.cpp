@@ -460,12 +460,8 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
         }
 
         /** Setting CSS and JS Files  */
-        const char *cssFiles[] = {
-            "/css?name=pure-min.css.gz", "/css?name=layout-v2.css", "/css?name=pure-custom.css"};
-        const char *jsFiles[] = {
-            "/js?name=responsive-menu-min.js.gz"};
-        this->UI->embedCSSFiles(this->HTMLResponse, cssFiles, 3);
-        this->UI->embedJSFiles(this->HTMLResponse, jsFiles, 1);
+        this->UI->embedCSSFiles(this->HTMLResponse);
+        this->UI->embedJSFiles(this->HTMLResponse);
     }
 
 /** Set site global parametrs */
