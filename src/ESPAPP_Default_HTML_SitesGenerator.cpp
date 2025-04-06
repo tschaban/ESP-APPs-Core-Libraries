@@ -83,7 +83,7 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
         case ESPAPP_HTTP_SITE_REBOOT:
         {
 
-            NETWORK *configuration = new NETWORK;
+            ESPAPP_NETWORK *configuration = new ESPAPP_NETWORK;
             success = this->System->File->read(configuration);
             char _redirectLink[ESPAPP_DEVICE_ID_LENGTH + 13]; // + http://.local
 
@@ -92,20 +92,20 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
 
                 if (this->Server->HTTPServer->arg(FPSTR(HTML_UI_FORM_INPUT_COMMON_0)).length() > 0)
                 {
-                    this->Server->HTTPServer->arg(FPSTR(HTML_UI_FORM_INPUT_COMMON_0)).toCharArray(configuration->primary.ssid, sizeof(configuration->primary.ssid));
+                    this->Server->HTTPServer->arg(FPSTR(HTML_UI_FORM_INPUT_COMMON_0)).toCharArray(configuration->primary->ssid, sizeof(configuration->primary->ssid));
                 }
                 else
                 {
-                    configuration->primary.ssid[0] = ESPAPP_EMPTY_STRING_TERMINATED;
+                    configuration->primary->ssid[0] = ESPAPP_EMPTY_STRING_TERMINATED;
                 }
 
                 if (this->Server->HTTPServer->arg(FPSTR(HTML_UI_FORM_INPUT_COMMON_1)).length() > 0)
                 {
-                    this->Server->HTTPServer->arg(FPSTR(HTML_UI_FORM_INPUT_COMMON_1)).toCharArray(configuration->primary.password, sizeof(configuration->primary.password));
+                    this->Server->HTTPServer->arg(FPSTR(HTML_UI_FORM_INPUT_COMMON_1)).toCharArray(configuration->primary->password, sizeof(configuration->primary->password));
                 }
                 else
                 {
-                    configuration->primary.password[0] = ESPAPP_EMPTY_STRING_TERMINATED;
+                    configuration->primary->password[0] = ESPAPP_EMPTY_STRING_TERMINATED;
                 }
 
                 this->System->File->save(configuration);
@@ -215,6 +215,8 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
         this->UI->endNavigationBlock(this->HTMLResponse);
         //** Body */
         this->UI->startBodySection(this->HTMLResponse);
+
+        this->UI->showSavedMessages(this->HTMLResponse, F(""), F(""));
 
         switch (this->Server->HTTPRequest->siteId)
         {
@@ -478,6 +480,14 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
 
 #ifdef DEBUG
     this->System->Msg->printBulletPoint(F("Site generated"));
+    if (this->HTMLResponse->length() > ESPAPP_HTTP_HTML_MAX_RESPONSE_SIZE)
+    {
+        this->System->Msg->printError(F("Site too long"), F("HTTP response"));
+        this->System->Msg->printBulletPoint(F("Max size: "));
+        this->System->Msg->printValue(ESPAPP_HTTP_HTML_MAX_RESPONSE_SIZE);
+    }
+    this->System->Msg->printBulletPoint(F("Site size: "));
+    this->System->Msg->printValue(this->HTMLResponse->length());
 #endif
 
     return success;

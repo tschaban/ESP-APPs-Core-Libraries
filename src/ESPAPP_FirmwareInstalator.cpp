@@ -136,6 +136,9 @@ ESPAPP_INSTALL_STATUS ESPAPP_FirmwareInstalator::install(const char* configUrl, 
            
            if (status == DOWNLOAD_SUCCESS) {
                stats.downloadedFiles++;
+    
+            this->System->Message->addMessage(url);
+
 #ifdef DEBUG
                this->System->Msg->printInformation(F("File downloaded successfully"), F("INSTALLER"));
 #endif
@@ -175,6 +178,8 @@ ESPAPP_INSTALL_STATUS ESPAPP_FirmwareInstalator::install(const char* configUrl, 
    if (stats.failedFiles > 0) {
        return INSTALL_ERROR_FILE_DOWNLOAD;
    }
+
+   this->System->Message->addMessage("Firmware installation completed successfully");
    
    return INSTALL_SUCCESS;
 }

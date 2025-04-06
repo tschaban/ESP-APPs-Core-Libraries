@@ -234,8 +234,32 @@ void ESPAPP_HTML_UI::closeMessageSection(String *site)
     this->closeSection(site);
 }
 
-void ESPAPP_HTML_UI::addMessageItem(String *site, const char *item) {
+void ESPAPP_HTML_UI::addMessageItem(String *site, const char *item)
+{
     this->addListItem(site, item);
+}
+
+void ESPAPP_HTML_UI::showSavedMessages(String *site, const __FlashStringHelper *title,
+                                       const __FlashStringHelper *description)
+{
+    if (this->System->Message->newMessageAvailable())
+    {
+
+        this->openMessageSection(site, title, description);
+
+        char **messages;
+        uint8_t count = 0;
+
+        this->System->Message->getMessages(messages, count);
+        for (int i = 0; i < count; i++)
+        {
+            this->addMessageItem(site, messages[i]);
+            delete[] messages[i];
+        }
+        delete[] messages;
+
+        this->closeMessageSection(site);
+    }
 }
 
 /** Form */

@@ -111,7 +111,7 @@ public:
 
   bool init(void);
 
-  NETWORK *configuration = new NETWORK;
+  ESPAPP_NETWORK *configuration = new ESPAPP_NETWORK;
 
 #ifdef ESP32
   WiFiClass WirelessNetwork;

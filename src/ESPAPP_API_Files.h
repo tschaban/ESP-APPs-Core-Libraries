@@ -33,12 +33,14 @@ public:
 
   bool read(ESPAPP_NETWORK_CONNECTION_MODE *data);
   bool save(ESPAPP_NETWORK_CONNECTION_MODE *data);
- 
+
   bool read(ESPAPP_OPERATING_MODE *data);
   bool save(ESPAPP_OPERATING_MODE *data);
-  
+
   // Network configuration methods
-  bool read(NETWORK *data);
-  bool save(NETWORK *data);
+  bool read(ESPAPP_NETWORK *data);
+  bool save(ESPAPP_NETWORK *data);
+
+
 };
 #endif // _ESPAPP_API_FILES_h

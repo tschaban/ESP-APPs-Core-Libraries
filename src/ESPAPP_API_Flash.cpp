@@ -48,13 +48,30 @@ bool ESPAPP_API_Flash::saveJSON(const __FlashStringHelper *fileName, JsonDocumen
 {
   boolean success = false;
   File configFile;
+
   if (openFile(configFile, ESPAPP_OPEN_FILE_WRITING,
                fileName, ESPAPP_NONE, true))
   {
-    serializeJson(doc, configFile);
+
+    if (serializeJson(doc, configFile) != 0)
+    {
+      success = true;
+    }
+
     configFile.close();
-    success = true;
   }
+
+#ifdef DEBUG
+  if (success)
+  {
+    this->Msg->printInformation(F("JSON saved successfully"), F("JSON"));
+  }
+  else
+  {
+    this->Msg->printError(F("Failed to save JSON"), F("JSON"));
+  }
+#endif
+
   return success;
 }
 
@@ -488,4 +505,42 @@ bool ESPAPP_API_Flash::deleteFolder(const char *path)
     return fileSystem.rmdir(this->fileName);
   }
   return false;
+}
+
+bool ESPAPP_API_Flash::deleteAllFilesInDirectory(const __FlashStringHelper *directory)
+{
+#ifdef DEBUG
+  this->Msg->printBulletPoint(F("Deleting all files in directory: "));
+  this->Msg->printValue(directory);
+#endif
+  
+
+
+  File dir = fileSystem.open(directory);
+  if (!dir || !dir.isDirectory())
+  {
+#ifdef DEBUG
+    this->Msg->printError(F("Failed to open directory: "), F("FS"));
+    this->Msg->printValue(directory);
+#endif
+    return false;
+  }
+
+  char fileToDelete[ESPAPP_FILE_MAX_FILE_NAME_LENGTH];
+  dir.rewindDirectory();
+  File entry = dir.openNextFile();
+  
+  while (entry)
+  {
+    if (!entry.isDirectory())
+    {
+      sprintf(fileToDelete, entry.name());
+      entry.close();
+      this->deleteFile((PGM_P)directory, fileToDelete);       
+    }
+    entry = dir.openNextFile();
+  }
+
+  dir.close();
+  return true;
 }

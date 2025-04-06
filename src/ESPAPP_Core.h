@@ -6,6 +6,7 @@
 #include <ESPAPP_API_Files.h>
 #include <ESPAPP_EventManager.h>
 #include <ESPAPP_Time.h>
+#include <ESPAPP_Message.h>
 
 #ifdef ESP32 // @TODO it'll be better not having here WiFi it's just neede to make the DeviceId
 #include <WiFi.h>
@@ -41,9 +42,11 @@ public:
     ESPAPP_SerialMessages *Msg = new ESPAPP_SerialMessages();
     ESPAPP_API_Flash *Flash = new ESPAPP_API_Flash(Msg);
     ESPAPP_API_Files *File = new ESPAPP_API_Files(Flash, Msg);
+    ESPAPP_Message *Message = new ESPAPP_Message(Flash, Msg);
 #else
     ESPAPP_API_Flash *Flash = new ESPAPP_API_Flash();
     ESPAPP_API_Files *File = new ESPAPP_API_Files(Flash);
+    ESPAPP_Message *Message = new ESPAPP_Message(Flash);
 #endif
 
 #ifdef DEBUG

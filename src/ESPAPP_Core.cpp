@@ -30,6 +30,10 @@ bool ESPAPP_Core::init(void)
     }
 
     this->Time->init();
+    
+    /** Deleting all files from temporary files folder */
+    this->Flash->deleteAllFilesInDirectory(FPSTR(path_temp));
+    
   }
   return success;
 }

@@ -91,7 +91,13 @@ public:
 
     void closeMessageSection(String *site);
     void addMessageItem(String *site, const char *item);
+ 
+    /** Show saved messages */
+    void showSavedMessages(String *site, const __FlashStringHelper *title,
+        const __FlashStringHelper *description);
+     
 
+    /** List */
     void startList(String *site);
     void endList(String *site);
     void addListItem(String *site, const char *item);

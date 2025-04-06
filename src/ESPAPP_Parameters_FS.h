@@ -28,4 +28,9 @@ const char path_sys[] PROGMEM = "/sys";
 const char path_boot[] PROGMEM = "/boot";
 const char *const ESPAPP_DIRECTORIES[] PROGMEM = {path_boot, path_configuration, path_ui, path_sys, path_temp, path_data};
 
+/** Files */
+
+#define ESPAPP_SYS_FILE_MESSAGES "/sys/messages.txt"
+
+
 #endif // _ESPAPP_Parameters_FS_h

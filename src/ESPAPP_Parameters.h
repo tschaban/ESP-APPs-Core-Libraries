@@ -8,6 +8,7 @@
 #define ESPAPP_NONE 255
 #define ESPAPP_EMPTY_STRING ""
 #define ESPAPP_EMPTY_STRING_TERMINATED '\0'
+#define ESPAPP_NEW_LINE '\n'
 #define ESPAPP_DEFAULT_DEVICE_NAME "ESP Device"
 #define ESPAPP_DEVICE_ID_PREFIX "espapp-"
 #define ESPAPP_DEVICE_ID_SUFIX ".local"
@@ -90,7 +91,7 @@ enum ESPAPP_NETWORK_CONNECTION_MODE
 
 /* Data structures */
 
-struct NETWORK_SETTING
+struct ESPAPP_NETWORK_SETTING
 {
   char ssid[33];
   char password[33];
@@ -102,10 +103,11 @@ struct NETWORK_SETTING
   char dns2[16];    // = ESPAPP_NETWORK_DEFAULT_DNS2;
 };
 
-struct NETWORK
+struct ESPAPP_NETWORK
 {
-  NETWORK_SETTING primary;
-  NETWORK_SETTING secondary;
+  ESPAPP_NETWORK_SETTING *primary = new ESPAPP_NETWORK_SETTING;
+  ESPAPP_NETWORK_SETTING *secondary = new ESPAPP_NETWORK_SETTING;
+  uint8_t connectionMode; // = ESPAPP_NETWORK_DEFAULT_CONNECTION_MODE;
   uint16_t connectionTimeout;       // = ESPAPP_NETWORK_DEFAULT_CONNECTION_TIMEOUT;
   uint16_t sleepTimeout;            // = ESPAPP_NETWORK_DEFAULT_SLEEP_TIMEOUT;
   uint8_t failuresToSwitch; // = ESPAPP_NETWORK_DEFAULT_SWITCH_NETWORK_AFTER; 
@@ -117,7 +119,7 @@ struct NETWORK
 };
 
 // Simple time structure with AM/PM indication
-struct TIME_INFO {
+struct ESPAPP_TIME_INFO {
   uint8_t hour;      // 1-12
   uint8_t minute;    // 0-59
   uint8_t second;    // 0-59
@@ -129,7 +131,7 @@ struct TIME_INFO {
 };
 
 // Time configuration structure
-struct TIME_CONFIG {
+struct ESPAPP_TIME_CONFIG {
   char timezone[32] = ESPAPP_TIME_DEFAULT_TIMEZONE;
   char primaryNTP[64] = ESPAPP_TIME_DEFAULT_PRIMARY_NTP;
   char secondaryNTP[64] = ESPAPP_TIME_DEFAULT_SECONDARY_NTP;

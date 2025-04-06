@@ -15,7 +15,7 @@ class ESPAPP_HTML_SitesGenerator
 private:
   ESPAPP_Core *System;
   ESPAPP_HTML_UI *UI;
-  String *HTMLResponse = new String();
+  String *HTMLResponse;
   ESPAPP_HTTPServer *Server;
   void setHTTPResponseCode(int responseCode = ESPAPP_HTTP_RESPONSE_CODE_OK);
   void configureSite(void);

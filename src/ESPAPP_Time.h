@@ -20,12 +20,12 @@ private:
     ESPAPP_SerialMessages *Msg;
 #endif
 
-    TIME_CONFIG *configuration = new TIME_CONFIG;
+ESPAPP_TIME_CONFIG *configuration = new ESPAPP_TIME_CONFIG;
 
     bool timeSynchronized = false;
     unsigned long lastSyncMillis = 0;
 
-    void formatTimeInfo(TIME_INFO *timeInfo, struct tm *timeDetails);
+    void formatTimeInfo(ESPAPP_TIME_INFO *timeInfo, struct tm *timeDetails);
     bool readConfiguration(void);
     bool createDefaultConfiguration(void);
 
@@ -36,7 +36,7 @@ public:
     ESPAPP_Time(ESPAPP_API_Flash *_Flash);
 #endif
 
-    TIME_INFO *lastTimeInfo = new TIME_INFO;
+ESPAPP_TIME_INFO *lastTimeInfo = new ESPAPP_TIME_INFO;
 
     bool init(void);
 
@@ -51,13 +51,13 @@ public:
     bool autoSynchronize(void);
 
     // Time retrieval methods
-    void getCurrentTime(TIME_INFO *timeInfo);
+    void getCurrentTime(ESPAPP_TIME_INFO *timeInfo);
     void getCurrentTimeFormatted(char *buffer, size_t bufferSize, const char *format = "%Y-%m-%d %H:%M:%S");
 
     // Utility methods
     bool isTimeValid();
     uint32_t getEpochTime();
-    void printTimeInfo(TIME_INFO *timeInfo);
+    void printTimeInfo(ESPAPP_TIME_INFO *timeInfo);
 
     // Save configuration
     bool saveConfiguration();

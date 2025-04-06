@@ -252,7 +252,7 @@ bool ESPAPP_Time::synchronize()
     return success;
 }
 
-void ESPAPP_Time::getCurrentTime(TIME_INFO *timeInfo)
+void ESPAPP_Time::getCurrentTime(ESPAPP_TIME_INFO *timeInfo)
 {
     time_t now = time(nullptr);
 
@@ -274,7 +274,7 @@ void ESPAPP_Time::getCurrentTime(TIME_INFO *timeInfo)
     formatTimeInfo(timeInfo, &timeDetails);
 }
 
-void ESPAPP_Time::formatTimeInfo(TIME_INFO *timeInfo, struct tm *timeDetails)
+void ESPAPP_Time::formatTimeInfo(ESPAPP_TIME_INFO *timeInfo, struct tm *timeDetails)
 {
     timeInfo->year = timeDetails->tm_year + 1900;
     timeInfo->month = timeDetails->tm_mon + 1;
@@ -331,7 +331,7 @@ uint32_t ESPAPP_Time::getEpochTime() {
     return (uint32_t)time(nullptr);
 }
 
-void ESPAPP_Time::printTimeInfo(TIME_INFO* timeInfo) {
+void ESPAPP_Time::printTimeInfo(ESPAPP_TIME_INFO* timeInfo) {
     if (!timeInfo->isValid) {
 #ifdef DEBUG
         this->Msg->printWarning(F("Time not synchronized yet"), F("TIME"));

@@ -44,10 +44,10 @@ bool ESPAPP_WirelessConnection::init(void)
     this->System->Msg->printInformation(F("Secondary WiFi configuration exist: "), F("WIFI"));
 #endif
 
-    if (strlen(this->configuration->secondary.ssid) > 0 &&
-        strcmp(this->configuration->secondary.ssid,
+    if (strlen(this->configuration->secondary->ssid) > 0 &&
+        strcmp(this->configuration->secondary->ssid,
                ESPAPP_NETWORK_DEFAULT_NONE_SSID) != 0 &&
-        strlen(this->configuration->secondary.password) > 0)
+        strlen(this->configuration->secondary->password) > 0)
     {
       this->isBackupConfigurationSet = true;
     }
@@ -147,48 +147,48 @@ void ESPAPP_WirelessConnection::switchConfiguration()
    * @brief Setting Fixed IP for Primary Configuration if set
    *
    */
-  if (this->isPrimaryConfiguration && !this->configuration->primary.isDHCP)
+  if (this->isPrimaryConfiguration && !this->configuration->primary->isDHCP)
   {
 
     IPAddress dns1;
-    if (!dns1.fromString(this->configuration->primary.dns1))
+    if (!dns1.fromString(this->configuration->primary->dns1))
     {
 #ifdef DEBUG
       this->System->Msg->printError(F("Problem with DNS1: "), F("WIFI"));
-      this->System->Msg->printValue(this->configuration->primary.dns1);
+      this->System->Msg->printValue(this->configuration->primary->dns1);
 #endif
     }
     IPAddress dns2;
-    if (!dns2.fromString(this->configuration->primary.dns2))
+    if (!dns2.fromString(this->configuration->primary->dns2))
     {
 #ifdef DEBUG
       this->System->Msg->printError(F("Problem with DNS2: "), F("WIFI"));
-      this->System->Msg->printValue(this->configuration->primary.dns2);
+      this->System->Msg->printValue(this->configuration->primary->dns2);
 #endif
     }
 
     IPAddress ip;
-    if (!ip.fromString(this->configuration->primary.ip))
+    if (!ip.fromString(this->configuration->primary->ip))
     {
 #ifdef DEBUG
       this->System->Msg->printError(F("Problem with WIFI IP: "), F("WIFI"));
-      this->System->Msg->printValue(this->configuration->primary.ip);
+      this->System->Msg->printValue(this->configuration->primary->ip);
 #endif
     }
     IPAddress gateway;
-    if (!gateway.fromString(this->configuration->primary.gateway))
+    if (!gateway.fromString(this->configuration->primary->gateway))
     {
 #ifdef DEBUG
       this->System->Msg->printError(F("Problem with WIFI gateway: "), F("WIFI"));
-      this->System->Msg->printValue(this->configuration->primary.gateway);
+      this->System->Msg->printValue(this->configuration->primary->gateway);
 #endif
     }
     IPAddress subnet;
-    if (!subnet.fromString(this->configuration->primary.subnet))
+    if (!subnet.fromString(this->configuration->primary->subnet))
     {
 #ifdef DEBUG
       this->System->Msg->printError(F("Problem with WIFI subnet: "), F("WIFI"));
-      this->System->Msg->printValue(this->configuration->primary.subnet);
+      this->System->Msg->printValue(this->configuration->primary->subnet);
 #endif
     }
 
@@ -204,8 +204,8 @@ void ESPAPP_WirelessConnection::switchConfiguration()
    *
    */
 
-  else if ((this->isPrimaryConfiguration && this->configuration->primary.isDHCP) ||
-           (!this->isPrimaryConfiguration && this->configuration->secondary.isDHCP))
+  else if ((this->isPrimaryConfiguration && this->configuration->primary->isDHCP) ||
+           (!this->isPrimaryConfiguration && this->configuration->secondary->isDHCP))
   {
     this->WirelessNetwork.config((uint32_t)0x00000000, (uint32_t)0x00000000, (uint32_t)0x00000000);
   }
@@ -214,53 +214,53 @@ void ESPAPP_WirelessConnection::switchConfiguration()
    * @brief Setting fixed IP for backup WiFi configurations
    *
    */
-  else if (!this->isPrimaryConfiguration && !this->configuration->secondary.isDHCP)
+  else if (!this->isPrimaryConfiguration && !this->configuration->secondary->isDHCP)
   {
 #ifdef DEBUG
     this->System->Msg->printInformation(F("Setting fixed IP ("), F("WIFI"));
-    this->System->Msg->printValue(this->configuration->secondary.ip);
+    this->System->Msg->printValue(this->configuration->secondary->ip);
     this->System->Msg->printValue(F(") address for backup WiFi configuration"));
 #endif
 
     IPAddress dns1;
-    if (!dns1.fromString(this->configuration->secondary.dns1))
+    if (!dns1.fromString(this->configuration->secondary->dns1))
     {
 #ifdef DEBUG
       this->System->Msg->printError(F("Problem with WIFI DNS1: "), F("WIFI"));
-      this->System->Msg->printValue(this->configuration->secondary.dns1);
+      this->System->Msg->printValue(this->configuration->secondary->dns1);
 #endif
     }
     IPAddress dns2;
-    if (!dns2.fromString(this->configuration->secondary.dns2))
+    if (!dns2.fromString(this->configuration->secondary->dns2))
     {
 #ifdef DEBUG
       this->System->Msg->printError(F("Problem with WIFI DNS2: "), F("WIFI"));
-      this->System->Msg->printValue(this->configuration->secondary.dns2);
+      this->System->Msg->printValue(this->configuration->secondary->dns2);
 #endif
     }
 
     IPAddress ip;
-    if (!ip.fromString(this->configuration->secondary.ip))
+    if (!ip.fromString(this->configuration->secondary->ip))
     {
 #ifdef DEBUG
       this->System->Msg->printError(F("Problem with WIFI IP: "), F("WIFI"));
-      this->System->Msg->printValue(this->configuration->secondary.ip);
+      this->System->Msg->printValue(this->configuration->secondary->ip);
 #endif
     }
     IPAddress gateway;
-    if (!gateway.fromString(this->configuration->secondary.gateway))
+    if (!gateway.fromString(this->configuration->secondary->gateway))
     {
 #ifdef DEBUG
       this->System->Msg->printError(F("Problem with WIFI gateway: "), F("WIFI"));
-      this->System->Msg->printValue(this->configuration->secondary.gateway);
+      this->System->Msg->printValue(this->configuration->secondary->gateway);
 #endif
     }
     IPAddress subnet;
-    if (!subnet.fromString(this->configuration->secondary.subnet))
+    if (!subnet.fromString(this->configuration->secondary->subnet))
     {
 #ifdef DEBUG
       this->System->Msg->printError(F("Problem with WIFI subnet: "), F("WIFI"));
-      this->System->Msg->printValue(this->configuration->secondary.subnet);
+      this->System->Msg->printValue(this->configuration->secondary->subnet);
 #endif
     }
 
@@ -346,7 +346,7 @@ void ESPAPP_WirelessConnection::listener()
       this->scecondsTimer = this->delayStartTime;
       if (this->connections == 0)
       {
-        if (strlen(this->configuration->primary.ssid) == 0 || strlen(this->configuration->primary.password) == 0)
+        if (strlen(this->configuration->primary->ssid) == 0 || strlen(this->configuration->primary->password) == 0)
         {
 #ifdef DEBUG
           this->System->Msg->printError(F("WiFi not configured, switching to Hotspot mode"), F("WIFI"));
@@ -358,20 +358,20 @@ void ESPAPP_WirelessConnection::listener()
 
         if (this->isPrimaryConfiguration)
         {
-          this->WirelessNetwork.begin(this->configuration->primary.ssid, this->configuration->primary.password);
+          this->WirelessNetwork.begin(this->configuration->primary->ssid, this->configuration->primary->password);
 #ifdef DEBUG
           this->System->Msg->printBulletPoint(F("Attempting connection to primary network"));
           this->System->Msg->printBulletPoint(F("SSID: "));
-          this->System->Msg->printValue(this->configuration->primary.ssid);
+          this->System->Msg->printValue(this->configuration->primary->ssid);
 #endif
         }
         else
         {
-          this->WirelessNetwork.begin(this->configuration->secondary.ssid, this->configuration->secondary.password);
+          this->WirelessNetwork.begin(this->configuration->secondary->ssid, this->configuration->secondary->password);
 #ifdef DEBUG
           this->System->Msg->printBulletPoint(F("Attempting connection to secondary network"));
           this->System->Msg->printBulletPoint(F("SSID: "));
-          this->System->Msg->printValue(this->configuration->secondary.ssid);
+          this->System->Msg->printValue(this->configuration->secondary->ssid);
 #endif
         }
       }

@@ -12,6 +12,7 @@ bool ESPAPP_Firmware::init(void)
 
   if (success)
   {
+        
     /** Initialize event listeners */
     this->initializeEventListeners();
 
@@ -27,6 +28,10 @@ bool ESPAPP_Firmware::init(void)
       success = this->Web->init();
     }
   }
+  
+  this->System->Message->addMessage(F("Firmware initialized successfully."));
+  this->System->Message->addMessage(F("Firmware version: 1.0.0")); // Example version, replace with actual version
+
   return success;
 }
 

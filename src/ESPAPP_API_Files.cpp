@@ -5,11 +5,15 @@ ESPAPP_API_Files::ESPAPP_API_Files(ESPAPP_API_Flash *_Flash, ESPAPP_SerialMessag
 {
   this->Msg = _Msg;
   this->Flash = _Flash;
+
+
 }
 #else
 ESPAPP_API_Files::ESPAPP_API_Files(ESPAPP_API_Flash *_Flash)
 {
   this->Flash = _Flash;
+  /** Deleting all files from temporary files folder */
+  this->Flash->deleteAllFilesInDirectory(FPSTR(path_temp));
 }
 #endif
 
@@ -28,7 +32,7 @@ bool ESPAPP_API_Files::read(ESPAPP_NETWORK_CONNECTION_MODE *data)
 
   if (success)
   {
-    *data = doc["mode"] | ESPAPP_NETWORK_CONNECTION_MODE::ACCESS_POINT; 
+    *data = doc["mode"] | ESPAPP_NETWORK_CONNECTION_MODE::ACCESS_POINT;
 
 #ifdef DEBUG
     this->Msg->printBulletPoint(F("Connection mode: "));
@@ -72,33 +76,33 @@ bool ESPAPP_API_Files::read(ESPAPP_OPERATING_MODE *data)
 {
   bool success = false;
 
-  #ifdef DEBUG
-    this->Msg->printInformation(F("Reading Operating mode configuration"), F("API-FILE"));
-  #endif
-  
-    StaticJsonDocument<256> doc;
-    success = this->Flash->getJSON(F("/boot/mode.json"), doc);
-  
-    if (success)
-    {
-      *data = doc["mode"] | ESPAPP_OPERATING_MODE::FIRST_TIME_BOOT;
-  
-  #ifdef DEBUG
-      this->Msg->printBulletPoint(F("Operating mode: "));
-      this->Msg->printValue(*data);
-  #endif
-    }
-    else
-    {
-      success = this->createDefaultOperatingModeConfiguration();
-    }
-  
-    return success;
+#ifdef DEBUG
+  this->Msg->printInformation(F("Reading Operating mode configuration"), F("API-FILE"));
+#endif
+
+  StaticJsonDocument<256> doc;
+  success = this->Flash->getJSON(F("/boot/mode.json"), doc);
+
+  if (success)
+  {
+    *data = doc["mode"] | ESPAPP_OPERATING_MODE::FIRST_TIME_BOOT;
+
+#ifdef DEBUG
+    this->Msg->printBulletPoint(F("Operating mode: "));
+    this->Msg->printValue(*data);
+#endif
+  }
+  else
+  {
+    success = this->createDefaultOperatingModeConfiguration();
+  }
+
+  return success;
 }
 
 bool ESPAPP_API_Files::save(ESPAPP_OPERATING_MODE *data)
 {
-  #ifdef DEBUG
+#ifdef DEBUG
   this->Msg->printInformation(F("Saving Operating mode configuration: "), F("API-FILE"));
   this->Msg->printValue(*data);
 #endif
@@ -117,11 +121,10 @@ bool ESPAPP_API_Files::createDefaultOperatingModeConfiguration()
   bool success = save(config);
   delete config;
   return success;
-
 }
 
 /** File: network.json */
-bool ESPAPP_API_Files::read(NETWORK *data)
+bool ESPAPP_API_Files::read(ESPAPP_NETWORK *data)
 {
   bool success = false;
 
@@ -135,24 +138,24 @@ bool ESPAPP_API_Files::read(NETWORK *data)
   if (success)
   {
     // Primary network
-    strlcpy(data->primary.ssid, doc["primary"]["ssid"] | ESPAPP_NETWORK_DEFAULT_NONE_SSID, sizeof(data->primary.ssid));
-    strlcpy(data->primary.password, doc["primary"]["password"] | "", sizeof(data->primary.password));
-    data->primary.isDHCP = doc["primary"]["isDHCP"] | ESPAPP_NETWORK_DEFAULT_DHCP;
-    strlcpy(data->primary.ip, doc["primary"]["ip"] | "", sizeof(data->primary.ip));
-    strlcpy(data->primary.gateway, doc["primary"]["gateway"] | ESPAPP_NETWORK_DEFAULT_GATEWAY, sizeof(data->primary.gateway));
-    strlcpy(data->primary.subnet, doc["primary"]["subnet"] | ESPAPP_NETWORK_DEFAULT_SUBNET, sizeof(data->primary.subnet));
-    strlcpy(data->primary.dns1, doc["primary"]["dns1"] | ESPAPP_NETWORK_DEFAULT_DNS1, sizeof(data->primary.dns1));
-    strlcpy(data->primary.dns2, doc["primary"]["dns2"] | ESPAPP_NETWORK_DEFAULT_DNS2, sizeof(data->primary.dns2));
+    strlcpy(data->primary->ssid, doc["primary"]["ssid"] | ESPAPP_NETWORK_DEFAULT_NONE_SSID, sizeof(data->primary->ssid));
+    strlcpy(data->primary->password, doc["primary"]["password"] | "", sizeof(data->primary->password));
+    data->primary->isDHCP = doc["primary"]["isDHCP"] | ESPAPP_NETWORK_DEFAULT_DHCP;
+    strlcpy(data->primary->ip, doc["primary"]["ip"] | "", sizeof(data->primary->ip));
+    strlcpy(data->primary->gateway, doc["primary"]["gateway"] | ESPAPP_NETWORK_DEFAULT_GATEWAY, sizeof(data->primary->gateway));
+    strlcpy(data->primary->subnet, doc["primary"]["subnet"] | ESPAPP_NETWORK_DEFAULT_SUBNET, sizeof(data->primary->subnet));
+    strlcpy(data->primary->dns1, doc["primary"]["dns1"] | ESPAPP_NETWORK_DEFAULT_DNS1, sizeof(data->primary->dns1));
+    strlcpy(data->primary->dns2, doc["primary"]["dns2"] | ESPAPP_NETWORK_DEFAULT_DNS2, sizeof(data->primary->dns2));
 
     // Secondary network
-    strlcpy(data->secondary.ssid, doc["secondary"]["ssid"] | ESPAPP_NETWORK_DEFAULT_NONE_SSID, sizeof(data->secondary.ssid));
-    strlcpy(data->secondary.password, doc["secondary"]["password"] | "", sizeof(data->secondary.password));
-    data->secondary.isDHCP = doc["secondary"]["isDHCP"] | ESPAPP_NETWORK_DEFAULT_DHCP;
-    strlcpy(data->secondary.ip, doc["secondary"]["ip"] | "", sizeof(data->secondary.ip));
-    strlcpy(data->secondary.gateway, doc["secondary"]["gateway"] | ESPAPP_NETWORK_DEFAULT_GATEWAY, sizeof(data->secondary.gateway));
-    strlcpy(data->secondary.subnet, doc["secondary"]["subnet"] | ESPAPP_NETWORK_DEFAULT_SUBNET, sizeof(data->secondary.subnet));
-    strlcpy(data->secondary.dns1, doc["secondary"]["dns1"] | ESPAPP_NETWORK_DEFAULT_DNS1, sizeof(data->secondary.dns1));
-    strlcpy(data->secondary.dns2, doc["secondary"]["dns2"] | ESPAPP_NETWORK_DEFAULT_DNS2, sizeof(data->secondary.dns2));
+    strlcpy(data->secondary->ssid, doc["secondary"]["ssid"] | ESPAPP_NETWORK_DEFAULT_NONE_SSID, sizeof(data->secondary->ssid));
+    strlcpy(data->secondary->password, doc["secondary"]["password"] | "", sizeof(data->secondary->password));
+    data->secondary->isDHCP = doc["secondary"]["isDHCP"] | ESPAPP_NETWORK_DEFAULT_DHCP;
+    strlcpy(data->secondary->ip, doc["secondary"]["ip"] | "", sizeof(data->secondary->ip));
+    strlcpy(data->secondary->gateway, doc["secondary"]["gateway"] | ESPAPP_NETWORK_DEFAULT_GATEWAY, sizeof(data->secondary->gateway));
+    strlcpy(data->secondary->subnet, doc["secondary"]["subnet"] | ESPAPP_NETWORK_DEFAULT_SUBNET, sizeof(data->secondary->subnet));
+    strlcpy(data->secondary->dns1, doc["secondary"]["dns1"] | ESPAPP_NETWORK_DEFAULT_DNS1, sizeof(data->secondary->dns1));
+    strlcpy(data->secondary->dns2, doc["secondary"]["dns2"] | ESPAPP_NETWORK_DEFAULT_DNS2, sizeof(data->secondary->dns2));
 
     // General settings
     data->connectionTimeout = doc["connectionTimeout"] | ESPAPP_NETWORK_DEFAULT_CONNECTION_TIMEOUT;
@@ -180,35 +183,35 @@ bool ESPAPP_API_Files::read(NETWORK *data)
   return success;
 }
 
-bool ESPAPP_API_Files::save(NETWORK *data)
+bool ESPAPP_API_Files::save(ESPAPP_NETWORK *data)
 {
 #ifdef DEBUG
   this->Msg->printInformation(F("Saving network configuration"), F("API-FILE"));
 #endif
-  
+
   StaticJsonDocument<1024> doc;
 
   // Primary network
   JsonObject primary = doc.createNestedObject("primary");
-  primary["ssid"] = data->primary.ssid;
-  primary["password"] = data->primary.password;
-  primary["isDHCP"] = data->primary.isDHCP;
-  primary["ip"] = data->primary.ip;
-  primary["gateway"] = data->primary.gateway;
-  primary["subnet"] = data->primary.subnet;
-  primary["dns1"] = data->primary.dns1;
-  primary["dns2"] = data->primary.dns2;
+  primary["ssid"] = data->primary->ssid;
+  primary["password"] = data->primary->password;
+  primary["isDHCP"] = data->primary->isDHCP;
+  primary["ip"] = data->primary->ip;
+  primary["gateway"] = data->primary->gateway;
+  primary["subnet"] = data->primary->subnet;
+  primary["dns1"] = data->primary->dns1;
+  primary["dns2"] = data->primary->dns2;
 
   // Secondary network
   JsonObject secondary = doc.createNestedObject("secondary");
-  secondary["ssid"] = data->secondary.ssid;
-  secondary["password"] = data->secondary.password;
-  secondary["isDHCP"] = data->secondary.isDHCP;
-  secondary["ip"] = data->secondary.ip;
-  secondary["gateway"] = data->secondary.gateway;
-  secondary["subnet"] = data->secondary.subnet;
-  secondary["dns1"] = data->secondary.dns1;
-  secondary["dns2"] = data->secondary.dns2;
+  secondary["ssid"] = data->secondary->ssid;
+  secondary["password"] = data->secondary->password;
+  secondary["isDHCP"] = data->secondary->isDHCP;
+  secondary["ip"] = data->secondary->ip;
+  secondary["gateway"] = data->secondary->gateway;
+  secondary["subnet"] = data->secondary->subnet;
+  secondary["dns1"] = data->secondary->dns1;
+  secondary["dns2"] = data->secondary->dns2;
 
   // General settings
   doc["connectionTimeout"] = data->connectionTimeout;
@@ -230,28 +233,28 @@ bool ESPAPP_API_Files::createDefaultNetworkConfiguration(void)
   this->Msg->printInformation(F("Creating default network configuration"), F("API-FILE"));
 #endif
 
-  NETWORK *config = new NETWORK();
-  
+  ESPAPP_NETWORK *config = new ESPAPP_NETWORK();
+
   // Primary network defaults
-  strlcpy(config->primary.ssid, ESPAPP_NETWORK_DEFAULT_NONE_SSID, sizeof(config->primary.ssid));
-  config->primary.password[0] = ESPAPP_EMPTY_STRING_TERMINATED;
-    
-  config->primary.isDHCP = ESPAPP_NETWORK_DEFAULT_DHCP;
-  config->primary.ip[0] = ESPAPP_EMPTY_STRING_TERMINATED;
-  strlcpy(config->primary.gateway, ESPAPP_NETWORK_DEFAULT_GATEWAY, sizeof(config->primary.gateway));
-  strlcpy(config->primary.subnet, ESPAPP_NETWORK_DEFAULT_SUBNET, sizeof(config->primary.subnet));
-  strlcpy(config->primary.dns1, ESPAPP_NETWORK_DEFAULT_DNS1, sizeof(config->primary.dns1));
-  strlcpy(config->primary.dns2, ESPAPP_NETWORK_DEFAULT_DNS2, sizeof(config->primary.dns2));
+  strlcpy(config->primary->ssid, ESPAPP_NETWORK_DEFAULT_NONE_SSID, sizeof(config->primary->ssid));
+  config->primary->password[0] = ESPAPP_EMPTY_STRING_TERMINATED;
+
+  config->primary->isDHCP = ESPAPP_NETWORK_DEFAULT_DHCP;
+  config->primary->ip[0] = ESPAPP_EMPTY_STRING_TERMINATED;
+  strlcpy(config->primary->gateway, ESPAPP_NETWORK_DEFAULT_GATEWAY, sizeof(config->primary->gateway));
+  strlcpy(config->primary->subnet, ESPAPP_NETWORK_DEFAULT_SUBNET, sizeof(config->primary->subnet));
+  strlcpy(config->primary->dns1, ESPAPP_NETWORK_DEFAULT_DNS1, sizeof(config->primary->dns1));
+  strlcpy(config->primary->dns2, ESPAPP_NETWORK_DEFAULT_DNS2, sizeof(config->primary->dns2));
 
   // Secondary network defaults
-  strlcpy(config->secondary.ssid, ESPAPP_NETWORK_DEFAULT_NONE_SSID, sizeof(config->secondary.ssid));
-  config->secondary.password[0] = ESPAPP_EMPTY_STRING_TERMINATED;
-  config->secondary.isDHCP = ESPAPP_NETWORK_DEFAULT_DHCP;
-  config->secondary.ip[0] = ESPAPP_EMPTY_STRING_TERMINATED;
-  strlcpy(config->secondary.gateway, ESPAPP_NETWORK_DEFAULT_GATEWAY, sizeof(config->secondary.gateway));
-  strlcpy(config->secondary.subnet, ESPAPP_NETWORK_DEFAULT_SUBNET, sizeof(config->secondary.subnet));
-  strlcpy(config->secondary.dns1, ESPAPP_NETWORK_DEFAULT_DNS1, sizeof(config->secondary.dns1));
-  strlcpy(config->secondary.dns2, ESPAPP_NETWORK_DEFAULT_DNS2, sizeof(config->secondary.dns2));
+  strlcpy(config->secondary->ssid, ESPAPP_NETWORK_DEFAULT_NONE_SSID, sizeof(config->secondary->ssid));
+  config->secondary->password[0] = ESPAPP_EMPTY_STRING_TERMINATED;
+  config->secondary->isDHCP = ESPAPP_NETWORK_DEFAULT_DHCP;
+  config->secondary->ip[0] = ESPAPP_EMPTY_STRING_TERMINATED;
+  strlcpy(config->secondary->gateway, ESPAPP_NETWORK_DEFAULT_GATEWAY, sizeof(config->secondary->gateway));
+  strlcpy(config->secondary->subnet, ESPAPP_NETWORK_DEFAULT_SUBNET, sizeof(config->secondary->subnet));
+  strlcpy(config->secondary->dns1, ESPAPP_NETWORK_DEFAULT_DNS1, sizeof(config->secondary->dns1));
+  strlcpy(config->secondary->dns2, ESPAPP_NETWORK_DEFAULT_DNS2, sizeof(config->secondary->dns2));
 
   // General network settings
   config->connectionTimeout = ESPAPP_NETWORK_DEFAULT_CONNECTION_TIMEOUT;
