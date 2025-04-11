@@ -76,7 +76,9 @@ const char HTML_UI_ICON_DISK[] PROGMEM ="&#128190; ";
 const char HTML_UI_SITE_HEADER_LIGHT[] PROGMEM =
     "<!DOCTYPE html><html><head><title>{{s.title}}</title>{{s.c}}</head><body><div><div>";
 
-const char HTML_UI_SITE_LIGHT_CSS[] PROGMEM = "<style>body{display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0;font-family:sans-serif;background-color:#777}form{border:1px solid #000;background-color:#fefefe;padding:2em;text-align:center}select,input,button{width:300px;margin-bottom:.8em;padding:.4em}form *{box-sizing:border-box}label{display:block;text-align:left;width:auto}</style>";    
+//const char HTML_UI_SITE_LIGHT_CSS[] PROGMEM = "<style>body{display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0;font-family:sans-serif;background-color:#777}form{border:1px solid #000;background-color:#fefefe;padding:2em;text-align:center}select,input,button{width:300px;margin-bottom:.8em;padding:.4em}form *{box-sizing:border-box}label{display:block;text-align:left;width:auto}</style>";    
+const char HTML_UI_SITE_LIGHT_CSS[] PROGMEM = "<style>body{font-family:sans-serif;margin:0;background:#eee}#layout{max-width:960px;margin:1em auto;padding:1em;background:#f;border:1px solid #c}td a,a{text-decoration:none}#menu{margin-bottom:1em}#menu header{background:#ddd;padding:.5em;margin-bottom:.5em}#menu header img{display:block;max-width:100px;margin-bottom:.4em}#menu header small{font-size:.8em;color:#3;display:block}.pure-menu-heading{font-weight:700;margin-bottom:.5em}.pure-menu-list{display:flex;list-style:none;padding:0;margin:.5em 0 0;flex-wrap:wrap}.pure-menu-item{margin-right:1em;margin-bottom:.5em}.pure-menu-link{padding:.2em 0}.h{font-size:.8em;color:#6;text-align:right;margin-bottom:1em}h1.cs{margin-top:1.5em;margin-bottom:.2em;font-size:1.2em;border-bottom:1px solid #eee;padding-bottom:.1em}h1.cs+section.s{margin-top:.2em}h2.st{margin-top:0;font-size:.9em;font-weight:400;color:#6}</style>";    
+
 
     
 const char HTML_UI_SITE_HEADER[] PROGMEM =
