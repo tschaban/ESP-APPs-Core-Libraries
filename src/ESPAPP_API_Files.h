@@ -23,6 +23,10 @@ private:
   bool createDefaultConnectionModeConfiguration(void);
   bool createDefaultOperatingModeConfiguration(void);
   bool createDefaultNetworkConfiguration(void);
+  
+#ifdef ESPAPP_HARDWARE_ACS758_INCLUDED
+  bool createDefaultACS758Configuration(void);
+#endif
 
 public:
 #ifdef DEBUG
@@ -41,6 +45,12 @@ public:
   bool read(ESPAPP_NETWORK *data);
   bool save(ESPAPP_NETWORK *data);
 
+#ifdef ESPAPP_HARDWARE_ACS758_INCLUDED
+  // ACS758 current sensor configuration methods
+  bool read(ACS758_CONFIG *data);
+  bool save(ACS758_CONFIG *data);
+  bool resetToDefault(ACS758_CONFIG *data);
+#endif
 
 };
 #endif // _ESPAPP_API_FILES_h

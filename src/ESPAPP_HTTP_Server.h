@@ -24,6 +24,7 @@ private:
     std::vector<uint8_t> fileBuffer;
     bool fileExededSize = false;
     bool fileUploadSuccess = false;
+    
 
 public:
     ESPAPP_HTTPServer(ESPAPP_Core *_System);

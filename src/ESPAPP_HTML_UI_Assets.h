@@ -58,7 +58,6 @@ const char HTML_UI_TAG_HINT[] PROGMEM = "{{h}}";
 #define HTML_UI_TAG_CSS "{{s.c}}"
 #define HTML_UI_TAG_JS "{{s.js}}"
 
-
 /** HTML TAGS templates */
 const char HTML_UI_SITE_CSS_FILE_TAG[] PROGMEM = "<link rel=\"stylesheet\" href=\"/css?name={{v}}\">";
 const char HTML_UI_SITE_JS_FILE_TAG[] PROGMEM = "<script src=\"/js?name={{v}}\"></script>";
@@ -76,9 +75,10 @@ const char HTML_UI_ICON_DISK[] PROGMEM ="&#128190; ";
 const char HTML_UI_SITE_HEADER_LIGHT[] PROGMEM =
     "<!DOCTYPE html><html><head><title>{{s.title}}</title>{{s.c}}</head><body><div><div>";
 
-//const char HTML_UI_SITE_LIGHT_CSS[] PROGMEM = "<style>body{display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0;font-family:sans-serif;background-color:#777}form{border:1px solid #000;background-color:#fefefe;padding:2em;text-align:center}select,input,button{width:300px;margin-bottom:.8em;padding:.4em}form *{box-sizing:border-box}label{display:block;text-align:left;width:auto}</style>";    
-const char HTML_UI_SITE_LIGHT_CSS[] PROGMEM = "<style>body{font-family:sans-serif;margin:0;background:#eee}#layout{max-width:960px;margin:1em auto;padding:1em;background:#f;border:1px solid #c}td a,a{text-decoration:none}#menu{margin-bottom:1em}#menu header{background:#ddd;padding:.5em;margin-bottom:.5em}#menu header img{display:block;max-width:100px;margin-bottom:.4em}#menu header small{font-size:.8em;color:#3;display:block}.pure-menu-heading{font-weight:700;margin-bottom:.5em}.pure-menu-list{display:flex;list-style:none;padding:0;margin:.5em 0 0;flex-wrap:wrap}.pure-menu-item{margin-right:1em;margin-bottom:.5em}.pure-menu-link{padding:.2em 0}.h{font-size:.8em;color:#6;text-align:right;margin-bottom:1em}h1.cs{margin-top:1.5em;margin-bottom:.2em;font-size:1.2em;border-bottom:1px solid #eee;padding-bottom:.1em}h1.cs+section.s{margin-top:.2em}h2.st{margin-top:0;font-size:.9em;font-weight:400;color:#6}</style>";    
-
+//const char HTML_UI_SITE_LIGHT_CSS[] PROGMEM = "<style>body{display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0;font-family:sans-serif;background-color:#777}form{border:1px solid #000;background-color:#fefefe;padding:2em;text-align:center}select,input,button{width:300px;margin-bottom:.8em;padding:.4em}form *{box-sizing:border-box}label{display:block;text-align:left;width:auto}</style>";
+const char HTML_UI_SITE_LIGHT_CSS[] PROGMEM = "";
+//"<style>body{font-family:sans-serif;margin:0;background:#eee}#layout{max-width:960px;margin:1em auto;padding:1em;background:#f;border:1px solid #c}td a,a{text-decoration:none}#menu{margin-bottom:1em}#menu header{background:#ddd;padding:.5em;margin-bottom:.5em}#menu header img{display:block;max-width:100px;margin-bottom:.4em}#menu header small{font-size:.8em;color:#3;display:block}.pure-menu-heading{font-weight:700;margin-bottom:.5em}.pure-menu-list{display:flex;list-style:none;padding:0;margin:.5em 0 0;flex-wrap:wrap}.pure-menu-item{margin-right:1em;margin-bottom:.5em}.pure-menu-link{padding:.2em 0}.h{font-size:.8em;color:#6;text-align:right;margin-bottom:1em}h1.cs{margin-top:1.5em;margin-bottom:.2em;font-size:1.2em;border-bottom:1px solid #eee;padding-bottom:.1em}h1.cs+section.s{margin-top:.2em}h2.st{margin-top:0;font-size:.9em;font-weight:400;color:#6}</style>";
+// body{font-family:sans-serif;margin:0;padding:.5em}a{text-decoration:none;color:#007bff}h1,h2{margin:.5em 0 .3em}label{display:block;margin-bottom:.2em}h1.cs{border-bottom:1px solid #c;padding-bottom:0;margin-bottom:.1em}h2.st{margin-top:.1em}
 
     
 const char HTML_UI_SITE_HEADER[] PROGMEM =
@@ -86,9 +86,7 @@ const char HTML_UI_SITE_HEADER[] PROGMEM =
 
 const char HTML_UI_SITE_BODY_START[] PROGMEM = "<div id=\"main\" class=\"c\"><header class=\"h\">WAN: {{f.w}} | Free Mem: {{f.h}} | Firmware: {{f.v}} | <a href=\"/?site=101&cmd=10&action=2\">Restart</a></header>";
 
-
 const char HTML_UI_SITE_FOOTER[] PROGMEM = "</div></div></body></html>";
-
 
 /** Navigation Block */
 const char HTML_UI_SITE_MENU_BLOCK_START[] PROGMEM = "<a href=\"#menu\" id=\"menuLink\" class=\"menu-link\"><span></span></a><div id=\"menu\"><header><img src=\"{{f.logo}}\" alt=\"{{s.title}}\"><small>{{f.subtitle-1}}<br>{{f.subtitle-2}}<br>{{f.v}}</small></header>";
@@ -127,7 +125,6 @@ const char HTML_UI_FORM_ITEM_INPUT_HINT_RANGE_TEXT[] PROGMEM = "(Range: {{l}} - 
 const char HTML_UI_FORM_ITEM_INPUT_HINT_MIN_NUMBER[] PROGMEM = "(Min: {{v}})";
 const char HTML_UI_FORM_ITEM_INPUT_HINT_MAX_NUMBER[] PROGMEM = "(Max: {{v}})";
 const char HTML_UI_FORM_ITEM_INPUT_HINT_RANGE_NUMBER[] PROGMEM = "(Range: {{l}} - {{m}})";
-
 
 /** Form: Radiobutton and Checkbox */
 const char HTML_UI_FORM_ITEM_CHECK_OR_RADIO_BOX[] PROGMEM =

@@ -9,6 +9,7 @@ class ESPAPP_HTML_UI
 private:
     ESPAPP_Core *System;
     bool isMenuSet = true;
+    bool largeCSS = false; // Default to using small CSS until we verify files exist
 
     String cssLinks;
     String jsLinks;
@@ -46,7 +47,6 @@ public:
     void removeMenu(void);
     bool showMenu(void);
     void setTitle(String *site, const __FlashStringHelper *title);
-    void setStyle(String *site, const __FlashStringHelper *css); // @TODO is this used?
     void embedCSSFiles(String *site);
     void embedJSFiles(String *site);
     void setLogo(String *site, const __FlashStringHelper *logo);
@@ -149,6 +149,8 @@ public:
 
     void addParagraph(String *item, const __FlashStringHelper *text, bool indented = false);
     void addParagraph(String *item, const char *text, bool indented = false);
+
+
 };
 
 #endif

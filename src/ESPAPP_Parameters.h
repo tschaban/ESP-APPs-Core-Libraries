@@ -81,7 +81,6 @@ enum ESPAPP_NETWORK_CONNECTION_MODE
 #define ESPAPP_TIME_DEFAULT_SYNC_INTERVAL 60 // 1 hour
 #define ESPAPP_TIME_DEFAULT_SYNC_TIMEOUT 10000 // 10 seconds
 
-
 /* HTTP Server */
 #include <ESPAPP_Parameters_HTTP_Server.h>
 
@@ -89,8 +88,9 @@ enum ESPAPP_NETWORK_CONNECTION_MODE
 #include <ESPAPP_Parameters_FS.h>
 
 /* Events */
-//#include <ESPAPP_Parameters_Events.h>
+#include <ESPAPP_Parameters_Events.h>
 
+#include <ESPAPP_Parameters_Hardware.h>
 /* Data structures */
 
 struct ESPAPP_NETWORK_SETTING

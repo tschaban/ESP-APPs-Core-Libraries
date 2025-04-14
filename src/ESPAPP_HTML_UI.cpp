@@ -2,9 +2,17 @@
 
 ESPAPP_HTML_UI::ESPAPP_HTML_UI(ESPAPP_Core *_System)
 {
+#ifdef DEBUG
+    this->System->Msg->printInformation(F("Initializing HTML UI"), F("HTML UI"));
+#endif
     System = _System;
     cssLinks.reserve((sizeof(HTML_UI_CSS) / sizeof(HTML_UI_CSS[0])) * (strlen_P(HTML_UI_SITE_CSS_FILE_TAG) - 5 + strlen_P(css_core) + 1)); // max 3 CSS files * 5 = {{v}} + max length of css_core + 1 = null terminator
-    jsLinks.reserve((sizeof(HTML_UI_JS) / sizeof(HTML_UI_JS[0])) * (strlen_P(HTML_UI_SITE_JS_FILE_TAG) - 5 + strlen_P(js_menu) + 1)); // max 3 JS files * 5 = {{v}} + max length of js_menu + 1 = null terminator
+    jsLinks.reserve((sizeof(HTML_UI_JS) / sizeof(HTML_UI_JS[0])) * (strlen_P(HTML_UI_SITE_JS_FILE_TAG) - 5 + strlen_P(js_menu) + 1));      // max 3 JS files * 5 = {{v}} + max length of js_menu + 1 = null terminator
+
+
+#ifdef DEBUG
+    this->System->Msg->printBulletPoint(F("UI Initialized"));
+#endif
 }
 
 ESPAPP_HTML_UI::~ESPAPP_HTML_UI()
@@ -48,11 +56,6 @@ void ESPAPP_HTML_UI::setRefresh(String *site, uint8_t refresh, const char *url)
 void ESPAPP_HTML_UI::setTitle(String *site, const __FlashStringHelper *title)
 {
     site->replace(F("{{s.title}}"), title);
-}
-
-void ESPAPP_HTML_UI::setStyle(String *site, const __FlashStringHelper *css)
-{
-    site->replace(F("{{s.style}}"), css);
 }
 
 void ESPAPP_HTML_UI::setLogo(String *site, const __FlashStringHelper *logo)
@@ -108,7 +111,7 @@ void ESPAPP_HTML_UI::setWANAccess(String *site, boolean access)
 }
 
 void ESPAPP_HTML_UI::embedCSSFiles(String *site)
-{        
+{
     for (uint8_t i = 0; i < sizeof(HTML_UI_CSS) / sizeof(HTML_UI_CSS[0]); i++)
     {
         this->cssLinks.concat(FPSTR(HTML_UI_SITE_CSS_FILE_TAG));
@@ -120,7 +123,7 @@ void ESPAPP_HTML_UI::embedCSSFiles(String *site)
 }
 
 void ESPAPP_HTML_UI::embedJSFiles(String *site)
-{ 
+{
     for (uint8_t i = 0; i < sizeof(HTML_UI_JS) / sizeof(HTML_UI_JS[0]); i++)
     {
         this->jsLinks.concat(FPSTR(HTML_UI_SITE_JS_FILE_TAG));
@@ -129,7 +132,6 @@ void ESPAPP_HTML_UI::embedJSFiles(String *site)
 
     site->replace(F(HTML_UI_TAG_JS), this->jsLinks);
     this->jsLinks.clear();
- 
 }
 
 void ESPAPP_HTML_UI::clearOrphantTags(String *site)
@@ -137,6 +139,17 @@ void ESPAPP_HTML_UI::clearOrphantTags(String *site)
     site->replace(F("{{s.lang}}"), F("en"));
     site->replace(F("{{s.refresh}}"), FPSTR(HTML_UI_EMPTY_STRING));
     site->replace(F("{{s.title}}"), F(ESPAPP_DEFAULT_DEVICE_NAME));
+
+   // if (!this->isLargeCSS())
+   // {
+  //      site->replace(F(HTML_UI_TAG_CSS), FPSTR(HTML_UI_SITE_LIGHT_CSS));
+  //  }
+ //   else
+ //   {
+        this->embedCSSFiles(site);
+        this->embedJSFiles(site);
+//}
+
     site->replace(F(HTML_UI_TAG_CSS), FPSTR(HTML_UI_EMPTY_STRING));
     site->replace(F(HTML_UI_TAG_JS), FPSTR(HTML_UI_EMPTY_STRING));
     site->replace(F("{{f.logo}}"), FPSTR(HTML_UI_EMPTY_STRING));
@@ -586,7 +599,31 @@ void ESPAPP_HTML_UI::addFileExplorerUploadForm(String *site, const char *directo
     site->concat(FPSTR(HTML_UI_FILE_EXPLORER_UPLOAD_FORM));
     this->replaceTagValue(site, directory);
 }
+/*
+void ESPAPP_HTML_UI::checkCSSFilesExist()
+{
+#ifdef DEBUG
+    this->System->Msg->printBulletPoint(F("Checking if CSS Files are downloaded"));
+#endif
 
+    this->largeCSS = true;
+
+    for (uint8_t i = 0; i < sizeof(HTML_UI_CSS) / sizeof(HTML_UI_CSS[0]); i++)
+    {
+        sprintf(this->System->Flash->fileName, "%s%s%s", FPSTR(path_root), FPSTR(path_ui), (char *)pgm_read_dword(&(HTML_UI_CSS[i])));
+        if (!this->System->Flash->fileExist(this->System->Flash->fileName))
+        {
+            this->largeCSS = false;
+            break;
+        }
+    }
+
+#ifdef DEBUG
+    this->System->Msg->printBulletPoint(F("CSS Files exists : "));
+    this->System->Msg->printValue(this->largeCSS);
+#endif
+}
+*/
 /** Private */
 void ESPAPP_HTML_UI::replaceTagTitle(String *item, const __FlashStringHelper *title)
 {

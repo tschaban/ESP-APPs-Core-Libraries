@@ -5,8 +5,6 @@ ESPAPP_API_Files::ESPAPP_API_Files(ESPAPP_API_Flash *_Flash, ESPAPP_SerialMessag
 {
   this->Msg = _Msg;
   this->Flash = _Flash;
-
-
 }
 #else
 ESPAPP_API_Files::ESPAPP_API_Files(ESPAPP_API_Flash *_Flash)
@@ -271,3 +269,135 @@ bool ESPAPP_API_Files::createDefaultNetworkConfiguration(void)
   delete config;
   return result;
 }
+
+#ifdef ESPAPP_HARDWARE_ACS758_INCLUDED
+/** File: acs758.json */
+bool ESPAPP_API_Files::read(ACS758_CONFIG *data)
+{
+  bool success = false;
+
+#ifdef DEBUG
+  this->Msg->printInformation(F("Reading ACS758 sensor configuration"), F("API-FILE"));
+#endif
+
+  StaticJsonDocument<512> doc;
+  success = this->Flash->getJSON(F("/etc/acs758.json"), doc);
+
+  if (success)
+  {
+    data->sensorModel = (ACS758_MODEL)(doc["sensorModel"] | (int)ACS758_100B);
+    data->analogPin = doc["analogPin"] | 34;
+    data->vRef = doc["vRef"] | 3.3f;
+    data->adcResolution = doc["adcResolution"] | 12;
+    data->zeroPoint = doc["zeroPoint"] | (data->vRef / 2.0f);
+    data->calibration = doc["calibration"] | 1.0f;
+    data->readInterval = doc["readInterval"] | 1000;
+    data->samplesCount = doc["samplesCount"] | 10;
+    data->enabled = doc["enabled"] | false;
+    data->eventId = doc["eventId"] | (EVENT_CUSTOM_START + 50);
+
+#ifdef DEBUG
+    this->Msg->printBulletPoint(F("ACS758 configuration loaded successfully"));
+    this->Msg->printBulletPoint(F("Sensor model: "));
+    this->Msg->printValue((int)data->sensorModel);
+    this->Msg->printBulletPoint(F("Read interval: "));
+    this->Msg->printValue(data->readInterval);
+    this->Msg->printBulletPoint(F("Analog pin: "));
+    this->Msg->printValue(data->analogPin);
+#endif
+  }
+  else
+  {
+#ifdef DEBUG
+    this->Msg->printWarning(F("Failed to load ACS758 configuration, creating default"), F("API-FILE"));
+#endif
+    success = this->createDefaultACS758Configuration();
+    if (success)
+    {
+      success = this->read(data); // Read the newly created configuration
+    }
+  }
+
+  return success;
+}
+
+bool ESPAPP_API_Files::save(ACS758_CONFIG *data)
+{
+#ifdef DEBUG
+  this->Msg->printInformation(F("Saving ACS758 sensor configuration"), F("API-FILE"));
+#endif
+
+  StaticJsonDocument<512> doc;
+
+  doc["sensorModel"] = (int)data->sensorModel;
+  doc["analogPin"] = data->analogPin;
+  doc["vRef"] = data->vRef;
+  doc["adcResolution"] = data->adcResolution;
+  doc["zeroPoint"] = data->zeroPoint;
+  doc["calibration"] = data->calibration;
+  doc["readInterval"] = data->readInterval;
+  doc["samplesCount"] = data->samplesCount;
+  doc["enabled"] = data->enabled;
+  doc["eventId"] = data->eventId;
+
+  bool success = this->Flash->saveJSON(F("/etc/acs758.json"), doc);
+
+#ifdef DEBUG
+  if (success)
+  {
+    this->Msg->printBulletPoint(F("ACS758 configuration saved successfully"));
+  }
+  else
+  {
+    this->Msg->printError(F("Failed to save ACS758 configuration"), F("API-FILE"));
+  }
+#endif
+
+  return success;
+}
+
+bool ESPAPP_API_Files::resetToDefault(ACS758_CONFIG *data)
+{
+#ifdef DEBUG
+  this->Msg->printInformation(F("Resetting ACS758 configuration to defaults"), F("API-FILE"));
+#endif
+
+  // Reset to default values
+  data->sensorModel = ACS758_100B;
+  data->analogPin = 34;
+  data->vRef = 3.3f;
+  data->adcResolution = 12;
+  data->zeroPoint = data->vRef / 2.0f;
+  data->calibration = 1.0f;
+  data->readInterval = 1000;
+  data->samplesCount = 10;
+  data->enabled = false;
+  data->eventId = EVENT_CUSTOM_START + 50;
+
+  // Save the default configuration
+  return this->save(data);
+}
+
+bool ESPAPP_API_Files::createDefaultACS758Configuration(void)
+{
+#ifdef DEBUG
+  this->Msg->printInformation(F("Creating default ACS758 configuration"), F("API-FILE"));
+#endif
+
+  ACS758_CONFIG config;
+
+  // Set default values
+  config.sensorModel = ACS758_100B;
+  config.analogPin = 34;
+  config.vRef = 3.3f;
+  config.adcResolution = 12;
+  config.zeroPoint = config.vRef / 2.0f;
+  config.calibration = 1.0f;
+  config.readInterval = 1000;
+  config.samplesCount = 10;
+  config.enabled = false;
+  config.eventId = EVENT_CUSTOM_START + 50;
+
+  return this->save(&config);
+}
+#endif // ESPAPP_HARDWARE_ACS758_INCLUDED
