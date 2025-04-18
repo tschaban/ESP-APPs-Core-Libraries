@@ -5,8 +5,7 @@ ESPAPP_HTML_SitesGenerator::ESPAPP_HTML_SitesGenerator(ESPAPP_Core *_System, ESP
     this->System = _System;
     this->HTMLResponse = _HTMLResponse;
     this->Server = _HTTPServer;
-    /** While initialized site gets it default sceleton */
-    this->UI = new ESPAPP_HTML_UI(_System);
+    this->UI = new ESPAPP_HTML_UI(this->System);
 
 #ifdef ESPAPP_CUSTOM_HTML_SITES_GENERATOR
     this->CustomSiteGenerator = new ESPAPP_HTML_Custom_Sites_Generator(_System, this->Server, this->UI);
@@ -25,7 +24,7 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
     this->HTMLResponse->clear();
 
     /** Menu */
-    if (this->System->getOperatingMode() == ESPAPP_OPERATING_MODE::FIRST_TIME_BOOT)
+    if (this->System->getConnectionMode() == ESPAPP_NETWORK_CONNECTION_MODE::ACCESS_POINT)
     {
         this->HTMLResponse->concat(FPSTR(HTML_UI_SITE_HEADER_LIGHT));
         switch (this->Server->HTTPRequest->siteId)
@@ -226,17 +225,19 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
                     this->Server->saveUploadedFile();
                 }
                 break;
+
             case ESPAPP_HTTP_SITE_FILE_EXPLORER_ACTION_DOWNLOAD:
                 if (this->Server->HTTPServer->hasArg(FPSTR(ESPAPP_FORM_TAG_FILENAME)))
                 {
                     success = this->Server->downloadFile(this->Server->HTTPRequest->parameter1, this->Server->HTTPServer->arg(FPSTR(ESPAPP_FORM_TAG_FILENAME)).c_str());
                     if (success)
                     {
-                        /** Not neet to process further, if file has been downloaded */
+
                         return true;
                     }
                 }
                 break;
+
             case ESPAPP_HTTP_SITE_FILE_EXPLORER_ACTION_VIEW:
                 break;
             case ESPAPP_HTTP_SITE_FILE_EXPLORER_ACTION_DELETE:
@@ -352,16 +353,9 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
             this->System->Msg->printInformation(F("Download UI components event handled"), F("SYSTEM EVENT"));
 #endif
 
-            // ESPAPP_FirmwareInstalator *Instalator = new ESPAPP_FirmwareInstalator(System);
-            // InstallationStats stats;
-            // Instalator->install("https://api.smartnydom.pl/espapp/ui-configuration.json", stats);
-            // Instalator->install("http://192.168.2.146:8080/static/covid/data.json", stats);
-            // Instalator->install("http://files.smartnydom.pl/espapp/config/ui-configuration.json", stats);
-            // delete Instalator;
-
             this->UI->openSection(this->HTMLResponse, F("UI Components"), F("Downloading UI components"));
             this->UI->addParagraph(this->HTMLResponse, F("Downloading UI components..."));
-            this->UI->addParagraph(this->HTMLResponse, F("You have 10 seconds to streatch your legs"));
+            this->UI->addParagraph(this->HTMLResponse, F("You have 10 seconds to streatch your legs"));            
             this->UI->closeSection(this->HTMLResponse);
             this->setHTTPResponseCode(ESPAPP_HTTP_RESPONSE_CODE_OK);
             this->UI->setRefresh(this->HTMLResponse, 10, (PGM_P)F("/"));
@@ -458,10 +452,6 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
             break;
         }
         }
-
-        /** Setting CSS and JS Files  */
-        this->UI->embedCSSFiles(this->HTMLResponse);
-        this->UI->embedJSFiles(this->HTMLResponse);
     }
 
 /** Set site global parametrs */
@@ -518,7 +508,7 @@ void ESPAPP_HTML_SitesGenerator::siteNotFound(String *site)
 {
     this->UI->openSection(site, F("Error: 404"), F("Site not found"));
     this->UI->addParagraph(site, F("OMG you are lost!"), true);
-    this->UI->addParagraph(site, F("Please go back to the main page"), true);    
+    this->UI->addParagraph(site, F("Please go back to the main page"), true);
     this->UI->closeSection(site);
     this->setHTTPResponseCode(ESPAPP_HTTP_RESPONSE_CODE_NOT_FOUND);
 }

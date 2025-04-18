@@ -286,15 +286,12 @@ bool ESPAPP_API_Files::read(ACS758_CONFIG *data)
   if (success)
   {
     data->sensorModel = (ACS758_MODEL)(doc["sensorModel"] | (int)ACS758_100B);
-    data->analogPin = doc["analogPin"] | 34;
-    data->vRef = doc["vRef"] | 3.3f;
-    data->adcResolution = doc["adcResolution"] | 12;
-    data->zeroPoint = doc["zeroPoint"] | (data->vRef / 2.0f);
-    data->calibration = doc["calibration"] | 1.0f;
-    data->readInterval = doc["readInterval"] | 1000;
-    data->samplesCount = doc["samplesCount"] | 10;
-    data->enabled = doc["enabled"] | false;
-    data->eventId = doc["eventId"] | (EVENT_CUSTOM_START + 50);
+    data->analogPin = doc["analogPin"];
+    data->vRef = doc["vRef"];
+    data->adcResolution = doc["adcResolution"];
+    data->calibration = doc["calibration"];
+    data->readInterval = doc["readInterval"];
+    data->samplesCount = doc["samplesCount"];
 
 #ifdef DEBUG
     this->Msg->printBulletPoint(F("ACS758 configuration loaded successfully"));
@@ -304,6 +301,15 @@ bool ESPAPP_API_Files::read(ACS758_CONFIG *data)
     this->Msg->printValue(data->readInterval);
     this->Msg->printBulletPoint(F("Analog pin: "));
     this->Msg->printValue(data->analogPin);
+    this->Msg->printBulletPoint(F("ADC resolution: "));
+    this->Msg->printValue(data->adcResolution);
+    this->Msg->printBulletPoint(F("Calibration: "));
+    this->Msg->printValue(data->calibration);
+    this->Msg->printBulletPoint(F("Samples count: "));
+    this->Msg->printValue(data->samplesCount);
+    this->Msg->printBulletPoint(F("Reference voltage: "));
+    this->Msg->printValue(data->vRef);
+
 #endif
   }
   else
@@ -333,12 +339,9 @@ bool ESPAPP_API_Files::save(ACS758_CONFIG *data)
   doc["analogPin"] = data->analogPin;
   doc["vRef"] = data->vRef;
   doc["adcResolution"] = data->adcResolution;
-  doc["zeroPoint"] = data->zeroPoint;
   doc["calibration"] = data->calibration;
   doc["readInterval"] = data->readInterval;
   doc["samplesCount"] = data->samplesCount;
-  doc["enabled"] = data->enabled;
-  doc["eventId"] = data->eventId;
 
   bool success = this->Flash->saveJSON(F("/etc/acs758.json"), doc);
 
@@ -356,28 +359,6 @@ bool ESPAPP_API_Files::save(ACS758_CONFIG *data)
   return success;
 }
 
-bool ESPAPP_API_Files::resetToDefault(ACS758_CONFIG *data)
-{
-#ifdef DEBUG
-  this->Msg->printInformation(F("Resetting ACS758 configuration to defaults"), F("API-FILE"));
-#endif
-
-  // Reset to default values
-  data->sensorModel = ACS758_100B;
-  data->analogPin = 34;
-  data->vRef = 3.3f;
-  data->adcResolution = 12;
-  data->zeroPoint = data->vRef / 2.0f;
-  data->calibration = 1.0f;
-  data->readInterval = 1000;
-  data->samplesCount = 10;
-  data->enabled = false;
-  data->eventId = EVENT_CUSTOM_START + 50;
-
-  // Save the default configuration
-  return this->save(data);
-}
-
 bool ESPAPP_API_Files::createDefaultACS758Configuration(void)
 {
 #ifdef DEBUG
@@ -389,14 +370,11 @@ bool ESPAPP_API_Files::createDefaultACS758Configuration(void)
   // Set default values
   config.sensorModel = ACS758_100B;
   config.analogPin = 34;
-  config.vRef = 3.3f;
-  config.adcResolution = 12;
-  config.zeroPoint = config.vRef / 2.0f;
-  config.calibration = 1.0f;
-  config.readInterval = 1000;
+  config.vRef = 2*2.32;
+  config.adcResolution = 10;   
+  config.calibration = 1;
+  config.readInterval = 5; //s
   config.samplesCount = 10;
-  config.enabled = false;
-  config.eventId = EVENT_CUSTOM_START + 50;
 
   return this->save(&config);
 }

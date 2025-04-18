@@ -1,10 +1,6 @@
 #include "ESPAPP_Firmware.h"
 
-ESPAPP_Firmware::ESPAPP_Firmware()
-{
-  this->API->Network = new ESPAPP_WirelessConnection(System);
-  Web = new ESPAPP_HTTPServerContainer(System);
-};
+ESPAPP_Firmware::ESPAPP_Firmware() {};
 
 bool ESPAPP_Firmware::init(void)
 {
@@ -12,7 +8,11 @@ bool ESPAPP_Firmware::init(void)
 
   if (success)
   {
-        
+
+    this->API->Network = new ESPAPP_WirelessConnection(this->System);
+    this->Web = new ESPAPP_HTTPServerContainer(this->System);
+    this->Hardware = new ESPAPP_Hardware(this->System);
+
     /** Initialize event listeners */
     this->initializeEventListeners();
 
@@ -27,14 +27,15 @@ bool ESPAPP_Firmware::init(void)
     {
       success = this->Web->init();
     }
-  }
-  
-  this->System->Message->addMessage(F("Firmware initialized successfully."));
-  this->System->Message->addMessage(F("Firmware version: 1.0.0")); // Example version, replace with actual version
 
+    if (success)
+    {
+      success = this->Hardware->init();
+    }
+
+  }
   return success;
 }
-
 void ESPAPP_Firmware::initializeEventListeners(void)
 {
 #ifdef DEBUG
@@ -54,6 +55,7 @@ void ESPAPP_Firmware::initializeEventListeners(void)
   }
 
   // Set up event handlers for timer events
+  /*
   this->System->Events->addEventListener(EVENT_TIMER_MINUTE,
                                          [this](void *data)
                                          { this->handleMinuteEvent(data); });
@@ -65,12 +67,12 @@ void ESPAPP_Firmware::initializeEventListeners(void)
   this->System->Events->addEventListener(EVENT_TIMER_DAY,
                                          [this](void *data)
                                          { this->handleDayEvent(data); });
-
+ */
   // Set up event handler for reboot
   this->System->Events->addEventListener(EVENT_REBOOT,
                                          [this](void *data)
                                          { this->handleRebootEvent(data); });
-
+ 
   this->System->Events->addEventListener(EVENT_NETWORK_CONNECTED,
                                          [this](void *data)
                                          { this->handleNetworkConnectedEvent(data); });
@@ -193,19 +195,13 @@ void ESPAPP_Firmware::handleDownloadUIComponentsEvent(void *data)
 
   this->System->Events->addEventListener(EVENT_CUSTOM_START + 2,
                                          [this](void *)
-                                         { 
-                                        
-                                          ESPAPP_FirmwareInstalator *Instalator = new ESPAPP_FirmwareInstalator(System);
-                                          InstallationStats stats;
-                                          Instalator->install("http://files.smartnydom.pl/espapp/config/ui-configuration.json", stats);
-                                          delete Instalator;
-
-                                          this->System->Events->removeEventListeners(EVENT_CUSTOM_START + 2);
-
-
-                                        });
+                                         {
+                                           ESPAPP_FirmwareInstalator *Instalator = new ESPAPP_FirmwareInstalator(System);
+                                           InstallationStats stats;
+                                           Instalator->install("http://files.smartnydom.pl/espapp/config/ui-configuration.json", stats);
+                                           delete Instalator;
+                                           this->System->Events->removeEventListeners(EVENT_CUSTOM_START + 2);
+                                         });
 
   uint16_t eventId1 = this->System->Events->scheduleEventIn(EVENT_CUSTOM_START + 2, 3);
-
-
 }

@@ -49,7 +49,6 @@ public:
   // ACS758 current sensor configuration methods
   bool read(ACS758_CONFIG *data);
   bool save(ACS758_CONFIG *data);
-  bool resetToDefault(ACS758_CONFIG *data);
 #endif
 
 };

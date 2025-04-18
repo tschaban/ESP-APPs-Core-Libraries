@@ -196,6 +196,7 @@ ESPAPP_INSTALL_STATUS ESPAPP_FirmwareInstalator::install(const char *configUrl, 
     }
 
     this->System->Message->addMessage("Firmware components installed successfully");
+    this->System->Message->addMessage("Restart the device to apply changes");
 
     return INSTALL_SUCCESS;
 }

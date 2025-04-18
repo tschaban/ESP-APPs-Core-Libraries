@@ -23,11 +23,9 @@ private:
 
   bool mountFileSystem(void);
   bool formatFileSystem(void);
-  bool fileExist(const char *path);
+
   bool createFile(const char *path);
   bool createFolder(const char *path);
-
-  
 
   bool readFSElements(const char *directory, ESPAPP_FILE files[], size_t capacity, size_t &count, bool includeFiles, bool includeFolders);
 
@@ -39,7 +37,7 @@ public:
 #endif
 
   fs::LittleFSFS &fileSystem = LittleFS;
-  
+
   /** Can be used in many places as allocated memory */
   char fileName[ESPAPP_FILE_MAX_FILE_NAME_LENGTH];
 
@@ -62,15 +60,14 @@ public:
   bool uploadFile(const char *directory, const char *filename, const uint8_t *data, size_t length);
 
   bool openFile(File &openedFile, const char *mode, const char *path, uint8_t id = ESPAPP_NONE,
-    boolean createIfNotExists = true);
+                boolean createIfNotExists = true);
+  bool fileExist(const char *path);
 
-    
   bool openFile(File &openedFile, const char *mode,
-    const __FlashStringHelper *path, uint8_t id = ESPAPP_NONE,
-    boolean createIfNotExists = true);
+                const __FlashStringHelper *path, uint8_t id = ESPAPP_NONE,
+                boolean createIfNotExists = true);
 
   bool deleteAllFilesInDirectory(const __FlashStringHelper *directory);
-
 };
 
 #endif // _ESPAPP_API_FLASH_h

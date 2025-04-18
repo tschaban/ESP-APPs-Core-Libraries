@@ -6,8 +6,28 @@
  * Uncomment to enable specific hardware modules
  */
 
-// Enable ACS758 Current Sensor
+ // Enabled Hardwares
+#define ESPAPP_HARDWARE_I2C_INCLUDED
+#define ESPAPP_HARDWARE_ADS1115_INCLUDED
 #define ESPAPP_HARDWARE_ACS758_INCLUDED
+
+
+
+#ifdef ESPAPP_HARDWARE_I2C_INCLUDED
+struct I2CPORT_CONFIG {
+    uint8_t SDA;
+    uint8_t SCL;
+  #ifdef ESP32  
+    uint32_t frequency;
+  #endif
+};
+#endif // ESPAPP_HARDWARE_I2C_INCLUDED
+
+
+
+#ifdef ESPAPP_HARDWARE_ACS758_INCLUDED
+
+#define ESPAPP_HARDWARE_ACS758_VOLTAGE_FOR_NOMINAL_SENSITIVITY 5.0f // Nominal voltage for sensitivity calculation (5V or 3.3V)
 
 // ACS758 sensor models with their sensitivity values in mV/A
 enum ACS758_MODEL
@@ -27,13 +47,14 @@ struct ACS758_CONFIG
     ACS758_MODEL sensorModel; // Sensor model
     uint8_t analogPin;        // Analog pin to read from
     float vRef;               // Reference voltage (typically 3.3V or 5V)
-    uint16_t adcResolution;   // ADC resolution in bits (e.g., 10, 12, etc.)
+    uint8_t adcResolution;   // ADC resolution in bits (e.g., 10, 12, etc.)
     float zeroPoint;          // Zero current voltage (midpoint for bidirectional)
     float calibration;        // Calibration factor (fine adjustment)
     uint16_t readInterval;    // Read interval in milliseconds
     uint8_t samplesCount;     // Number of samples to average
-    bool enabled;             // Whether the sensor is enabled
-    uint16_t eventId;         // Custom event ID for current measurements
 };
+
+
+#endif  // ESPAPP_HARDWARE_ACS758_INCLUDED
 
 #endif // _ESPAPP_PARAMETERS_HARDWARE_H

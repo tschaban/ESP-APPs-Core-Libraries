@@ -87,10 +87,14 @@ enum ESPAPP_NETWORK_CONNECTION_MODE
 /* File system */
 #include <ESPAPP_Parameters_FS.h>
 
+/** Hardware */
+#include <ESPAPP_Parameters_Hardware.h>
+
 /* Events */
 #include <ESPAPP_Parameters_Events.h>
 
-#include <ESPAPP_Parameters_Hardware.h>
+
+
 /* Data structures */
 
 struct ESPAPP_NETWORK_SETTING

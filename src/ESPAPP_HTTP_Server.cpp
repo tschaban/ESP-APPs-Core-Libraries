@@ -60,7 +60,7 @@ void ESPAPP_HTTPServer::readDirectoryFromHTTPRequestParameter1(char *path) // re
 void ESPAPP_HTTPServer::readHTTPRequest(void)
 {
 
-  if (this->System->getOperatingMode() == ESPAPP_OPERATING_MODE::FIRST_TIME_BOOT)
+  if (this->System->getConnectionMode() == ESPAPP_NETWORK_CONNECTION_MODE::ACCESS_POINT)
   {
     this->HTTPRequest->siteId = this->HTTPServer->hasArg(F("site")) ? this->HTTPServer->arg(F("site")).toInt() : ESPAPP_HTTP_SITE_WIFI_CONFIGURATION;
   }

@@ -84,6 +84,12 @@ const char *ESPAPP_EventManager::getEventName(uint16_t eventId)
         return "SYNC_TIME";
     case EVENT_WAN_CHECK:
         return "WAN_CHECK";
+    case EVENT_DOWNLOAD_UI_COMPONENTS:
+        return "DOWNLOAD_UI_COMPONENTS";
+#ifdef ESPAPP_HARDWARE_ACS758_INCLUDED
+    case EVENT_HARDWARE_ACS758:
+        return "HARDWARE_ACS758";
+#endif
     default:
         if (eventId >= EVENT_CUSTOM_START)
         {
@@ -150,7 +156,7 @@ uint16_t ESPAPP_EventManager::scheduleEvent(uint16_t eventId, time_t triggerTime
 
     this->Msg->printInformation(F("Event scheduled"), F("EVENT"));
     this->Msg->printBulletPoint(F("Schedule ID: "));
-    this->Msg->printValue((int)scheduleId);
+    this->Msg->printValue(scheduleId);
     this->Msg->printBulletPoint(F("Event: "));
     this->Msg->printValue(getEventName(eventId));
     this->Msg->printBulletPoint(F("Trigger time: "));
@@ -164,7 +170,7 @@ uint16_t ESPAPP_EventManager::scheduleEvent(uint16_t eventId, time_t triggerTime
         {
         case SCHEDULE_REPEAT:
             this->Msg->printValue(F("Repeating every "));
-            this->Msg->printValue((int)interval);
+            this->Msg->printValue(interval);
             this->Msg->printValue(F(" seconds"));
             break;
         case SCHEDULE_DAILY:

@@ -8,7 +8,7 @@ boolean ESPAPP_WirelessConnection::eventConnectionLost = true;
 
 ESPAPP_WirelessConnection::ESPAPP_WirelessConnection(ESPAPP_Core *_System)
 {
-  System = _System;
+  this->System = _System;
 }
 
 bool ESPAPP_WirelessConnection::init(void)

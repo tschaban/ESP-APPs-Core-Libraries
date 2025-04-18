@@ -1,0 +1,6 @@
+projectKey=ESPAPP-Core
+serverUrl=http://192.168.2.146:9000
+serverVersion=25.4.0.105899
+dashboardUrl=http://192.168.2.146:9000/dashboard?id=ESPAPP-Core
+ceTaskId=cff0ddd3-a03f-4a9e-8a5a-8ce9ac1f2837
+ceTaskUrl=http://192.168.2.146:9000/api/ce/task?id=cff0ddd3-a03f-4a9e-8a5a-8ce9ac1f2837

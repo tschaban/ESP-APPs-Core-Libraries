@@ -9,7 +9,7 @@ class ESPAPP_HTML_UI
 private:
     ESPAPP_Core *System;
     bool isMenuSet = true;
-    bool largeCSS = false; // Default to using small CSS until we verify files exist
+    bool largeCSS = true;
 
     String cssLinks;
     String jsLinks;
@@ -60,6 +60,8 @@ public:
     void setVersion(String *site, const __FlashStringHelper *version);
     void setFreeHeap(String *site);
     void setWANAccess(String *site, boolean access);
+    
+    void CSSDownloaded();
 
     /** Site level */
     void siteStart(String *site);

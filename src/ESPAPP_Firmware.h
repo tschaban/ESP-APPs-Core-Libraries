@@ -10,6 +10,7 @@
 #include <ESPAPP_AccessToWAN.h>
 #include <ESPAPP_HTTP_Server_Container.h>
 #include <ESPAPP_FirmwareInstalator.h>
+#include <ESPAPP_Hardware.h>
 
 class ESPAPP_Firmware //: public ESPAPPCoreHardware
 {
@@ -24,6 +25,7 @@ private:
   void handleDayEvent(void *data);
   void handleRebootEvent(void *data);
   void handleNetworkConnectedEvent(void *data);
+  
   void handleDownloadUIComponentsEvent(void *data);
     
 
@@ -35,7 +37,8 @@ private:
 
 public:
   ESPAPP_Core *System = new ESPAPP_Core();
-  ESPAPP_HTTPServerContainer *Web;
+  ESPAPP_HTTPServerContainer *Web = nullptr;
+  ESPAPP_Hardware *Hardware = nullptr;
 
   struct GLOBAL_API_OBJECTS
   {
@@ -55,6 +58,7 @@ public:
   GLOBAL_CONFIGURATION_OBJECTS *Configuration =
       new GLOBAL_CONFIGURATION_OBJECTS;
 
+      
   // ESPAPPDevice *Device = new ESPAPPDevice();
 
   /* Constructor */

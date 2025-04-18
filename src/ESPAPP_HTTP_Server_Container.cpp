@@ -4,7 +4,7 @@ ESPAPP_HTTPServerContainer::ESPAPP_HTTPServerContainer(ESPAPP_Core *_System)
 {
     this->System = _System;
     this->Server = new ESPAPP_HTTPServer(_System);
-    this->Site = new ESPAPP_HTML_SitesGenerator(_System, this->Server, this->Server->outputStream);
+    this->Site = new ESPAPP_HTML_SitesGenerator(this->System, this->Server, this->Server->outputStream);
 };
 
 ESPAPP_HTTPServerContainer::~ESPAPP_HTTPServerContainer() {
