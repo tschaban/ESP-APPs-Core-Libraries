@@ -105,6 +105,8 @@ private:
     TwoWire *Wire;
     uint8_t i2cAddress;
     ADS1115_GAIN gain;
+
+    bool successfullyInitialized = false;
     
     uint16_t readRegister(uint8_t reg);
     void writeRegister(uint8_t reg, uint16_t value);
@@ -116,14 +118,18 @@ public:
     ~ADS1115();
     
     bool init();
+    bool initalized();
+
     void setGain(ADS1115_GAIN gain);
     ADS1115_GAIN getGain();
+
+    void startComparator_SingleEnded(ADS1115_CHANNEL channel, int16_t threshold);
+    int16_t getLastConversionResults();
     
     int16_t readADC(ADS1115_CHANNEL channel);
     float getVoltage(ADS1115_CHANNEL channel);
         
-    void startComparator_SingleEnded(ADS1115_CHANNEL channel, int16_t threshold);
-    int16_t getLastConversionResults();
+
 };
 
 #endif // _ADS1115_h

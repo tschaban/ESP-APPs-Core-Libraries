@@ -26,14 +26,14 @@ ESPAPP_INSTALL_STATUS ESPAPP_FirmwareInstalator::install(const char *configUrl, 
     stats.failedFiles = 0;
 
 #ifdef DEBUG
-    this->System->Msg->printInformation(F("Starting firmware installation"), F("INSTALLER"));
-    this->System->Msg->printBulletPoint(F("Configuration URL: "));
-    this->System->Msg->printValue(configUrl);
+    this->System->Debugger->printInformation(F("Starting firmware installation"), F("INSTALLER"));
+    this->System->Debugger->printBulletPoint(F("Configuration URL: "));
+    this->System->Debugger->printValue(configUrl);
 
     // Show available space on filesystem
-    this->System->Msg->printBulletPoint(F("Available space: "));
-    this->System->Msg->printValue(this->System->Flash->fileSystem.totalBytes() - this->System->Flash->fileSystem.usedBytes());
-    this->System->Msg->printValue(F(" bytes"));
+    this->System->Debugger->printBulletPoint(F("Available space: "));
+    this->System->Debugger->printValue(this->System->Flash->fileSystem.totalBytes() - this->System->Flash->fileSystem.usedBytes());
+    this->System->Debugger->printValue(F(" bytes"));
 
     // Record start time for the entire installation
     unsigned long installStartTime = millis();
@@ -49,8 +49,8 @@ ESPAPP_INSTALL_STATUS ESPAPP_FirmwareInstalator::install(const char *configUrl, 
     if (downloadStatus != DOWNLOAD_SUCCESS)
     {
 #ifdef DEBUG
-        this->System->Msg->printError(F("Failed to download configuration file: "), F("INSTALLER"));
-        this->System->Msg->printValue(this->Downloader->getStatusText(downloadStatus));
+        this->System->Debugger->printError(F("Failed to download configuration file: "), F("INSTALLER"));
+        this->System->Debugger->printValue(this->Downloader->getStatusText(downloadStatus));
 #endif
         this->System->Message->addMessage("Firmware components installation failed: Failed to download configuration file");
         return INSTALL_ERROR_CONFIG_DOWNLOAD;
@@ -61,7 +61,7 @@ ESPAPP_INSTALL_STATUS ESPAPP_FirmwareInstalator::install(const char *configUrl, 
     if (!this->System->Flash->openFile(configFile, ESPAPP_OPEN_FILE_READING, configPath))
     {
 #ifdef DEBUG
-        this->System->Msg->printError(F("Failed to open configuration file"), F("INSTALLER"));
+        this->System->Debugger->printError(F("Failed to open configuration file"), F("INSTALLER"));
 #endif
         this->System->Message->addMessage("Firmware components installation failed: Failed to open configuration file");
         return INSTALL_ERROR_CONFIG_PARSE;
@@ -72,7 +72,7 @@ ESPAPP_INSTALL_STATUS ESPAPP_FirmwareInstalator::install(const char *configUrl, 
     if (fileSize > 16384)
     {
 #ifdef DEBUG
-        this->System->Msg->printError(F("Configuration file too large"), F("INSTALLER"));
+        this->System->Debugger->printError(F("Configuration file too large"), F("INSTALLER"));
 #endif
         configFile.close();
         this->System->Message->addMessage("Firmware components installation failed: Configuration file too large");
@@ -89,8 +89,8 @@ ESPAPP_INSTALL_STATUS ESPAPP_FirmwareInstalator::install(const char *configUrl, 
     if (error)
     {
 #ifdef DEBUG
-        this->System->Msg->printError(F("Failed to parse configuration file: "), F("INSTALLER"));
-        this->System->Msg->printValue(error.c_str());
+        this->System->Debugger->printError(F("Failed to parse configuration file: "), F("INSTALLER"));
+        this->System->Debugger->printValue(error.c_str());
 #endif
         this->System->Message->addMessage("Firmware components installation failed: Failed to parse configuration file");
         return INSTALL_ERROR_CONFIG_PARSE;
@@ -101,7 +101,7 @@ ESPAPP_INSTALL_STATUS ESPAPP_FirmwareInstalator::install(const char *configUrl, 
     if (configArray.isNull())
     {
 #ifdef DEBUG
-        this->System->Msg->printError(F("Invalid configuration format"), F("INSTALLER"));
+        this->System->Debugger->printError(F("Invalid configuration format"), F("INSTALLER"));
 #endif
         this->System->Message->addMessage("Firmware components installation failed: Invalid configuration format");
         return INSTALL_ERROR_CONFIG_PARSE;
@@ -115,10 +115,10 @@ ESPAPP_INSTALL_STATUS ESPAPP_FirmwareInstalator::install(const char *configUrl, 
         const char *targetFolder = config["targetFolder"];
 
 #ifdef DEBUG
-        this->System->Msg->printInformation(F("Processing configuration: "), F("INSTALLER"));
-        this->System->Msg->printValue(configName);
-        this->System->Msg->printBulletPoint(F("Target folder: "));
-        this->System->Msg->printValue(targetFolder);
+        this->System->Debugger->printInformation(F("Processing configuration: "), F("INSTALLER"));
+        this->System->Debugger->printValue(configName);
+        this->System->Debugger->printBulletPoint(F("Target folder: "));
+        this->System->Debugger->printValue(targetFolder);
 #endif
 
         // Iterate through files
@@ -135,14 +135,14 @@ ESPAPP_INSTALL_STATUS ESPAPP_FirmwareInstalator::install(const char *configUrl, 
             snprintf(url, sizeof(url), "http://files.smartnydom.pl%s/%s", baseUrl, fileName);
 
 #ifdef DEBUG
-            this->System->Msg->printInformation(F("Downloading file: "), F("INSTALLER"));
-            this->System->Msg->printValue(fileName);
-            this->System->Msg->printBulletPoint(F("URL: "));
-            this->System->Msg->printValue(url);
-            this->System->Msg->printBulletPoint(F("Target folder: "));
-            this->System->Msg->printValue(targetFolder);
-            this->System->Msg->printBulletPoint(F("Target file: "));
-            this->System->Msg->printValue(targetFile);
+            this->System->Debugger->printInformation(F("Downloading file: "), F("INSTALLER"));
+            this->System->Debugger->printValue(fileName);
+            this->System->Debugger->printBulletPoint(F("URL: "));
+            this->System->Debugger->printValue(url);
+            this->System->Debugger->printBulletPoint(F("Target folder: "));
+            this->System->Debugger->printValue(targetFolder);
+            this->System->Debugger->printBulletPoint(F("Target file: "));
+            this->System->Debugger->printValue(targetFile);
 #endif
 
             // Download the file and save it with the target name in the target folder
@@ -153,17 +153,17 @@ ESPAPP_INSTALL_STATUS ESPAPP_FirmwareInstalator::install(const char *configUrl, 
                 stats.downloadedFiles++;
 
 #ifdef DEBUG
-                this->System->Msg->printInformation(F("File downloaded successfully"), F("INSTALLER"));
+                this->System->Debugger->printInformation(F("File downloaded successfully"), F("INSTALLER"));
 #endif
             }
             else
             {
                 stats.failedFiles++;
 #ifdef DEBUG
-                this->System->Msg->printError(F("Failed to download file: "), F("INSTALLER"));
-                this->System->Msg->printValue(fileName);
-                this->System->Msg->printBulletPoint(F("Status: "));
-                this->System->Msg->printValue(this->Downloader->getStatusText(status));
+                this->System->Debugger->printError(F("Failed to download file: "), F("INSTALLER"));
+                this->System->Debugger->printValue(fileName);
+                this->System->Debugger->printBulletPoint(F("Status: "));
+                this->System->Debugger->printValue(this->Downloader->getStatusText(status));
 #endif
             }
 
@@ -176,16 +176,16 @@ ESPAPP_INSTALL_STATUS ESPAPP_FirmwareInstalator::install(const char *configUrl, 
     // Calculate total installation time
     unsigned long installTime = millis() - installStartTime;
 
-    this->System->Msg->printInformation(F("Installation completed"), F("INSTALLER"));
-    this->System->Msg->printBulletPoint(F("Total files: "));
-    this->System->Msg->printValue(stats.totalFiles);
-    this->System->Msg->printBulletPoint(F("Downloaded files: "));
-    this->System->Msg->printValue(stats.downloadedFiles);
-    this->System->Msg->printBulletPoint(F("Failed files: "));
-    this->System->Msg->printValue(stats.failedFiles);
-    this->System->Msg->printBulletPoint(F("Time taken: "));
-    this->System->Msg->printValue((float)(installTime / 1000.0));
-    this->System->Msg->printValue(F(" seconds"));
+    this->System->Debugger->printInformation(F("Installation completed"), F("INSTALLER"));
+    this->System->Debugger->printBulletPoint(F("Total files: "));
+    this->System->Debugger->printValue(stats.totalFiles);
+    this->System->Debugger->printBulletPoint(F("Downloaded files: "));
+    this->System->Debugger->printValue(stats.downloadedFiles);
+    this->System->Debugger->printBulletPoint(F("Failed files: "));
+    this->System->Debugger->printValue(stats.failedFiles);
+    this->System->Debugger->printBulletPoint(F("Time taken: "));
+    this->System->Debugger->printValue((float)(installTime / 1000.0));
+    this->System->Debugger->printValue(F(" seconds"));
 
 #endif
 

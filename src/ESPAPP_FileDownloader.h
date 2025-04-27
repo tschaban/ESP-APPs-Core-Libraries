@@ -5,10 +5,6 @@
 #include <ESPAPP_API_Flash.h>
 #include <HTTPClient.h>
 
-#ifdef DEBUG
-#include <ESPAPP_SerialMessages.h>
-#endif
-
 /**
  * @brief Status codes for file download operations
  */

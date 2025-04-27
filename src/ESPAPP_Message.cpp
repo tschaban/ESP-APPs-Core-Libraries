@@ -1,10 +1,10 @@
 #include "ESPAPP_Message.h"
 
 #ifdef DEBUG
-ESPAPP_Message::ESPAPP_Message(ESPAPP_API_Flash *_Flash, ESPAPP_SerialMessages *_Msg)
+ESPAPP_Message::ESPAPP_Message(ESPAPP_API_Flash *_Flash, ESPAPP_SerialDebugger *_Debugger)
 {
     this->Flash = _Flash;
-    this->Msg = _Msg;
+    this->Debugger = _Debugger;
 }
 #else
 ESPAPP_Message::ESPAPP_Message(ESPAPP_API_Flash *_Flash)
@@ -16,9 +16,9 @@ ESPAPP_Message::ESPAPP_Message(ESPAPP_API_Flash *_Flash)
 bool ESPAPP_Message::addMessage(const char *message)
 {
 #ifdef DEBUG
-    this->Msg->printInformation(F("Adding message"), F("MSG"));
-    this->Msg->printBulletPoint(F("Content: "));
-    this->Msg->printValue(message);
+    this->Debugger->printInformation(F("Adding message"), F("MSG"));
+    this->Debugger->printBulletPoint(F("Content: "));
+    this->Debugger->printValue(message);
 #endif
 
     // Open the file in append mode
@@ -31,13 +31,13 @@ bool ESPAPP_Message::addMessage(const char *message)
         file.close();
 
 #ifdef DEBUG
-        this->Msg->printBulletPoint(F("Message added successfully"));
+        this->Debugger->printBulletPoint(F("Message added successfully"));
 #endif
     }
     else
     {
 #ifdef DEBUG
-        this->Msg->printError(F("Failed to add message"), F("MSG"));
+        this->Debugger->printError(F("Failed to add message"), F("MSG"));
 #endif
     }
 
@@ -57,7 +57,7 @@ bool ESPAPP_Message::addMessage(const __FlashStringHelper *message)
 bool ESPAPP_Message::clearMessages()
 {
 #ifdef DEBUG
-    this->Msg->printInformation(F("Clearing all messages"), F("MSG"));
+    this->Debugger->printInformation(F("Clearing all messages"), F("MSG"));
 #endif
 
     // Overwrite the file with an empty file
@@ -70,13 +70,13 @@ bool ESPAPP_Message::clearMessages()
 
 
 #ifdef DEBUG
-        this->Msg->printBulletPoint(F("Messages cleared successfully"));
+        this->Debugger->printBulletPoint(F("Messages cleared successfully"));
 #endif
     }
     else
     {
 #ifdef DEBUG
-        this->Msg->printError(F("Failed to clear messages"), F("MSG"));
+        this->Debugger->printError(F("Failed to clear messages"), F("MSG"));
 #endif
     }
 
@@ -86,7 +86,7 @@ bool ESPAPP_Message::clearMessages()
 bool ESPAPP_Message::getMessages(char **&messageArray, uint8_t &count)
 {
 #ifdef DEBUG
-    this->Msg->printInformation(F("Retrieving all messages"), F("MSG"));
+    this->Debugger->printInformation(F("Retrieving all messages"), F("MSG"));
 #endif
 
     File file;
@@ -95,7 +95,7 @@ bool ESPAPP_Message::getMessages(char **&messageArray, uint8_t &count)
     if (!success)
     {
 #ifdef DEBUG
-        this->Msg->printBulletPoint(F("No messages file found"));
+        this->Debugger->printBulletPoint(F("No messages file found"));
 #endif
         messageArray = nullptr;
         count = 0;
@@ -114,7 +114,7 @@ bool ESPAPP_Message::getMessages(char **&messageArray, uint8_t &count)
     if (count == 0)
     {
 #ifdef DEBUG
-        this->Msg->printBulletPoint(F("No messages found"));
+        this->Debugger->printBulletPoint(F("No messages found"));
 #endif
         messageArray = nullptr;
         return true; // Success, but empty
@@ -130,8 +130,8 @@ bool ESPAPP_Message::getMessages(char **&messageArray, uint8_t &count)
     }
 
 #ifdef DEBUG
-    this->Msg->printBulletPoint(F("Retrieved messages count: "));
-    this->Msg->printValue(count);
+    this->Debugger->printBulletPoint(F("Retrieved messages count: "));
+    this->Debugger->printValue(count);
 #endif
 
     this->clearMessages(); // Clear messages after retrieval

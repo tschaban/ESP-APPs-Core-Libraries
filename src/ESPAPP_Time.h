@@ -9,7 +9,7 @@
 #include <time.h>
 
 #ifdef DEBUG
-#include <ESPAPP_SerialMessages.h>
+#include <ESPAPP_SerialDebugger.h>
 #endif
 
 class ESPAPP_Time
@@ -17,7 +17,7 @@ class ESPAPP_Time
 private:
     ESPAPP_API_Flash *Flash;
 #ifdef DEBUG
-    ESPAPP_SerialMessages *Msg;
+    ESPAPP_SerialDebugger *Debugger;
 #endif
 
 ESPAPP_TIME_CONFIG *configuration = new ESPAPP_TIME_CONFIG;
@@ -31,7 +31,7 @@ ESPAPP_TIME_CONFIG *configuration = new ESPAPP_TIME_CONFIG;
 
 public:
 #ifdef DEBUG
-    ESPAPP_Time(ESPAPP_API_Flash *_Flash, ESPAPP_SerialMessages *_Msg);
+    ESPAPP_Time(ESPAPP_API_Flash *_Flash, ESPAPP_SerialDebugger *_Debugger);
 #else
     ESPAPP_Time(ESPAPP_API_Flash *_Flash);
 #endif

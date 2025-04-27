@@ -5,7 +5,7 @@ ESPAPP_HTML_UI::ESPAPP_HTML_UI(ESPAPP_Core *_System)
     this->System = _System;
 
 #ifdef DEBUG
-    this->System->Msg->printInformation(F("Initializing HTML UI"), F("HTML UI"));
+    this->System->Debugger->printInformation(F("Initializing HTML UI"), F("HTML UI"));
 #endif
 
     cssLinks.reserve((sizeof(HTML_UI_CSS) / sizeof(HTML_UI_CSS[0])) * (strlen_P(HTML_UI_SITE_CSS_FILE_TAG) - 5 + strlen_P(css_core) + 1)); // max 3 CSS files * 5 = {{v}} + max length of css_core + 1 = null terminator
@@ -14,7 +14,7 @@ ESPAPP_HTML_UI::ESPAPP_HTML_UI(ESPAPP_Core *_System)
     CSSDownloaded();
 
 #ifdef DEBUG
-    this->System->Msg->printBulletPoint(F("UI Initialized"));
+    this->System->Debugger->printBulletPoint(F("UI Initialized"));
 #endif
 }
 
@@ -31,9 +31,9 @@ void ESPAPP_HTML_UI::setRefresh(String *site, uint8_t refresh, const char *url)
 {
 
 #ifdef DEBUG
-    this->System->Msg->printInformation(F("Setting refresh"), F("HTTP"));
-    this->System->Msg->printBulletPoint(F("URL to redirect: "));
-    this->System->Msg->printValue(url);
+    this->System->Debugger->printInformation(F("Setting refresh"), F("HTTP"));
+    this->System->Debugger->printBulletPoint(F("URL to redirect: "));
+    this->System->Debugger->printValue(url);
 #endif
 
     char timeout[4];
@@ -47,8 +47,8 @@ void ESPAPP_HTML_UI::setRefresh(String *site, uint8_t refresh, const char *url)
     }
 
 #ifdef DEBUG
-    this->System->Msg->printBulletPoint(F("Timeout: "));
-    this->System->Msg->printValue(timeout);
+    this->System->Debugger->printBulletPoint(F("Timeout: "));
+    this->System->Debugger->printValue(timeout);
 #endif
 
     site->replace(F("{{s.refresh}}"), FPSTR(HTML_UI_SITE_REFRESH_TAG));
@@ -167,7 +167,7 @@ void ESPAPP_HTML_UI::clearOrphantTags(String *site)
 void ESPAPP_HTML_UI::CSSDownloaded()
 {
 #ifdef DEBUG
-    this->System->Msg->printInformation(F("Checking if CSS Files are downloaded"), F("HTML UI"));
+    this->System->Debugger->printInformation(F("Checking if CSS Files are downloaded"), F("HTML UI"));
 #endif
 
     this->largeCSS = true;
@@ -177,14 +177,14 @@ void ESPAPP_HTML_UI::CSSDownloaded()
         sprintf(this->System->Flash->fileName, "%s%s%s", FPSTR(path_ui), FPSTR(path_root), (char *)pgm_read_dword(&(HTML_UI_CSS[i])));
 
 #ifdef DEBUG
-        this->System->Msg->printBulletPoint(F("Checking file: "));
-        this->System->Msg->printValue(this->System->Flash->fileName);
+        this->System->Debugger->printBulletPoint(F("Checking file: "));
+        this->System->Debugger->printValue(this->System->Flash->fileName);
 #endif
 
         if (!this->System->Flash->fileExist(this->System->Flash->fileName))
         {
 #ifdef DEBUG
-            this->System->Msg->printBulletPoint(F("CSS File not found"));
+            this->System->Debugger->printBulletPoint(F("CSS File not found"));
 #endif
             this->largeCSS = false;
             break;
@@ -633,7 +633,7 @@ void ESPAPP_HTML_UI::addFileExplorerUploadForm(String *site, const char *directo
 void ESPAPP_HTML_UI::checkCSSFilesExist()
 {
 #ifdef DEBUG
-    this->System->Msg->printBulletPoint(F("Checking if CSS Files are downloaded"));
+    this->System->Debugger->printBulletPoint(F("Checking if CSS Files are downloaded"));
 #endif
 
     this->largeCSS = true;
@@ -649,8 +649,8 @@ void ESPAPP_HTML_UI::checkCSSFilesExist()
     }
 
 #ifdef DEBUG
-    this->System->Msg->printBulletPoint(F("CSS Files exists : "));
-    this->System->Msg->printValue(this->largeCSS);
+    this->System->Debugger->printBulletPoint(F("CSS Files exists : "));
+    this->System->Debugger->printValue(this->largeCSS);
 #endif
 }
 */

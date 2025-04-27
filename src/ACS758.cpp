@@ -11,18 +11,16 @@ ACS758::ACS758(ESPAPP_Core *_System, ADS1115 *_ads1115)
 
 ACS758::~ACS758()
 {
-  // Stop monitoring if active
   this->stopMonitoring();
 }
-
-
 
 bool ACS758::init()
 {
   // Check if ADS1115 is available
-  if (!this->ads1115) {
+  if (!this->ads1115->initalized())
+  {
 #ifdef DEBUG
-    this->System->Msg->printError(F("ADS1115 not available"), F("ACS758"));
+    this->System->Debugger->printWarning(F("ADS1115 not available"), F("ACS758"));
 #endif
     return false;
   }
@@ -33,7 +31,7 @@ bool ACS758::init()
   {
     /** Configuring */
     this->isBidirectional = this->config->sensorModel <= ACS758_200B;
-    this->sensitivity = (this->getSensitivity() / 1000.0); 
+    this->sensitivity = (this->getSensitivity() / 1000.0);
     this->zeroPoint = this->config->vRef / 2;
     this->successfullyInitialized = this->startMonitoring();
   }
@@ -41,42 +39,47 @@ bool ACS758::init()
 #ifdef DEBUG
   if (this->successfullyInitialized)
   {
-    this->System->Msg->printBulletPoint(F("Bidirectional: "));
-    this->System->Msg->printValue(this->isBidirectional);
-   
-    this->System->Msg->printBulletPoint(F("Nominal sensitivity: "));
-    this->System->Msg->printValue(this->getSensitivity());
-    this->System->Msg->printValue(F(" mV/A"));
+    this->System->Debugger->printBulletPoint(F("Bidirectional: "));
+    this->System->Debugger->printValue(this->isBidirectional);
 
-    this->System->Msg->printBulletPoint(F("Actual sensitivity: "));
-    this->System->Msg->printValue(this->sensitivity);
-    this->System->Msg->printValue(F(" mV/A"));
+    this->System->Debugger->printBulletPoint(F("Nominal sensitivity: "));
+    this->System->Debugger->printValue(this->getSensitivity());
+    this->System->Debugger->printValue(F(" mV/A"));
 
-    this->System->Msg->printBulletPoint(F("Calibration: "));
-    this->System->Msg->printValue(this->config->calibration);
-    this->System->Msg->printValue(F(" A/V"));
+    this->System->Debugger->printBulletPoint(F("Actual sensitivity: "));
+    this->System->Debugger->printValue(this->sensitivity);
+    this->System->Debugger->printValue(F(" mV/A"));
 
-    this->System->Msg->printBulletPoint(F("Zero point: "));
-    this->System->Msg->printValue(this->config->zeroPoint);
-    this->System->Msg->printValue(F(" V"));
+    this->System->Debugger->printBulletPoint(F("Calibration: "));
+    this->System->Debugger->printValue(this->config->calibration);
+    this->System->Debugger->printValue(F(" A/V"));
+
+    this->System->Debugger->printBulletPoint(F("Zero point: "));
+    this->System->Debugger->printValue(this->config->zeroPoint);
+    this->System->Debugger->printValue(F(" V"));
 
     if (this->config && this->config != nullptr)
     {
-      this->System->Msg->printBulletPoint(F("Sensor model: "));
-      this->System->Msg->printValue(this->config->sensorModel);
+      this->System->Debugger->printBulletPoint(F("Sensor model: "));
+      this->System->Debugger->printValue(this->config->sensorModel);
     }
-    
-    this->System->Msg->printBulletPoint(F("ADC Channel: "));
-    this->System->Msg->printValue((int)this->adcChannel);
-   
-    this->System->Msg->printInformation(F("ACS758 sensor initialized successfully"), F("ACS758"));
+
+    this->System->Debugger->printBulletPoint(F("ADC Channel: "));
+    this->System->Debugger->printValue((int)this->adcChannel);
+
+    this->System->Debugger->printInformation(F("ACS758 sensor initialized successfully"), F("ACS758"));
   }
   else
   {
-    this->System->Msg->printError(F("Failed to initialize ACS758 sensor"), F("ACS758"));
+    this->System->Debugger->printError(F("Failed to initialize ACS758 sensor"), F("ACS758"));
   }
 #endif
 
+  return this->successfullyInitialized;
+}
+
+bool ACS758::initalized()
+{
   return this->successfullyInitialized;
 }
 
@@ -109,9 +112,10 @@ float ACS758::getSensitivity()
 
 void ACS758::readRawVoltage()
 {
-  if (!this->ads1115) {
+  if (!this->initalized())
+  {
 #ifdef DEBUG
-    this->System->Msg->printError(F("ADS1115 not available for reading"), F("ACS758"));
+    this->System->Debugger->printWarning(F("Not initialized"), F("ACS758"));
 #endif
     return;
   }
@@ -119,8 +123,8 @@ void ACS758::readRawVoltage()
   this->lastVoltageReading = 0;
 
 #ifdef DEBUG
-  this->System->Msg->printBulletPoint(F("Reading from ADS1115 channel: "));
-  this->System->Msg->printValue((int)this->adcChannel);
+  this->System->Debugger->printBulletPoint(F("Reading from ADS1115 channel: "));
+  this->System->Debugger->printValue((int)this->adcChannel);
 #endif
 
   // Read voltage from ADS1115
@@ -130,21 +134,30 @@ void ACS758::readRawVoltage()
     this->lastVoltageReading += this->_tempVoltage;
     delay(1); // Small delay between readings
   }
-  
+
   // Average the readings
   this->lastVoltageReading = this->lastVoltageReading / (float)this->config->samplesCount;
 
 #ifdef DEBUG
-  this->System->Msg->printBulletPoint(F("Raw voltage reading: "));
-  this->System->Msg->printValue(this->lastVoltageReading);
-  this->System->Msg->printValue(F(" V"));
+  this->System->Debugger->printBulletPoint(F("Raw voltage reading: "));
+  this->System->Debugger->printValue(this->lastVoltageReading);
+  this->System->Debugger->printValue(F(" V"));
 #endif
 }
 
 void ACS758::takeReading()
 {
+
+  if (!this->initalized())
+  {
 #ifdef DEBUG
-  this->System->Msg->printInformation(F("Taking reading"), F("ACS758"));
+    this->System->Debugger->printWarning(F("Not initialized"), F("ACS758"));
+#endif
+    return;
+  }
+
+#ifdef DEBUG
+  this->System->Debugger->printInformation(F("Taking reading"), F("ACS758"));
 #endif
 
   // Read raw voltage
@@ -164,20 +177,23 @@ void ACS758::takeReading()
   this->lastReadTime = millis();
 
 #ifdef DEBUG
-  this->System->Msg->printBulletPoint(F("Voltage: "));
-  this->System->Msg->printValue(this->lastVoltageReading);
-  this->System->Msg->printValue(F(" V"));
-  this->System->Msg->printBulletPoint(F("Current: "));
-  this->System->Msg->printValue(this->currentReading);
-  this->System->Msg->printValue(F(" A"));
+  this->System->Debugger->printBulletPoint(F("Voltage: "));
+  this->System->Debugger->printValue(this->lastVoltageReading);
+  this->System->Debugger->printValue(F(" V"));
+  this->System->Debugger->printBulletPoint(F("Current: "));
+  this->System->Debugger->printValue(this->currentReading);
+  this->System->Debugger->printValue(F(" A"));
 #endif
 }
 
-
 bool ACS758::startMonitoring()
 {
-  if (!this->successfullyInitialized || !this->ads1115)
+  if (!this->initalized())
   {
+#ifdef DEBUG
+    this->System->Debugger->printWarning(F("Not initialized"), F("ACS758"));
+    this->System->Debugger->printBulletPoint(F("Monitoring can't start"));
+#endif
     return false;
   }
 
@@ -185,7 +201,7 @@ bool ACS758::startMonitoring()
   this->stopMonitoring();
 
 #ifdef DEBUG
-  this->System->Msg->printInformation(F("Starting ACS758 monitoring"), F("ACS758"));
+  this->System->Debugger->printInformation(F("Starting ACS758 monitoring"), F("ACS758"));
 #endif
 
   // Schedule the event to take readings at the configured interval
@@ -205,9 +221,9 @@ bool ACS758::startMonitoring()
       });
 
 #ifdef DEBUG
-  this->System->Msg->printBulletPoint(F("Monitoring started with interval: "));
-  this->System->Msg->printValue(this->config->readInterval);
-  this->System->Msg->printValue(F("s"));
+  this->System->Debugger->printBulletPoint(F("Monitoring started with interval: "));
+  this->System->Debugger->printValue(this->config->readInterval);
+  this->System->Debugger->printValue(F("s"));
 #endif
 
   return true;
@@ -218,7 +234,7 @@ bool ACS758::stopMonitoring()
   if (this->scheduledEventId > 0)
   {
 #ifdef DEBUG
-    this->System->Msg->printInformation(F("Stopping ACS758 monitoring"), F("ACS758"));
+    this->System->Debugger->printInformation(F("Stopping ACS758 monitoring"), F("ACS758"));
 #endif
 
     // Cancel the scheduled event
@@ -235,15 +251,16 @@ bool ACS758::stopMonitoring()
 
 bool ACS758::calibrateZeroPoint()
 {
-  if (!this->ads1115) {
+  if (!this->ads1115)
+  {
 #ifdef DEBUG
-    this->System->Msg->printError(F("ADS1115 not available for calibration"), F("ACS758"));
+    this->System->Debugger->printError(F("ADS1115 not available for calibration"), F("ACS758"));
 #endif
     return false;
   }
 
 #ifdef DEBUG
-  this->System->Msg->printInformation(F("Calibrating ACS758 zero point"), F("ACS758"));
+  this->System->Debugger->printInformation(F("Calibrating ACS758 zero point"), F("ACS758"));
 #endif
 
   // Ensure no current is flowing through the sensor before calling this method
@@ -261,9 +278,9 @@ bool ACS758::calibrateZeroPoint()
   this->config->zeroPoint = total / (float)samples;
 
 #ifdef DEBUG
-  this->System->Msg->printBulletPoint(F("New zero point: "));
-  this->System->Msg->printValue(this->config->zeroPoint);
-  this->System->Msg->printValue(F(" V"));
+  this->System->Debugger->printBulletPoint(F("New zero point: "));
+  this->System->Debugger->printValue(this->config->zeroPoint);
+  this->System->Debugger->printValue(F(" V"));
 #endif
 
   // Save the configuration

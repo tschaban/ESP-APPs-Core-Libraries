@@ -13,7 +13,7 @@ bool ESPAPP_HTTPServer::init(void)
   this->HTTPServer->begin(80);
 
 #ifdef DEBUG
-  this->System->Msg->printBulletPoint(F("HTTP Server is up&running"));
+  this->System->Debugger->printBulletPoint(F("HTTP Server is up&running"));
 #endif
 
   return true;
@@ -27,10 +27,10 @@ void ESPAPP_HTTPServer::listener(void)
 bool ESPAPP_HTTPServer::pushHTMLResponse()
 {
 #ifdef DEBUG
-  this->System->Msg->printBulletPoint(F("Pushing HTML response: "));
-  this->System->Msg->printValue(this->outputStream->length(), F("B"));
-  this->System->Msg->printBulletPoint(F("Response HTTP code: "));
-  this->System->Msg->printValue(this->HTTPRequest->HTTPResponseCode);
+  this->System->Debugger->printBulletPoint(F("Pushing HTML response: "));
+  this->System->Debugger->printValue(this->outputStream->length(), F("B"));
+  this->System->Debugger->printBulletPoint(F("Response HTTP code: "));
+  this->System->Debugger->printValue(this->HTTPRequest->HTTPResponseCode);
 #endif
   this->HTTPServer->sendHeader(F("Cache-Control"), F("no-cache"));
   // this->HTTPServer->setContentLength(CONTENT_LENGTH_UNKNOWN);
@@ -39,7 +39,7 @@ bool ESPAPP_HTTPServer::pushHTMLResponse()
   this->HTTPServer->send(this->HTTPRequest->HTTPResponseCode, F("text/html"), this->outputStream->c_str());
 
 #ifdef DEBUG
-  this->System->Msg->printBulletPoint(F("Site published"));
+  this->System->Debugger->printBulletPoint(F("Site published"));
 #endif
   return true;
 }
@@ -52,8 +52,8 @@ void ESPAPP_HTTPServer::readDirectoryFromHTTPRequestParameter1(char *path) // re
   }
 
 #ifdef DEBUG
-  this->System->Msg->printBulletPoint(F("Directory: "));
-  this->System->Msg->printValue(path);
+  this->System->Debugger->printBulletPoint(F("Directory: "));
+  this->System->Debugger->printValue(path);
 #endif
 }
 
@@ -83,14 +83,14 @@ void ESPAPP_HTTPServer::readHTTPRequest(void)
   }
 
 #ifdef DEBUG
-  this->System->Msg->printBulletPoint(F("Site ID: "));
-  this->System->Msg->printValue(this->HTTPRequest->siteId);
-  this->System->Msg->printBulletPoint(F("Command: "));
-  this->System->Msg->printValue(this->HTTPRequest->command);
-  this->System->Msg->printBulletPoint(F("Action: "));
-  this->System->Msg->printValue(this->HTTPRequest->action);
-  this->System->Msg->printBulletPoint(F("Option: "));
-  this->System->Msg->printValue(this->HTTPRequest->option);
+  this->System->Debugger->printBulletPoint(F("Site ID: "));
+  this->System->Debugger->printValue(this->HTTPRequest->siteId);
+  this->System->Debugger->printBulletPoint(F("Command: "));
+  this->System->Debugger->printValue(this->HTTPRequest->command);
+  this->System->Debugger->printBulletPoint(F("Action: "));
+  this->System->Debugger->printValue(this->HTTPRequest->action);
+  this->System->Debugger->printBulletPoint(F("Option: "));
+  this->System->Debugger->printValue(this->HTTPRequest->option);
 #endif
 }
 
@@ -102,9 +102,9 @@ void ESPAPP_HTTPServer::processUploadFile(void)
   {
 
 #ifdef DEBUG
-    this->System->Msg->printBulletPoint(F("Upload Started"));
-    this->System->Msg->printBulletPoint(F("Buffer size: "));
-    this->System->Msg->printValue(HTTP_UPLOAD_BUFLEN);
+    this->System->Debugger->printBulletPoint(F("Upload Started"));
+    this->System->Debugger->printBulletPoint(F("Buffer size: "));
+    this->System->Debugger->printValue(HTTP_UPLOAD_BUFLEN);
 #endif
 
     fileSize = 0;
@@ -126,25 +126,25 @@ void ESPAPP_HTTPServer::processUploadFile(void)
         fileSize += uploadFile.currentSize;
         fileBuffer.insert(fileBuffer.end(), uploadFile.buf, uploadFile.buf + uploadFile.currentSize);
 #ifdef DEBUG
-        this->System->Msg->printValue(F("."));
+        this->System->Debugger->printValue(F("."));
 #endif
       }
 #ifdef DEBUG
     }
     else
     {
-      this->System->Msg->printValue(F("!"));
+      this->System->Debugger->printValue(F("!"));
 #endif
     }
   }
   else if (uploadFile.status == UPLOAD_FILE_END)
   {
 #ifdef DEBUG
-    this->System->Msg->printBulletPoint(F("Uploaded finished"));
-    this->System->Msg->printBulletPoint(F("Upload: File name: "));
-    this->System->Msg->printValue(uploadFile.filename);
-    this->System->Msg->printBulletPoint(F("Upload: Size: "));
-    this->System->Msg->printValue(uploadFile.totalSize, F("B"));
+    this->System->Debugger->printBulletPoint(F("Uploaded finished"));
+    this->System->Debugger->printBulletPoint(F("Upload: File name: "));
+    this->System->Debugger->printValue(uploadFile.filename);
+    this->System->Debugger->printBulletPoint(F("Upload: Size: "));
+    this->System->Debugger->printValue(uploadFile.totalSize, F("B"));
 #endif
 
     if (!fileExededSize)
@@ -154,9 +154,9 @@ void ESPAPP_HTTPServer::processUploadFile(void)
 #ifdef DEBUG
     else
     {
-      this->System->Msg->printError(F("Max uploaded file size exceeded"), F("HTTP Server"));
-      this->System->Msg->printValue((uint16_t)ESPAPP_FILE_MAX_SIZE / 1024);
-      this->System->Msg->printValue(F("kB"));
+      this->System->Debugger->printError(F("Max uploaded file size exceeded"), F("HTTP Server"));
+      this->System->Debugger->printValue((uint16_t)ESPAPP_FILE_MAX_SIZE / 1024);
+      this->System->Debugger->printValue(F("kB"));
     }
 #endif
   }
@@ -179,14 +179,14 @@ bool ESPAPP_HTTPServer::saveUploadedFile(void)
   this->readDirectoryFromHTTPRequestParameter1(directory);
 
 #ifdef DEBUG
-  this->System->Msg->printBulletPoint(F("Save to directory: "));
-  this->System->Msg->printValue(directory);
+  this->System->Debugger->printBulletPoint(F("Save to directory: "));
+  this->System->Debugger->printValue(directory);
 #endif
 
   if (strlen(uploadFileName) > 0)
   {
 #ifdef DEBUG
-    this->System->Msg->printBulletPoint(F("Saving in the file system"));
+    this->System->Debugger->printBulletPoint(F("Saving in the file system"));
 #endif
     success = this->System->Flash->uploadFile(directory, uploadFileName,
                                               fileBuffer.data(), uploadFile.totalSize);
@@ -194,7 +194,7 @@ bool ESPAPP_HTTPServer::saveUploadedFile(void)
 #ifdef DEBUG
   else
   {
-    this->System->Msg->printError(F("Empty file name"), F("HTTP Server"));
+    this->System->Debugger->printError(F("Empty file name"), F("HTTP Server"));
   }
 #endif
   return success;
@@ -205,8 +205,8 @@ bool ESPAPP_HTTPServer::downloadFile(const char *directory, const char *filename
 
   this->System->Flash->getPathToFile(this->System->Flash->fileName, directory, filename);
 #ifdef DEBUG
-  this->System->Msg->printBulletPoint(F("Downloading file: "));
-  this->System->Msg->printValue(this->System->Flash->fileName);
+  this->System->Debugger->printBulletPoint(F("Downloading file: "));
+  this->System->Debugger->printValue(this->System->Flash->fileName);
 #endif
 
   if (this->System->Flash->fileSystem.exists(this->System->Flash->fileName))
@@ -227,8 +227,8 @@ bool ESPAPP_HTTPServer::downloadFile(const char *directory, const char *filename
 #ifdef DEBUG
   else
   {
-    this->System->Msg->printError(F("File not found: "), F("File Explorer"));
-    this->System->Msg->printValue(filename);
+    this->System->Debugger->printError(F("File not found: "), F("File Explorer"));
+    this->System->Debugger->printValue(filename);
   }
 #endif
   return false;
@@ -243,7 +243,7 @@ bool ESPAPP_HTTPServer::processCSSFileRequest(void)
 {
   bool success = true;
 #ifdef DEBUG
-  this->System->Msg->printInformation(F("Processing CSS file request"), F("HTTP Server"));
+  this->System->Debugger->printInformation(F("Processing CSS file request"), F("HTTP Server"));
 #endif
 
   char pathToCSSFile[strlen_P(path_data) + strlen_P(path_root) + ESPAPP_FILE_MAX_FILE_NAME_LENGTH];
@@ -253,15 +253,15 @@ bool ESPAPP_HTTPServer::processCSSFileRequest(void)
     sprintf(pathToCSSFile, "%s%s%s", FPSTR(path_ui), FPSTR(path_root), this->HTTPServer->arg(F("name")).c_str());
 
 #ifdef DEBUG
-    this->System->Msg->printBulletPoint(F("CSS: "));
-    this->System->Msg->printValue(pathToCSSFile);
+    this->System->Debugger->printBulletPoint(F("CSS: "));
+    this->System->Debugger->printValue(pathToCSSFile);
 #endif
   }
   else
   {
     success = false;
 #ifdef DEBUG
-    this->System->Msg->printError(F("CSS file name not provided"), F("HTTP Server"));
+    this->System->Debugger->printBulletPoint(F("CSS file name not provided"), ESPAPP_DEBUGGER_MESSAGE_COLOR::BLUE);
 #endif
   }
 
@@ -279,7 +279,7 @@ bool ESPAPP_HTTPServer::processCSSFileRequest(void)
       // }
 
 #ifdef DEBUG
-      this->System->Msg->printBulletPoint(F("CSS file streamed successfully"));
+      this->System->Debugger->printBulletPoint(F("CSS file streamed successfully"));
 #endif
     }
     else
@@ -292,7 +292,7 @@ bool ESPAPP_HTTPServer::processCSSFileRequest(void)
   {
     this->HTTPServer->send(404, "text/plain", "File Not Found");
 #ifdef DEBUG
-    this->System->Msg->printError(F("CSS file not found"), F("HTTP Server"));
+    this->System->Debugger->printBulletPoint(F("CSS file not found"), ESPAPP_DEBUGGER_MESSAGE_COLOR::RED);
 #endif
   }
 
@@ -303,7 +303,7 @@ bool ESPAPP_HTTPServer::processJSFileRequest(void)
 {
   bool success = true;
 #ifdef DEBUG
-  this->System->Msg->printInformation(F("Processing JS file request"), F("HTTP Server"));
+  this->System->Debugger->printInformation(F("Processing JS file request"), F("HTTP Server"));
 #endif
 
   char pathToJSFile[strlen_P(path_data) + strlen_P(path_root) + ESPAPP_FILE_MAX_FILE_NAME_LENGTH];
@@ -313,15 +313,15 @@ bool ESPAPP_HTTPServer::processJSFileRequest(void)
     sprintf(pathToJSFile, "%s%s%s", FPSTR(path_ui), FPSTR(path_root), this->HTTPServer->arg(F("name")).c_str());
 
 #ifdef DEBUG
-    this->System->Msg->printBulletPoint(F("JS: "));
-    this->System->Msg->printValue(pathToJSFile);
+    this->System->Debugger->printBulletPoint(F("JS: "));
+    this->System->Debugger->printValue(pathToJSFile);
 #endif
   }
   else
   {
     success = false;
 #ifdef DEBUG
-    this->System->Msg->printError(F("JS file name not provided"), F("HTTP Server"));
+    this->System->Debugger->printBulletPoint(F("JS file name not provided"), ESPAPP_DEBUGGER_MESSAGE_COLOR::BLUE);
 #endif
   }
 
@@ -339,7 +339,7 @@ bool ESPAPP_HTTPServer::processJSFileRequest(void)
       // }
 
 #ifdef DEBUG
-      this->System->Msg->printBulletPoint(F("JS file streamed successfully"));
+      this->System->Debugger->printBulletPoint(F("JS file streamed successfully"));
 #endif
     }
     else
@@ -352,7 +352,7 @@ bool ESPAPP_HTTPServer::processJSFileRequest(void)
   {
     this->HTTPServer->send(404, "text/plain", "File Not Found");
 #ifdef DEBUG
-    this->System->Msg->printError(F("JS file not found"), F("HTTP Server"));
+    this->System->Debugger->printBulletPoint(F("JS file not found"), ESPAPP_DEBUGGER_MESSAGE_COLOR::RED);
 #endif
   }
 

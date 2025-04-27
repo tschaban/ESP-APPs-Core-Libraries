@@ -5,7 +5,7 @@ ESPAPP_FileDownloader::ESPAPP_FileDownloader(ESPAPP_Core *_System)
     this->System = _System;
 
 #ifdef DEBUG
-    this->System->Msg->printInformation(F("File downloader initialized"), F("DOWNLOAD"));
+    this->System->Debugger->printInformation(F("File downloader initialized"), F("DOWNLOAD"));
 #endif
 }
 
@@ -28,13 +28,13 @@ bool ESPAPP_FileDownloader::checkAvailableSpace(size_t size)
 ESPAPP_DOWNLOAD_STATUS ESPAPP_FileDownloader::downloadFile(const char *url, const char *directory, const char *filename)
 {
 #ifdef DEBUG
-    this->System->Msg->printInformation(F("Downloading file from URL"), F("DOWNLOAD"));
-    this->System->Msg->printBulletPoint(F("URL: "));
-    this->System->Msg->printValue(url);
-    this->System->Msg->printBulletPoint(F("Target directory: "));
-    this->System->Msg->printValue(directory);
-    this->System->Msg->printBulletPoint(F("Filename: "));
-    this->System->Msg->printValue(filename);
+    this->System->Debugger->printInformation(F("Downloading file from URL"), F("DOWNLOAD"));
+    this->System->Debugger->printBulletPoint(F("URL: "));
+    this->System->Debugger->printValue(url);
+    this->System->Debugger->printBulletPoint(F("Target directory: "));
+    this->System->Debugger->printValue(directory);
+    this->System->Debugger->printBulletPoint(F("Filename: "));
+    this->System->Debugger->printValue(filename);
 #endif
 
     // Set timeout for connection
@@ -49,18 +49,18 @@ ESPAPP_DOWNLOAD_STATUS ESPAPP_FileDownloader::downloadFile(const char *url, cons
     if (!parseUrl(url, host, port, path))
     {
 #ifdef DEBUG
-        this->System->Msg->printError(F("Invalid URL format"), F("DOWNLOAD"));
+        this->System->Debugger->printError(F("Invalid URL format"), F("DOWNLOAD"));
 #endif
         return DOWNLOAD_ERROR_CANNOT_CONNECT;
     }
 
 #ifdef DEBUG
-    this->System->Msg->printBulletPoint(F("Host: "));
-    this->System->Msg->printValue(host);
-    this->System->Msg->printBulletPoint(F("Port: "));
-    this->System->Msg->printValue(port);
-    this->System->Msg->printBulletPoint(F("Path: "));
-    this->System->Msg->printValue(path);
+    this->System->Debugger->printBulletPoint(F("Host: "));
+    this->System->Debugger->printValue(host);
+    this->System->Debugger->printBulletPoint(F("Port: "));
+    this->System->Debugger->printValue(port);
+    this->System->Debugger->printBulletPoint(F("Path: "));
+    this->System->Debugger->printValue(path);
 #endif
 
     // Begin HTTP connection
@@ -73,8 +73,8 @@ ESPAPP_DOWNLOAD_STATUS ESPAPP_FileDownloader::downloadFile(const char *url, cons
     if (httpCode <= 0)
     {
 #ifdef DEBUG
-        this->System->Msg->printError(F("Connection failed: "), F("DOWNLOAD"));
-        this->System->Msg->printValue(http.errorToString(httpCode).c_str());
+        this->System->Debugger->printError(F("Connection failed: "), F("DOWNLOAD"));
+        this->System->Debugger->printValue(http.errorToString(httpCode).c_str());
 #endif
         http.end();
         return DOWNLOAD_ERROR_CANNOT_CONNECT;
@@ -84,8 +84,8 @@ ESPAPP_DOWNLOAD_STATUS ESPAPP_FileDownloader::downloadFile(const char *url, cons
     if (httpCode != HTTP_CODE_OK)
     {
 #ifdef DEBUG
-        this->System->Msg->printError(F("HTTP error code: "), F("DOWNLOAD"));
-        this->System->Msg->printValue(httpCode);
+        this->System->Debugger->printError(F("HTTP error code: "), F("DOWNLOAD"));
+        this->System->Debugger->printValue(httpCode);
 #endif
         http.end();
 
@@ -107,24 +107,24 @@ ESPAPP_DOWNLOAD_STATUS ESPAPP_FileDownloader::downloadFile(const char *url, cons
     int contentLength = http.getSize();
 
 #ifdef DEBUG
-    this->System->Msg->printBulletPoint(F("Content length: "));
-    this->System->Msg->printValue(contentLength, F(" bytes"));
+    this->System->Debugger->printBulletPoint(F("Content length: "));
+    this->System->Debugger->printValue(contentLength, F(" bytes"));
 #endif
 
     // Check if content length is valid
     if (contentLength <= 0)
     {
 #ifdef DEBUG
-        this->System->Msg->printWarning(F("Content length is invalid or unknown"), F("DOWNLOAD"));
+        this->System->Debugger->printWarning(F("Content length is invalid or unknown"), F("DOWNLOAD"));
 #endif
     }
     else if (contentLength > MAX_DOWNLOAD_SIZE)
     {
 #ifdef DEBUG
-        this->System->Msg->printError(F("File too large: "), F("DOWNLOAD"));
-        this->System->Msg->printValue(contentLength, F(" bytes"));
-        this->System->Msg->printValue(F(" > Maximum allowed: "));
-        this->System->Msg->printValue(MAX_DOWNLOAD_SIZE, F(" bytes"));
+        this->System->Debugger->printError(F("File too large: "), F("DOWNLOAD"));
+        this->System->Debugger->printValue(contentLength, F(" bytes"));
+        this->System->Debugger->printValue(F(" > Maximum allowed: "));
+        this->System->Debugger->printValue(MAX_DOWNLOAD_SIZE, F(" bytes"));
 #endif
         http.end();
         return DOWNLOAD_ERROR_INSUFFICIENT_SPACE;
@@ -134,7 +134,7 @@ ESPAPP_DOWNLOAD_STATUS ESPAPP_FileDownloader::downloadFile(const char *url, cons
     if (contentLength > 0 && !checkAvailableSpace(contentLength))
     {
 #ifdef DEBUG
-        this->System->Msg->printError(F("Insufficient space in filesystem"), F("DOWNLOAD"));
+        this->System->Debugger->printError(F("Insufficient space in filesystem"), F("DOWNLOAD"));
 #endif
         http.end();
         return DOWNLOAD_ERROR_INSUFFICIENT_SPACE;
@@ -148,8 +148,8 @@ ESPAPP_DOWNLOAD_STATUS ESPAPP_FileDownloader::downloadFile(const char *url, cons
     this->System->Flash->getPathToFile(filePath, directory, filename);
 
 #ifdef DEBUG
-    this->System->Msg->printBulletPoint(F("Saving to path: "));
-    this->System->Msg->printValue(filePath);
+    this->System->Debugger->printBulletPoint(F("Saving to path: "));
+    this->System->Debugger->printValue(filePath);
 #endif
 
     // Open the file for writing
@@ -159,7 +159,7 @@ ESPAPP_DOWNLOAD_STATUS ESPAPP_FileDownloader::downloadFile(const char *url, cons
     if (!file)
     {
 #ifdef DEBUG
-        this->System->Msg->printError(F("Failed to open file for writing"), F("DOWNLOAD"));
+        this->System->Debugger->printError(F("Failed to open file for writing"), F("DOWNLOAD"));
 #endif
         http.end();
         return DOWNLOAD_ERROR_WRITE_FAILED;
@@ -186,7 +186,7 @@ ESPAPP_DOWNLOAD_STATUS ESPAPP_FileDownloader::downloadFile(const char *url, cons
             if (file.write(buffer, c) != c)
             {
 #ifdef DEBUG
-                this->System->Msg->printError(F("Write failed"), F("DOWNLOAD"));
+                this->System->Debugger->printError(F("Write failed"), F("DOWNLOAD"));
 #endif
                 file.close();
                 http.end();
@@ -203,13 +203,13 @@ ESPAPP_DOWNLOAD_STATUS ESPAPP_FileDownloader::downloadFile(const char *url, cons
 #ifdef DEBUG
                 if (contentLength > 0)
                 {
-                    this->System->Msg->printBulletPoint(F("Progress: "));
-                    this->System->Msg->printValue((totalBytesRead * 100) / contentLength, F("%"));
+                    this->System->Debugger->printBulletPoint(F("Progress: "));
+                    this->System->Debugger->printValue((totalBytesRead * 100) / contentLength, F("%"));
                 }
                 else
                 {
-                    this->System->Msg->printBulletPoint(F("Downloaded: "));
-                    this->System->Msg->printValue(totalBytesRead, F(" bytes"));
+                    this->System->Debugger->printBulletPoint(F("Downloaded: "));
+                    this->System->Debugger->printValue(totalBytesRead, F(" bytes"));
                 }
 #endif
             }
@@ -224,7 +224,7 @@ ESPAPP_DOWNLOAD_STATUS ESPAPP_FileDownloader::downloadFile(const char *url, cons
         if (millis() - lastTimeUpdate > CONNECTION_TIMEOUT * 2)
         {
 #ifdef DEBUG
-            this->System->Msg->printError(F("Download timeout"), F("DOWNLOAD"));
+            this->System->Debugger->printError(F("Download timeout"), F("DOWNLOAD"));
 #endif
             file.close();
             http.end();
@@ -239,8 +239,8 @@ ESPAPP_DOWNLOAD_STATUS ESPAPP_FileDownloader::downloadFile(const char *url, cons
     http.end();
 
 #ifdef DEBUG
-    this->System->Msg->printInformation(F("Download complete: "), F("DOWNLOAD"));
-    this->System->Msg->printValue(totalBytesRead, F(" bytes"));
+    this->System->Debugger->printInformation(F("Download complete: "), F("DOWNLOAD"));
+    this->System->Debugger->printValue(totalBytesRead, F(" bytes"));
 #endif
 
     return DOWNLOAD_SUCCESS;

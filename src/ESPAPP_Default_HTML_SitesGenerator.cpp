@@ -17,7 +17,7 @@ ESPAPP_HTML_SitesGenerator::~ESPAPP_HTML_SitesGenerator() {};
 bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
 {
 #ifdef DEBUG
-    this->System->Msg->printBulletPoint(F("Generating site: started"));
+    this->System->Debugger->printBulletPoint(F("Generating site: started"));
 #endif
 
     bool success = false;
@@ -44,14 +44,14 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
             this->UI->addSelectFormItemOpen(this->HTMLResponse, FPSTR(HTML_UI_FORM_INPUT_COMMON_0), F(""));
 
 #ifdef DEBUG
-            this->System->Msg->printBulletPoint(F("Scanning for WiFi networks"));
+            this->System->Debugger->printBulletPoint(F("Scanning for WiFi networks"));
 #endif
 
             int8_t numberOfNetworks = WiFi.scanNetworks();
             char _ssid[33];
 #ifdef DEBUG
-            this->System->Msg->printBulletPoint(F("Number of networks: "));
-            this->System->Msg->printValue(numberOfNetworks);
+            this->System->Debugger->printBulletPoint(F("Number of networks: "));
+            this->System->Debugger->printValue(numberOfNetworks);
 #endif
 
             if (numberOfNetworks > 0)
@@ -172,8 +172,8 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
             if ((this->Server->HTTPServer->hasArg("a")))
             {
 #ifdef DEBUG
-                this->System->Msg->printBulletPoint(F("Action detected: "));
-                this->System->Msg->printValue(this->Server->HTTPServer->arg("a").c_str());
+                this->System->Debugger->printBulletPoint(F("Action detected: "));
+                this->System->Debugger->printValue(this->Server->HTTPServer->arg("a").c_str());
 #endif
                 this->Server->HTTPRequest->action = this->Server->HTTPServer->arg("a").toInt();
             }
@@ -254,11 +254,11 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
                 break;
 #ifdef DEBUG
             case ESPAPP_NONE:
-                this->System->Msg->printBulletPoint(F("No action set"));
+                this->System->Debugger->printBulletPoint(F("No action set"));
                 break;
             default:
-                this->System->Msg->printError(F("Action not implmented: "), F("File Explorer"));
-                this->System->Msg->printValue(this->Server->HTTPRequest->action);
+                this->System->Debugger->printError(F("Action not implmented: "), F("File Explorer"));
+                this->System->Debugger->printValue(this->Server->HTTPRequest->action);
                 break;
 #endif
             }
@@ -350,7 +350,7 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
         {
 
 #ifdef DEBUG
-            this->System->Msg->printInformation(F("Download UI components event handled"), F("SYSTEM EVENT"));
+            this->System->Debugger->printInformation(F("Download UI components event handled"), F("SYSTEM EVENT"));
 #endif
 
             this->UI->openSection(this->HTMLResponse, F("UI Components"), F("Downloading UI components"));
@@ -473,15 +473,15 @@ bool ESPAPP_HTML_SitesGenerator::processHTTPRequest(void)
 #endif
 
 #ifdef DEBUG
-    this->System->Msg->printBulletPoint(F("Site generated"));
+    this->System->Debugger->printBulletPoint(F("Site generated"));
     if (this->HTMLResponse->length() > ESPAPP_HTTP_HTML_MAX_RESPONSE_SIZE)
     {
-        this->System->Msg->printError(F("Site too long"), F("HTTP response"));
-        this->System->Msg->printBulletPoint(F("Max size: "));
-        this->System->Msg->printValue(ESPAPP_HTTP_HTML_MAX_RESPONSE_SIZE);
+        this->System->Debugger->printError(F("Site too long"), F("HTTP response"));
+        this->System->Debugger->printBulletPoint(F("Max size: "));
+        this->System->Debugger->printValue(ESPAPP_HTTP_HTML_MAX_RESPONSE_SIZE);
     }
-    this->System->Msg->printBulletPoint(F("Site size: "));
-    this->System->Msg->printValue(this->HTMLResponse->length());
+    this->System->Debugger->printBulletPoint(F("Site size: "));
+    this->System->Debugger->printValue(this->HTMLResponse->length());
 #endif
 
     return success;

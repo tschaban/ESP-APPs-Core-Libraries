@@ -9,7 +9,7 @@
 #include <ESPAPP_Parameters.h>
 
 #ifdef DEBUG
-#include <ESPAPP_SerialMessages.h>
+#include <ESPAPP_SerialDebugger.h>
 #endif
 
 // Event callback type definition
@@ -35,13 +35,13 @@ private:
     uint16_t nextScheduledEventId = 1;
 
 #ifdef DEBUG
-    ESPAPP_SerialMessages *Msg;
+ESPAPP_SerialDebugger *Debugger;
     const char *getEventName(uint16_t eventId);
 #endif
 
 public:
 #ifdef DEBUG
-    ESPAPP_EventManager(ESPAPP_SerialMessages *_Msg);
+    ESPAPP_EventManager(ESPAPP_SerialDebugger *_Debugger);
 #else
     ESPAPP_EventManager();
 #endif

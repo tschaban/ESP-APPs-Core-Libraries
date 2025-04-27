@@ -13,8 +13,8 @@ ESPAPP_HTTPServerContainer::~ESPAPP_HTTPServerContainer() {
 bool ESPAPP_HTTPServerContainer::init(void)
 {
 #ifdef DEBUG
-    this->System->Msg->printInformation(F("Initializing HTTP Server"), F("HTTP Server"));
-    this->System->Msg->printBulletPoint(F("Setting HTTP handlers"));
+    this->System->Debugger->printInformation(F("Initializing HTTP Server"), F("HTTP Server"));
+    this->System->Debugger->printBulletPoint(F("Setting HTTP handlers"));
 #endif
 
     onNotFound(std::bind(&ESPAPP_HTTPServerContainer::handleHTTPRequests, this));
@@ -35,8 +35,8 @@ void ESPAPP_HTTPServerContainer::handleHTTPRequests(void)
 {
 
 #ifdef DEBUG
-    this->System->Msg->printHeader(1, 0, ESPAPP_MSG_HEADER_DEFAULT_LENGTH, ESPAPP_MSG_HEADER_TYPE_DASH);
-    this->System->Msg->printInformation(F("New HTTP Request"), F("HTTP Server"));
+    this->System->Debugger->printHeader(1, 0, ESPAPP_MSG_HEADER_DEFAULT_LENGTH, ESPAPP_DEBUGGER_MESSAGE_HEADER_TYPE::DASH);
+    this->System->Debugger->printInformation(F("New HTTP Request"), F("HTTP Server"));
 #endif
     this->Server->readHTTPRequest();
     this->Site->processHTTPRequest();
@@ -44,7 +44,7 @@ void ESPAPP_HTTPServerContainer::handleHTTPRequests(void)
     this->handleCommand();
 
 #ifdef DEBUG
-    this->System->Msg->printHeader(1, 1, ESPAPP_MSG_HEADER_DEFAULT_LENGTH, ESPAPP_MSG_HEADER_TYPE_DASH);
+    this->System->Debugger->printHeader(1, 1, ESPAPP_MSG_HEADER_DEFAULT_LENGTH, ESPAPP_DEBUGGER_MESSAGE_HEADER_TYPE::DASH);
 #endif
 }
 

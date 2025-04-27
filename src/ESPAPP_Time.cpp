@@ -1,9 +1,9 @@
 #include "ESPAPP_Time.h"
 
 #ifdef DEBUG
-ESPAPP_Time::ESPAPP_Time(ESPAPP_API_Flash *_Flash, ESPAPP_SerialMessages *_Msg)
+ESPAPP_Time::ESPAPP_Time(ESPAPP_API_Flash *_Flash, ESPAPP_SerialDebugger *_Debugger)
 {
-    this->Msg = _Msg;
+    this->Debugger = _Debugger;
     this->Flash = _Flash;
 };
 #else
@@ -17,7 +17,7 @@ ESPAPP_Time::ESPAPP_Time(ESPAPP_API_Flash *_Flash)
 bool ESPAPP_Time::init(void)
 {
 #ifdef DEBUG
-    this->Msg->printInformation(F("Initializing Time system"), F("TIME"));
+    this->Debugger->printInformation(F("Initializing Time system"), F("TIME"));
 #endif
     
     // Initialize last time info
@@ -36,7 +36,7 @@ bool ESPAPP_Time::init(void)
     if (!success)
     {
 #ifdef DEBUG
-        this->Msg->printWarning(F("Failed to read time configuration, creating default"), F("TIME"));
+        this->Debugger->printWarning(F("Failed to read time configuration, creating default"), F("TIME"));
 #endif
         success = createDefaultConfiguration();
     }
@@ -53,7 +53,7 @@ bool ESPAPP_Time::init(void)
         if (this->configuration->autoSync)
         {
 #ifdef DEBUG
-            this->Msg->printInformation(F("Auto time sync is enabled"), F("TIME"));
+            this->Debugger->printInformation(F("Auto time sync is enabled"), F("TIME"));
 #endif
         }
     }
@@ -66,7 +66,7 @@ bool ESPAPP_Time::readConfiguration(void)
     bool success = false;
 
 #ifdef DEBUG
-    this->Msg->printInformation(F("Reading time configuration"), F("TIME"));
+    this->Debugger->printInformation(F("Reading time configuration"), F("TIME"));
 #endif
 
     StaticJsonDocument<512> doc;
@@ -90,18 +90,18 @@ bool ESPAPP_Time::readConfiguration(void)
         this->configuration->syncTimeout = doc["timeout"] | ESPAPP_TIME_DEFAULT_SYNC_TIMEOUT;
 
 #ifdef DEBUG
-        this->Msg->printBulletPoint(F("Timezone: "));
-        this->Msg->printValue(this->configuration->timezone);
-        this->Msg->printBulletPoint(F("Primary NTP: "));
-        this->Msg->printValue(this->configuration->primaryNTP);
-        this->Msg->printBulletPoint(F("Secondary NTP: "));
-        this->Msg->printValue(this->configuration->secondaryNTP);
-        this->Msg->printBulletPoint(F("Sync Interval: "));
-        this->Msg->printValue(this->configuration->syncInterval, F(" seconds"));
-        this->Msg->printBulletPoint(F("Auto Sync: "));
-        this->Msg->printValue(this->configuration->autoSync);
-        this->Msg->printBulletPoint(F("Sync Timeout: "));
-        this->Msg->printValue(this->configuration->syncTimeout, F(" ms"));
+        this->Debugger->printBulletPoint(F("Timezone: "));
+        this->Debugger->printValue(this->configuration->timezone);
+        this->Debugger->printBulletPoint(F("Primary NTP: "));
+        this->Debugger->printValue(this->configuration->primaryNTP);
+        this->Debugger->printBulletPoint(F("Secondary NTP: "));
+        this->Debugger->printValue(this->configuration->secondaryNTP);
+        this->Debugger->printBulletPoint(F("Sync Interval: "));
+        this->Debugger->printValue(this->configuration->syncInterval, F(" seconds"));
+        this->Debugger->printBulletPoint(F("Auto Sync: "));
+        this->Debugger->printValue(this->configuration->autoSync);
+        this->Debugger->printBulletPoint(F("Sync Timeout: "));
+        this->Debugger->printValue(this->configuration->syncTimeout, F(" ms"));
 
 #endif
     }
@@ -112,7 +112,7 @@ bool ESPAPP_Time::readConfiguration(void)
 bool ESPAPP_Time::createDefaultConfiguration(void)
 {
 #ifdef DEBUG
-    this->Msg->printInformation(F("Creating default time configuration"), F("TIME"));
+    this->Debugger->printInformation(F("Creating default time configuration"), F("TIME"));
 #endif
 
     // Set default values
@@ -130,7 +130,7 @@ bool ESPAPP_Time::createDefaultConfiguration(void)
 bool ESPAPP_Time::saveConfiguration(void)
 {
 #ifdef DEBUG
-    this->Msg->printInformation(F("Saving time configuration"), F("TIME"));
+    this->Debugger->printInformation(F("Saving time configuration"), F("TIME"));
 #endif
 
     StaticJsonDocument<512> doc; // @TODO check the size
@@ -156,8 +156,8 @@ void ESPAPP_Time::setTimeZone(const char *tz_info)
         tzset();
 
 #ifdef DEBUG
-        this->Msg->printInformation(F("Time zone set to"), F("TIME"));
-        this->Msg->printBulletPoint(this->configuration->timezone);
+        this->Debugger->printInformation(F("Time zone set to"), F("TIME"));
+        this->Debugger->printBulletPoint(this->configuration->timezone);
 #endif
     }
 }
@@ -183,11 +183,11 @@ void ESPAPP_Time::setNTPServers(const char *primary, const char *secondary)
     }
 
 #ifdef DEBUG
-    this->Msg->printInformation(F("NTP servers configured"), F("TIME"));
-    this->Msg->printBulletPoint(F("Primary: "));
-    this->Msg->printValue(this->configuration->primaryNTP);
-    this->Msg->printBulletPoint(F("Secondary: "));
-    this->Msg->printValue(this->configuration->secondaryNTP);
+    this->Debugger->printInformation(F("NTP servers configured"), F("TIME"));
+    this->Debugger->printBulletPoint(F("Primary: "));
+    this->Debugger->printValue(this->configuration->primaryNTP);
+    this->Debugger->printBulletPoint(F("Secondary: "));
+    this->Debugger->printValue(this->configuration->secondaryNTP);
 #endif
 }
 
@@ -205,7 +205,7 @@ bool ESPAPP_Time::synchronize()
 {
     bool success = false;
 #ifdef DEBUG
-    this->Msg->printInformation(F("Starting time synchronization"), F("TIME"));
+    this->Debugger->printInformation(F("Starting time synchronization"), F("TIME"));
 #endif
 
     // Configure SNTP
@@ -228,11 +228,11 @@ bool ESPAPP_Time::synchronize()
             lastSyncMillis = millis();
 
 #ifdef DEBUG
-            this->Msg->printInformation(F("Time synchronized successfully"), F("TIME"));
+            this->Debugger->printInformation(F("Time synchronized successfully"), F("TIME"));
             char timeStr[30];
             this->getCurrentTimeFormatted(timeStr, sizeof(timeStr));
-            this->Msg->printBulletPoint(F("Current time: "));
-            this->Msg->printValue(timeStr);
+            this->Debugger->printBulletPoint(F("Current time: "));
+            this->Debugger->printValue(timeStr);
 #endif
 
             success = true;
@@ -245,7 +245,7 @@ bool ESPAPP_Time::synchronize()
 #ifdef DEBUG
     if (!success)
     {
-        this->Msg->printWarning(F("Time synchronization failed"), F("TIME"));
+        this->Debugger->printWarning(F("Time synchronization failed"), F("TIME"));
     }
 #endif
     sntp_stop();
@@ -262,7 +262,7 @@ void ESPAPP_Time::getCurrentTime(ESPAPP_TIME_INFO *timeInfo)
         timeInfo->isValid = false;
 
 #ifdef DEBUG
-        this->Msg->printWarning(F("Time not synchronized yet"), F("TIME"));
+        this->Debugger->printWarning(F("Time not synchronized yet"), F("TIME"));
 #endif
 
         return;
@@ -334,7 +334,7 @@ uint32_t ESPAPP_Time::getEpochTime() {
 void ESPAPP_Time::printTimeInfo(ESPAPP_TIME_INFO* timeInfo) {
     if (!timeInfo->isValid) {
 #ifdef DEBUG
-        this->Msg->printWarning(F("Time not synchronized yet"), F("TIME"));
+        this->Debugger->printWarning(F("Time not synchronized yet"), F("TIME"));
 #endif
         return;
     }
@@ -346,8 +346,8 @@ void ESPAPP_Time::printTimeInfo(ESPAPP_TIME_INFO* timeInfo) {
         timeInfo->hour, timeInfo->minute, timeInfo->second,
         timeInfo->isAM ? "AM" : "PM");
     
-    this->Msg->printInformation(F("Current time"), F("TIME"));
-    this->Msg->printBulletPoint(buffer);
+    this->Debugger->printInformation(F("Current time"), F("TIME"));
+    this->Debugger->printBulletPoint(buffer);
 #endif
 }
 

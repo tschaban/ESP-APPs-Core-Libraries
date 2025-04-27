@@ -2,10 +2,10 @@
 #include <time.h>
 
 #ifdef DEBUG
-ESPAPP_EventManager::ESPAPP_EventManager(ESPAPP_SerialMessages *_Msg)
+ESPAPP_EventManager::ESPAPP_EventManager(ESPAPP_SerialDebugger *_Debugger)
 {
-    this->Msg = _Msg;
-    this->Msg->printInformation(F("Event Manager initialized"), F("EVENT"));
+    this->Debugger = _Debugger;
+    this->Debugger->printInformation(F("Event Manager initialized"), F("EVENT"));
 }
 #else
 ESPAPP_EventManager::ESPAPP_EventManager()
@@ -27,11 +27,11 @@ void ESPAPP_EventManager::addEventListener(uint16_t eventId, EventCallback callb
     eventCallbacks[eventId].push_back(callback);
 
 #ifdef DEBUG
-    this->Msg->printInformation(F("Event listener added"), F("EVENT"));
-    this->Msg->printBulletPoint(F("Event: "));
-    this->Msg->printValue(getEventName(eventId));
-    this->Msg->printBulletPoint(F("Total listeners: "));
-    this->Msg->printValue((int)eventCallbacks[eventId].size());
+    this->Debugger->printInformation(F("Event listener added"), F("EVENT"));
+    this->Debugger->printBulletPoint(F("Event: "));
+    this->Debugger->printValue(getEventName(eventId));
+    this->Debugger->printBulletPoint(F("Total listeners: "));
+    this->Debugger->printValue((int)eventCallbacks[eventId].size());
 #endif
 }
 
@@ -44,9 +44,9 @@ void ESPAPP_EventManager::removeEventListeners(uint16_t eventId)
         eventCallbacks.erase(eventId);
 
 #ifdef DEBUG
-        this->Msg->printInformation(F("All listeners removed"), F("EVENT"));
-        this->Msg->printBulletPoint(F("Event: "));
-        this->Msg->printValue(getEventName(eventId));
+        this->Debugger->printInformation(F("All listeners removed"), F("EVENT"));
+        this->Debugger->printBulletPoint(F("Event: "));
+        this->Debugger->printValue(getEventName(eventId));
 #endif
     }
 }
@@ -109,10 +109,10 @@ void ESPAPP_EventManager::triggerEvent(uint16_t eventId, void *data)
     if (eventCallbacks.find(eventId) != eventCallbacks.end())
     {
 #ifdef DEBUG
-        this->Msg->printInformation(F("Event triggered: "), F("EVENT"));
-        this->Msg->printValue(getEventName(eventId));
-        this->Msg->printValue(F(", Listeners: "));
-        this->Msg->printValue((uint16_t)eventCallbacks[eventId].size());
+        this->Debugger->printInformation(F("Event triggered: "), F("EVENT"));
+        this->Debugger->printValue(getEventName(eventId));
+        this->Debugger->printValue(F(", Listeners: "));
+        this->Debugger->printValue((uint16_t)eventCallbacks[eventId].size());
 #endif
 
         // Execute all callbacks for this event
@@ -124,9 +124,9 @@ void ESPAPP_EventManager::triggerEvent(uint16_t eventId, void *data)
 #ifdef DEBUG
     else
     {
-        this->Msg->printInformation(F("Event triggered (no listeners)"), F("EVENT"));
-        this->Msg->printBulletPoint(F("Event: "));
-        this->Msg->printValue(getEventName(eventId));
+        this->Debugger->printInformation(F("Event triggered (no listeners)"), F("EVENT"));
+        this->Debugger->printBulletPoint(F("Event: "));
+        this->Debugger->printValue(getEventName(eventId));
     }
 #endif
 }
@@ -154,33 +154,33 @@ uint16_t ESPAPP_EventManager::scheduleEvent(uint16_t eventId, time_t triggerTime
     struct tm *tm_info = localtime(&triggerTime);
     strftime(timeStr, 25, "%Y-%m-%d %H:%M:%S", tm_info);
 
-    this->Msg->printInformation(F("Event scheduled"), F("EVENT"));
-    this->Msg->printBulletPoint(F("Schedule ID: "));
-    this->Msg->printValue(scheduleId);
-    this->Msg->printBulletPoint(F("Event: "));
-    this->Msg->printValue(getEventName(eventId));
-    this->Msg->printBulletPoint(F("Trigger time: "));
-    this->Msg->printValue(timeStr);
+    this->Debugger->printInformation(F("Event scheduled"), F("EVENT"));
+    this->Debugger->printBulletPoint(F("Schedule ID: "));
+    this->Debugger->printValue(scheduleId);
+    this->Debugger->printBulletPoint(F("Event: "));
+    this->Debugger->printValue(getEventName(eventId));
+    this->Debugger->printBulletPoint(F("Trigger time: "));
+    this->Debugger->printValue(timeStr);
 
     if (repeatMode != SCHEDULE_ONCE)
     {
-        this->Msg->printBulletPoint(F("Repeat mode: "));
+        this->Debugger->printBulletPoint(F("Repeat mode: "));
 
         switch (repeatMode)
         {
         case SCHEDULE_REPEAT:
-            this->Msg->printValue(F("Repeating every "));
-            this->Msg->printValue(interval);
-            this->Msg->printValue(F(" seconds"));
+            this->Debugger->printValue(F("Repeating every "));
+            this->Debugger->printValue(interval);
+            this->Debugger->printValue(F(" seconds"));
             break;
         case SCHEDULE_DAILY:
-            this->Msg->printValue(F("Daily"));
+            this->Debugger->printValue(F("Daily"));
             break;
         case SCHEDULE_WEEKLY:
-            this->Msg->printValue(F("Weekly"));
+            this->Debugger->printValue(F("Weekly"));
             break;
         case SCHEDULE_MONTHLY:
-            this->Msg->printValue(F("Monthly"));
+            this->Debugger->printValue(F("Monthly"));
             break;
         }
     }
@@ -232,20 +232,20 @@ bool ESPAPP_EventManager::rescheduleEvent(uint16_t scheduleId, time_t newTrigger
         struct tm *tm_info = localtime(&newTriggerTime);
         strftime(timeStr, 25, "%Y-%m-%d %H:%M:%S", tm_info);
 
-        this->Msg->printInformation(F("Event rescheduled"), F("EVENT"));
-        this->Msg->printBulletPoint(F("Schedule ID: "));
-        this->Msg->printValue((int)scheduleId);
-        this->Msg->printBulletPoint(F("New trigger time: "));
-        this->Msg->printValue(timeStr);
+        this->Debugger->printInformation(F("Event rescheduled"), F("EVENT"));
+        this->Debugger->printBulletPoint(F("Schedule ID: "));
+        this->Debugger->printValue((int)scheduleId);
+        this->Debugger->printBulletPoint(F("New trigger time: "));
+        this->Debugger->printValue(timeStr);
 #endif
 
         return true;
     }
 
 #ifdef DEBUG
-    this->Msg->printWarning(F("Failed to reschedule event - ID not found"), F("EVENT"));
-    this->Msg->printBulletPoint(F("Schedule ID: "));
-    this->Msg->printValue((int)scheduleId);
+    this->Debugger->printWarning(F("Failed to reschedule event - ID not found"), F("EVENT"));
+    this->Debugger->printBulletPoint(F("Schedule ID: "));
+    this->Debugger->printValue((int)scheduleId);
 #endif
 
     return false;
@@ -266,18 +266,18 @@ bool ESPAPP_EventManager::cancelScheduledEvent(uint16_t scheduleId)
         scheduledEvents.erase(scheduleId);
 
 #ifdef DEBUG
-        this->Msg->printInformation(F("Scheduled event cancelled"), F("EVENT"));
-        this->Msg->printBulletPoint(F("Schedule ID: "));
-        this->Msg->printValue((int)scheduleId);
+        this->Debugger->printInformation(F("Scheduled event cancelled"), F("EVENT"));
+        this->Debugger->printBulletPoint(F("Schedule ID: "));
+        this->Debugger->printValue((int)scheduleId);
 #endif
 
         return true;
     }
 
 #ifdef DEBUG
-    this->Msg->printWarning(F("Failed to cancel scheduled event - ID not found"), F("EVENT"));
-    this->Msg->printBulletPoint(F("Schedule ID: "));
-    this->Msg->printValue((int)scheduleId);
+    this->Debugger->printWarning(F("Failed to cancel scheduled event - ID not found"), F("EVENT"));
+    this->Debugger->printBulletPoint(F("Schedule ID: "));
+    this->Debugger->printValue((int)scheduleId);
 #endif
 
     return false;
@@ -356,13 +356,13 @@ int ESPAPP_EventManager::countActiveScheduledEvents()
 void ESPAPP_EventManager::listScheduledEvents()
 {
 #ifdef DEBUG
-    this->Msg->printInformation(F("Listing scheduled events"), F("EVENT"));
-    this->Msg->printBulletPoint(F("Total events: "));
-    this->Msg->printValue((int)scheduledEvents.size());
+    this->Debugger->printInformation(F("Listing scheduled events"), F("EVENT"));
+    this->Debugger->printBulletPoint(F("Total events: "));
+    this->Debugger->printValue((int)scheduledEvents.size());
 
     if (scheduledEvents.empty())
     {
-        this->Msg->printBulletPoint(F("No scheduled events"));
+        this->Debugger->printBulletPoint(F("No scheduled events"));
         return;
     }
 
@@ -378,34 +378,34 @@ void ESPAPP_EventManager::listScheduledEvents()
 
         int32_t secondsRemaining = (int32_t)difftime(event.triggerTime, now);
 
-        this->Msg->printBulletPoint(F("ID: "));
-        this->Msg->printValue((int)event.id);
-        this->Msg->printBulletPoint(F("  Event: "));
-        this->Msg->printValue(getEventName(event.eventId));
-        this->Msg->printBulletPoint(F("  Time: "));
-        this->Msg->printValue(timeStr);
-        this->Msg->printBulletPoint(F("  Seconds remaining: "));
-        this->Msg->printValue((int)secondsRemaining);
+        this->Debugger->printBulletPoint(F("ID: "));
+        this->Debugger->printValue((int)event.id);
+        this->Debugger->printBulletPoint(F("  Event: "));
+        this->Debugger->printValue(getEventName(event.eventId));
+        this->Debugger->printBulletPoint(F("  Time: "));
+        this->Debugger->printValue(timeStr);
+        this->Debugger->printBulletPoint(F("  Seconds remaining: "));
+        this->Debugger->printValue((int)secondsRemaining);
 
         if (event.repeatMode != SCHEDULE_ONCE)
         {
-            this->Msg->printBulletPoint(F("  Repeat mode: "));
+            this->Debugger->printBulletPoint(F("  Repeat mode: "));
 
             switch (event.repeatMode)
             {
             case SCHEDULE_REPEAT:
-                this->Msg->printValue(F("Repeating every "));
-                this->Msg->printValue((int)event.interval);
-                this->Msg->printValue(F(" seconds"));
+                this->Debugger->printValue(F("Repeating every "));
+                this->Debugger->printValue((int)event.interval);
+                this->Debugger->printValue(F(" seconds"));
                 break;
             case SCHEDULE_DAILY:
-                this->Msg->printValue(F("Daily"));
+                this->Debugger->printValue(F("Daily"));
                 break;
             case SCHEDULE_WEEKLY:
-                this->Msg->printValue(F("Weekly"));
+                this->Debugger->printValue(F("Weekly"));
                 break;
             case SCHEDULE_MONTHLY:
-                this->Msg->printValue(F("Monthly"));
+                this->Debugger->printValue(F("Monthly"));
                 break;
             }
         }

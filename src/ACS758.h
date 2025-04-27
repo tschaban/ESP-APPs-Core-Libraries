@@ -42,6 +42,7 @@ public:
   
   // Initialization
   bool init();
+  bool initalized();                        // Check if the sensor is initialized
   // Measurement methods
   float getCurrentInAmps();                 // Get the current value in amps
   float getRawVoltage();                    // Get the last raw voltage reading

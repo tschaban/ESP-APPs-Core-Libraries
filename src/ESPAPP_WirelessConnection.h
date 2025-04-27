@@ -28,13 +28,14 @@ private:
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   unsigned long ledStartTime = 0;
+  AFELED *Led;
 #endif // AFE_CONFIG_HARDWARE_LED
 
   /**
    * @brief Used to count connection attemps before going to sleep mode
    *
    */
-  uint16_t connections = 0;
+  uint16_t secondsCounter = 0;
 
   /**
    * @brief Used to switch between Primary and Backup configuration
@@ -50,11 +51,9 @@ private:
    */
   boolean sleepMode = false;
   unsigned long sleepStartTime = 0;
-  uint16_t scecondsTimer = 0;
+  uint16_t secondsTimer = 0;
 
-#ifdef AFE_CONFIG_HARDWARE_LED
-  AFELED *Led;
-#endif // AFE_CONFIG_HARDWARE_LED
+
 
   /**
    * @brief is set to true when connection to WiFi is established

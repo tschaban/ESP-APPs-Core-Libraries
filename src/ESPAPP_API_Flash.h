@@ -9,14 +9,14 @@
 #include <FS.h>
 
 #ifdef DEBUG
-#include <ESPAPP_SerialMessages.h>
+#include <ESPAPP_SerialDebugger.h>
 #endif
 
 class ESPAPP_API_Flash
 {
 private:
 #ifdef DEBUG
-  ESPAPP_SerialMessages *Msg;
+  ESPAPP_SerialDebugger *Debugger;
 #endif
 
   bool fileSystemReady = false;
@@ -31,7 +31,7 @@ private:
 
 public:
 #ifdef DEBUG
-  ESPAPP_API_Flash(ESPAPP_SerialMessages *_Msg);
+  ESPAPP_API_Flash(ESPAPP_SerialDebugger *_Debugger);
 #else
   ESPAPP_API_Flash();
 #endif

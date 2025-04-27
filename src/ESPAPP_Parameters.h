@@ -17,22 +17,6 @@
 // looks like: espapp-1a2b-3c4d
 #define ESPAPP_DEVICE_ID_LENGTH 18 + sizeof(ESPAPP_DEVICE_ID_PREFIX)
 
-/* Configuration of Terminal messages outputs */
-#ifdef DEBUG
-
-/* Colors of fonts for Teminal messages */
-#define ESPAPP_TERMINAL_FONT_RED "\u001b[31m"
-#define ESPAPP_TERMINAL_FONT_BLUE "\u001b[34m"
-#define ESPAPP_TERMINAL_FONT_GREEN "\u001b[32m"
-#define ESPAPP_TERMINAL_FONT_RESET_COLOR "\u001b[0m"
-
-/* Header types */
-#define ESPAPP_MSG_HEADER_TYPE_HASH 0
-#define ESPAPP_MSG_HEADER_TYPE_DASH 1
-#define ESPAPP_MSG_HEADER_TYPE_SPACE 2
-
-#endif /* End of Terminal output messages */
-
 /* Boot modes */
 enum ESPAPP_OPERATING_MODE
 {

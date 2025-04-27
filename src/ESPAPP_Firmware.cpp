@@ -39,7 +39,7 @@ bool ESPAPP_Firmware::init(void)
 void ESPAPP_Firmware::initializeEventListeners(void)
 {
 #ifdef DEBUG
-  this->System->Msg->printInformation(F("Initializing event listeners"), F("EVENT"));
+  this->System->Debugger->printInformation(F("Initializing event listeners"), F("EVENT"));
 #endif
 
   // Set up event for time synchronization
@@ -135,10 +135,10 @@ void ESPAPP_Firmware::handleMinuteEvent(void *data)
 {
   // Empty implementation - to be overridden by derived classes if needed
 #ifdef DEBUG
-  this->System->Msg->printInformation(F("Minute event handled: "), F("SYSTEM EVENT"));
+  this->System->Debugger->printInformation(F("Minute event handled: "), F("SYSTEM EVENT"));
   char buffer[50];
   this->System->Time->getCurrentTimeFormatted(buffer, sizeof(buffer));
-  this->System->Msg->printValue(buffer);
+  this->System->Debugger->printValue(buffer);
 #endif
 }
 
@@ -146,10 +146,10 @@ void ESPAPP_Firmware::handleHourEvent(void *data)
 {
   // Empty implementation - to be overridden by derived classes if needed
 #ifdef DEBUG
-  this->System->Msg->printInformation(F("Hour event handled"), F("SYSTEM EVENT"));
+  this->System->Debugger->printInformation(F("Hour event handled"), F("SYSTEM EVENT"));
   char buffer[50];
   this->System->Time->getCurrentTimeFormatted(buffer, sizeof(buffer));
-  this->System->Msg->printBulletPoint(buffer);
+  this->System->Debugger->printBulletPoint(buffer);
 
 #endif
 }
@@ -158,10 +158,10 @@ void ESPAPP_Firmware::handleDayEvent(void *data)
 {
   // Empty implementation - to be overridden by derived classes if needed
 #ifdef DEBUG
-  this->System->Msg->printInformation(F("Day event handled"), F("SYSTEM EVENT"));
+  this->System->Debugger->printInformation(F("Day event handled"), F("SYSTEM EVENT"));
   char buffer[50];
   this->System->Time->getCurrentTimeFormatted(buffer, sizeof(buffer));
-  this->System->Msg->printBulletPoint(buffer);
+  this->System->Debugger->printBulletPoint(buffer);
 
 #endif
 }
@@ -169,7 +169,7 @@ void ESPAPP_Firmware::handleDayEvent(void *data)
 void ESPAPP_Firmware::handleRebootEvent(void *data)
 {
 #ifdef DEBUG
-  this->System->Msg->printInformation(F("Reboot event handled"), F("SYSTEM EVENT"));
+  this->System->Debugger->printInformation(F("Reboot event handled"), F("SYSTEM EVENT"));
 #endif
 
   this->System->Events->addEventListener(EVENT_CUSTOM_START + 1,
@@ -182,7 +182,7 @@ void ESPAPP_Firmware::handleRebootEvent(void *data)
 void ESPAPP_Firmware::handleNetworkConnectedEvent(void *data)
 {
 #ifdef DEBUG
-  this->System->Msg->printInformation(F("Network connected event handle"), F("SYSTEM EVENT"));
+  this->System->Debugger->printInformation(F("Network connected event handle"), F("SYSTEM EVENT"));
 #endif
   this->System->Events->triggerEvent(EVENT_SYNC_TIME);
 }
@@ -190,7 +190,7 @@ void ESPAPP_Firmware::handleNetworkConnectedEvent(void *data)
 void ESPAPP_Firmware::handleDownloadUIComponentsEvent(void *data)
 {
 #ifdef DEBUG
-  this->System->Msg->printInformation(F("Download UI components event handled"), F("SYSTEM EVENT"));
+  this->System->Debugger->printInformation(F("Download UI components event handled"), F("SYSTEM EVENT"));
 #endif
 
   this->System->Events->addEventListener(EVENT_CUSTOM_START + 2,

@@ -1,9 +1,9 @@
 #include "ESPAPP_API_Files.h"
 
 #ifdef DEBUG
-ESPAPP_API_Files::ESPAPP_API_Files(ESPAPP_API_Flash *_Flash, ESPAPP_SerialMessages *_Msg)
+ESPAPP_API_Files::ESPAPP_API_Files(ESPAPP_API_Flash *_Flash, ESPAPP_SerialDebugger *_Debugger)
 {
-  this->Msg = _Msg;
+  this->Debugger = _Debugger;
   this->Flash = _Flash;
 }
 #else
@@ -22,7 +22,8 @@ bool ESPAPP_API_Files::read(ESPAPP_NETWORK_CONNECTION_MODE *data)
   bool success = false;
 
 #ifdef DEBUG
-  this->Msg->printInformation(F("Reading connection mode configuration"), F("API-FILE"));
+  this->Debugger->printHeader(2, 0, 72, ESPAPP_DEBUGGER_MESSAGE_HEADER_TYPE::DASH);
+  this->Debugger->printInformation(F("Reading connection mode configuration"), F("API-FILE"));
 #endif
 
   StaticJsonDocument<256> doc;
@@ -33,14 +34,21 @@ bool ESPAPP_API_Files::read(ESPAPP_NETWORK_CONNECTION_MODE *data)
     *data = doc["mode"] | ESPAPP_NETWORK_CONNECTION_MODE::ACCESS_POINT;
 
 #ifdef DEBUG
-    this->Msg->printBulletPoint(F("Connection mode: "));
-    this->Msg->printValue(*data);
+    this->Debugger->printBulletPoint(F("Connection mode: "));
+    this->Debugger->printValue(*data);
 #endif
   }
   else
   {
+    #ifdef DEBUG
+    this->Debugger->printBulletPoint(F("Failed to load Connection Mode configuration, creating default"), ESPAPP_DEBUGGER_MESSAGE_COLOR::BLUE);
+#endif
     success = this->createDefaultConnectionModeConfiguration();
   }
+
+#ifdef DEBUG
+  this->Debugger->printHeader(1, 1, 72, ESPAPP_DEBUGGER_MESSAGE_HEADER_TYPE::DASH);
+#endif
 
   return success;
 }
@@ -48,8 +56,8 @@ bool ESPAPP_API_Files::read(ESPAPP_NETWORK_CONNECTION_MODE *data)
 bool ESPAPP_API_Files::save(ESPAPP_NETWORK_CONNECTION_MODE *data)
 {
 #ifdef DEBUG
-  this->Msg->printInformation(F("Saving connection mode configuration: "), F("API-FILE"));
-  this->Msg->printValue(data);
+  this->Debugger->printInformation(F("Saving connection mode configuration: "), F("API-FILE"));
+  this->Debugger->printValue(data);
 #endif
   StaticJsonDocument<256> doc;
   doc["mode"] = *data;
@@ -59,7 +67,7 @@ bool ESPAPP_API_Files::save(ESPAPP_NETWORK_CONNECTION_MODE *data)
 bool ESPAPP_API_Files::createDefaultConnectionModeConfiguration(void)
 {
 #ifdef DEBUG
-  this->Msg->printInformation(F("Creating default connection mode configuration"), F("API-FILE"));
+  this->Debugger->printInformation(F("Creating default connection mode configuration"), F("API-FILE"));
 #endif
 
   ESPAPP_NETWORK_CONNECTION_MODE *config = new ESPAPP_NETWORK_CONNECTION_MODE;
@@ -75,7 +83,8 @@ bool ESPAPP_API_Files::read(ESPAPP_OPERATING_MODE *data)
   bool success = false;
 
 #ifdef DEBUG
-  this->Msg->printInformation(F("Reading Operating mode configuration"), F("API-FILE"));
+  this->Debugger->printHeader(2, 0, 72, ESPAPP_DEBUGGER_MESSAGE_HEADER_TYPE::DASH);
+  this->Debugger->printInformation(F("Reading Operating mode configuration"), F("API-FILE"));
 #endif
 
   StaticJsonDocument<256> doc;
@@ -86,14 +95,21 @@ bool ESPAPP_API_Files::read(ESPAPP_OPERATING_MODE *data)
     *data = doc["mode"] | ESPAPP_OPERATING_MODE::FIRST_TIME_BOOT;
 
 #ifdef DEBUG
-    this->Msg->printBulletPoint(F("Operating mode: "));
-    this->Msg->printValue(*data);
+    this->Debugger->printBulletPoint(F("Operating mode: "));
+    this->Debugger->printValue(*data);
 #endif
   }
   else
   {
+#ifdef DEBUG
+    this->Debugger->printBulletPoint(F("Failed to load Operating Mode, creating default"), ESPAPP_DEBUGGER_MESSAGE_COLOR::BLUE);
+#endif
     success = this->createDefaultOperatingModeConfiguration();
   }
+
+#ifdef DEBUG
+  this->Debugger->printHeader(1, 1, 72, ESPAPP_DEBUGGER_MESSAGE_HEADER_TYPE::DASH);
+#endif
 
   return success;
 }
@@ -101,8 +117,8 @@ bool ESPAPP_API_Files::read(ESPAPP_OPERATING_MODE *data)
 bool ESPAPP_API_Files::save(ESPAPP_OPERATING_MODE *data)
 {
 #ifdef DEBUG
-  this->Msg->printInformation(F("Saving Operating mode configuration: "), F("API-FILE"));
-  this->Msg->printValue(*data);
+  this->Debugger->printInformation(F("Saving Operating mode configuration: "), F("API-FILE"));
+  this->Debugger->printValue(*data);
 #endif
   StaticJsonDocument<256> doc;
   doc["mode"] = *data;
@@ -112,7 +128,7 @@ bool ESPAPP_API_Files::save(ESPAPP_OPERATING_MODE *data)
 bool ESPAPP_API_Files::createDefaultOperatingModeConfiguration()
 {
 #ifdef DEBUG
-  this->Msg->printInformation(F("Creating default Operating mode configuration"), F("API-FILE"));
+  this->Debugger->printInformation(F("Creating default Operating mode configuration"), F("API-FILE"));
 #endif
   ESPAPP_OPERATING_MODE *config = new ESPAPP_OPERATING_MODE;
   *config = ESPAPP_OPERATING_MODE::FIRST_TIME_BOOT;
@@ -127,7 +143,8 @@ bool ESPAPP_API_Files::read(ESPAPP_NETWORK *data)
   bool success = false;
 
 #ifdef DEBUG
-  this->Msg->printInformation(F("Reading network configuration"), F("API-FILE"));
+  this->Debugger->printHeader(2, 0, 72, ESPAPP_DEBUGGER_MESSAGE_HEADER_TYPE::DASH);
+  this->Debugger->printInformation(F("Reading network configuration"), F("API-FILE"));
 #endif
 
   StaticJsonDocument<1024> doc;
@@ -167,16 +184,59 @@ bool ESPAPP_API_Files::read(ESPAPP_NETWORK *data)
 #endif
 
 #ifdef DEBUG
-    this->Msg->printBulletPoint(F("Network configuration loaded"));
+    this->Debugger->printBulletPoint(F("Network configuration loaded"));
+    this->Debugger->printBulletPoint(F("Primary SSID: "));
+    this->Debugger->printValue(data->primary->ssid);
+    this->Debugger->printBulletPoint(F("Primary password: hidden"));
+    this->Debugger->printBulletPoint(F("Primary isDHCP: "));
+    this->Debugger->printValue(data->primary->isDHCP);
+    this->Debugger->printBulletPoint(F("Primary IP: "));
+    this->Debugger->printValue(data->primary->ip);
+    this->Debugger->printBulletPoint(F("Primary gateway: "));
+    this->Debugger->printValue(data->primary->gateway);
+    this->Debugger->printBulletPoint(F("Primary subnet: "));
+    this->Debugger->printValue(data->primary->subnet);
+    this->Debugger->printBulletPoint(F("Primary DNS1: "));
+    this->Debugger->printValue(data->primary->dns1);
+    this->Debugger->printBulletPoint(F("Primary DNS2: "));
+    this->Debugger->printValue(data->primary->dns2);
+    this->Debugger->printBulletPoint(F("Secondary SSID: "));
+    this->Debugger->printValue(data->secondary->ssid);
+    this->Debugger->printBulletPoint(F("Secondary password: hidden"));
+    this->Debugger->printBulletPoint(F("Secondary isDHCP: "));
+    this->Debugger->printValue(data->secondary->isDHCP);
+    this->Debugger->printBulletPoint(F("Secondary IP: "));
+    this->Debugger->printValue(data->secondary->ip);
+    this->Debugger->printBulletPoint(F("Secondary gateway: "));
+    this->Debugger->printValue(data->secondary->gateway);
+    this->Debugger->printBulletPoint(F("Secondary subnet: "));
+    this->Debugger->printValue(data->secondary->subnet);
+    this->Debugger->printBulletPoint(F("Secondary DNS1: "));
+    this->Debugger->printValue(data->secondary->dns1);
+    this->Debugger->printBulletPoint(F("Secondary DNS2: "));
+    this->Debugger->printValue(data->secondary->dns2);
+    this->Debugger->printBulletPoint(F("Connection timeout: "));
+    this->Debugger->printValue(data->connectionTimeout);
+    this->Debugger->printBulletPoint(F("Sleep timeout: "));
+    this->Debugger->printValue(data->sleepTimeout);
+    this->Debugger->printBulletPoint(F("Failures to switch: "));
+    this->Debugger->printValue(data->failuresToSwitch);
+    this->Debugger->printBulletPoint(F("mDNS: "));
+    this->Debugger->printValue(data->mDNS);
+
 #endif
   }
   else
   {
 #ifdef DEBUG
-    this->Msg->printWarning(F("Failed to load network configuration, creating default"), F("API-FILE"));
+    this->Debugger->printBulletPoint(F("Failed to load Network configuration, creating default"), ESPAPP_DEBUGGER_MESSAGE_COLOR::BLUE);
 #endif
     success = this->createDefaultNetworkConfiguration();
   }
+
+#ifdef DEBUG
+  this->Debugger->printHeader(1, 1, 72, ESPAPP_DEBUGGER_MESSAGE_HEADER_TYPE::DASH);
+#endif
 
   return success;
 }
@@ -184,7 +244,7 @@ bool ESPAPP_API_Files::read(ESPAPP_NETWORK *data)
 bool ESPAPP_API_Files::save(ESPAPP_NETWORK *data)
 {
 #ifdef DEBUG
-  this->Msg->printInformation(F("Saving network configuration"), F("API-FILE"));
+  this->Debugger->printInformation(F("Saving network configuration"), F("API-FILE"));
 #endif
 
   StaticJsonDocument<1024> doc;
@@ -228,7 +288,7 @@ bool ESPAPP_API_Files::save(ESPAPP_NETWORK *data)
 bool ESPAPP_API_Files::createDefaultNetworkConfiguration(void)
 {
 #ifdef DEBUG
-  this->Msg->printInformation(F("Creating default network configuration"), F("API-FILE"));
+  this->Debugger->printInformation(F("Creating default network configuration"), F("API-FILE"));
 #endif
 
   ESPAPP_NETWORK *config = new ESPAPP_NETWORK();
@@ -277,7 +337,8 @@ bool ESPAPP_API_Files::read(ACS758_CONFIG *data)
   bool success = false;
 
 #ifdef DEBUG
-  this->Msg->printInformation(F("Reading ACS758 sensor configuration"), F("API-FILE"));
+  this->Debugger->printHeader(2, 0, 72, ESPAPP_DEBUGGER_MESSAGE_HEADER_TYPE::DASH);
+  this->Debugger->printInformation(F("Reading ACS758 sensor configuration"), F("API-FILE"));
 #endif
 
   StaticJsonDocument<512> doc;
@@ -294,28 +355,28 @@ bool ESPAPP_API_Files::read(ACS758_CONFIG *data)
     data->samplesCount = doc["samplesCount"];
 
 #ifdef DEBUG
-    this->Msg->printBulletPoint(F("ACS758 configuration loaded successfully"));
-    this->Msg->printBulletPoint(F("Sensor model: "));
-    this->Msg->printValue((int)data->sensorModel);
-    this->Msg->printBulletPoint(F("Read interval: "));
-    this->Msg->printValue(data->readInterval);
-    this->Msg->printBulletPoint(F("Analog pin: "));
-    this->Msg->printValue(data->analogPin);
-    this->Msg->printBulletPoint(F("ADC resolution: "));
-    this->Msg->printValue(data->adcResolution);
-    this->Msg->printBulletPoint(F("Calibration: "));
-    this->Msg->printValue(data->calibration);
-    this->Msg->printBulletPoint(F("Samples count: "));
-    this->Msg->printValue(data->samplesCount);
-    this->Msg->printBulletPoint(F("Reference voltage: "));
-    this->Msg->printValue(data->vRef);
+    this->Debugger->printBulletPoint(F("ACS758 configuration loaded successfully"));
+    this->Debugger->printBulletPoint(F("Sensor model: "));
+    this->Debugger->printValue((int)data->sensorModel);
+    this->Debugger->printBulletPoint(F("Read interval: "));
+    this->Debugger->printValue(data->readInterval);
+    this->Debugger->printBulletPoint(F("Analog pin: "));
+    this->Debugger->printValue(data->analogPin);
+    this->Debugger->printBulletPoint(F("ADC resolution: "));
+    this->Debugger->printValue(data->adcResolution);
+    this->Debugger->printBulletPoint(F("Calibration: "));
+    this->Debugger->printValue(data->calibration);
+    this->Debugger->printBulletPoint(F("Samples count: "));
+    this->Debugger->printValue(data->samplesCount);
+    this->Debugger->printBulletPoint(F("Reference voltage: "));
+    this->Debugger->printValue(data->vRef);
 
 #endif
   }
   else
   {
 #ifdef DEBUG
-    this->Msg->printWarning(F("Failed to load ACS758 configuration, creating default"), F("API-FILE"));
+    this->Debugger->printBulletPoint(F("Failed to load ACS758 configuration, creating default"), ESPAPP_DEBUGGER_MESSAGE_COLOR::BLUE);
 #endif
     success = this->createDefaultACS758Configuration();
     if (success)
@@ -324,13 +385,17 @@ bool ESPAPP_API_Files::read(ACS758_CONFIG *data)
     }
   }
 
+#ifdef DEBUG
+  this->Debugger->printHeader(1, 1, 72, ESPAPP_DEBUGGER_MESSAGE_HEADER_TYPE::DASH);
+#endif
+
   return success;
 }
 
 bool ESPAPP_API_Files::save(ACS758_CONFIG *data)
 {
 #ifdef DEBUG
-  this->Msg->printInformation(F("Saving ACS758 sensor configuration"), F("API-FILE"));
+  this->Debugger->printInformation(F("Saving ACS758 sensor configuration"), F("API-FILE"));
 #endif
 
   StaticJsonDocument<512> doc;
@@ -348,11 +413,11 @@ bool ESPAPP_API_Files::save(ACS758_CONFIG *data)
 #ifdef DEBUG
   if (success)
   {
-    this->Msg->printBulletPoint(F("ACS758 configuration saved successfully"));
+    this->Debugger->printBulletPoint(F("ACS758 configuration saved successfully"));
   }
   else
   {
-    this->Msg->printError(F("Failed to save ACS758 configuration"), F("API-FILE"));
+    this->Debugger->printError(F("Failed to save ACS758 configuration"), F("API-FILE"));
   }
 #endif
 
@@ -362,7 +427,7 @@ bool ESPAPP_API_Files::save(ACS758_CONFIG *data)
 bool ESPAPP_API_Files::createDefaultACS758Configuration(void)
 {
 #ifdef DEBUG
-  this->Msg->printInformation(F("Creating default ACS758 configuration"), F("API-FILE"));
+  this->Debugger->printInformation(F("Creating default ACS758 configuration"), F("API-FILE"));
 #endif
 
   ACS758_CONFIG config;
@@ -370,10 +435,10 @@ bool ESPAPP_API_Files::createDefaultACS758Configuration(void)
   // Set default values
   config.sensorModel = ACS758_100B;
   config.analogPin = 34;
-  config.vRef = 2*2.32;
-  config.adcResolution = 10;   
+  config.vRef = 3.3;
+  config.adcResolution = 10;
   config.calibration = 1;
-  config.readInterval = 5; //s
+  config.readInterval = 5; // s
   config.samplesCount = 10;
 
   return this->save(&config);

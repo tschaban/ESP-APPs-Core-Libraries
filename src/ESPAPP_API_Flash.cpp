@@ -1,9 +1,9 @@
 #include "ESPAPP_API_Flash.h"
 
 #ifdef DEBUG
-ESPAPP_API_Flash::ESPAPP_API_Flash(ESPAPP_SerialMessages *_Msg)
+ESPAPP_API_Flash::ESPAPP_API_Flash(ESPAPP_SerialDebugger *_Debugger)
 {
-  this->Msg = _Msg;
+  this->Debugger = _Debugger;
 }
 #else
 ESPAPP_API_Flash::ESPAPP_API_Flash()
@@ -35,8 +35,8 @@ bool ESPAPP_API_Flash::getJSON(const __FlashStringHelper *fileName, JsonDocument
 #ifdef DEBUG
     else
     {
-      this->Msg->printError(F("Deserialisation error: "), F("JSON"));
-      this->Msg->printValue(error.c_str());
+      this->Debugger->printBulletPoint(F("Deserialisation error: "), ESPAPP_DEBUGGER_MESSAGE_COLOR::RED);
+      this->Debugger->printValue(error.c_str());
     }
   }
 #endif
@@ -62,13 +62,9 @@ bool ESPAPP_API_Flash::saveJSON(const __FlashStringHelper *fileName, JsonDocumen
   }
 
 #ifdef DEBUG
-  if (success)
-  {
-    this->Msg->printInformation(F("JSON saved successfully"), F("JSON"));
-  }
-  else
-  {
-    this->Msg->printError(F("Failed to save JSON"), F("JSON"));
+  if (!success)
+   {
+    this->Debugger->printBulletPoint(F("Failed to save JSON"), ESPAPP_DEBUGGER_MESSAGE_COLOR::RED);
   }
 #endif
 
@@ -78,18 +74,18 @@ bool ESPAPP_API_Flash::saveJSON(const __FlashStringHelper *fileName, JsonDocumen
 bool ESPAPP_API_Flash::init(void)
 {
 #ifdef DEBUG
-  this->Msg->printInformation(F("Initializing file system"), F("FS"));
+  this->Debugger->printInformation(F("Initializing file system"), F("FS"));
 #endif
-  fileSystemReady = mountFileSystem();
+  fileSystemReady = this->mountFileSystem();
 
   if (fileSystemReady)
   {
 
     sprintf(this->fileName, "%s%s%s", FPSTR(path_boot), FPSTR(path_root), F(ESPAPP_FILE_SYSTEM_INITIALIZED));
 
-    fileSystemReady = fileExist(this->fileName);
+    fileSystemReady = this->fileExist(this->fileName);
 #ifdef DEBUG
-    this->Msg->printBulletPoint(F("Files structure exists"));
+    this->Debugger->printBulletPoint(F("Files structure exists"));
 #endif
   }
 
@@ -101,11 +97,11 @@ bool ESPAPP_API_Flash::init(void)
 #ifdef DEBUG
   if (fileSystemReady)
   {
-    this->Msg->printBulletPoint(F("File system is ready"));
+    this->Debugger->printBulletPoint(F("File system is ready"));
   }
   else
   {
-    this->Msg->printError(F("File system is NOT ready"), F("FS"));
+    this->Debugger->printBulletPoint(F("File system is NOT ready"), ESPAPP_DEBUGGER_MESSAGE_COLOR::BLUE);
   }
 #endif
 
@@ -125,11 +121,11 @@ bool ESPAPP_API_Flash::mountFileSystem(void)
 #ifdef DEBUG
   if (success)
   {
-    this->Msg->printInformation(F("File system mounted: "), F("FS"));
+    this->Debugger->printBulletPoint(F("File system mounted"));
   }
   else
   {
-    this->Msg->printError(F("File system NOT mounted: "), F("FS"));
+    this->Debugger->printBulletPoint(F("File system NOT mounted"), ESPAPP_DEBUGGER_MESSAGE_COLOR::RED);
   }
 #endif
 
@@ -140,7 +136,7 @@ bool ESPAPP_API_Flash::formatFileSystem(void)
 {
   bool success = false;
 #ifdef DEBUG
-  this->Msg->printBulletPoint(F("Formatting File System"));
+  this->Debugger->printBulletPoint(F("Formatting File System"));
 #endif
 
   success = fileSystem.format();
@@ -161,11 +157,11 @@ bool ESPAPP_API_Flash::formatFileSystem(void)
     fileSystem.open(this->fileName, ESPAPP_OPEN_FILE_WRITING).close();
 
 #ifdef DEBUG
-    this->Msg->printBulletPoint(F("Completed"));
+    this->Debugger->printBulletPoint(F("Completed"));
   }
   else
   {
-    this->Msg->printError(F("Formatting failed"), F("FS"));
+    this->Debugger->printBulletPoint(F("Formatting failed"), ESPAPP_DEBUGGER_MESSAGE_COLOR::RED);
 #endif
   }
 
@@ -176,10 +172,10 @@ bool ESPAPP_API_Flash::fileExist(const char *path)
 {
   bool _ret = fileSystem.exists(path);
 #ifdef DEBUG
-  this->Msg->printBulletPoint(F("File: "));
-  this->Msg->printValue(path);
-  this->Msg->printValue(F(" - Found: "));
-  this->Msg->printValue(_ret);
+  if (!_ret)
+  {
+    this->Debugger->printBulletPoint(F("File not found: "),ESPAPP_DEBUGGER_MESSAGE_COLOR::RED);
+  }
 #endif
   return _ret;
 }
@@ -188,9 +184,9 @@ bool ESPAPP_API_Flash::createFile(const char *path)
 {
   boolean success = false;
 #ifdef DEBUG
-  this->Msg->printBulletPoint(F("File: "));
-  this->Msg->printValue(path);
-  this->Msg->printValue(F(" - Created: "));
+  this->Debugger->printBulletPoint(F("File: "));
+  this->Debugger->printValue(path);
+  this->Debugger->printValue(F(" - Created: "));
 #endif
 
   File createFile = fileSystem.open(path, ESPAPP_OPEN_FILE_WRITING);
@@ -202,7 +198,7 @@ bool ESPAPP_API_Flash::createFile(const char *path)
   }
 
 #ifdef DEBUG
-  this->Msg->printValue(success);
+  this->Debugger->printValue(success);
 #endif
 
   return success;
@@ -212,15 +208,11 @@ bool ESPAPP_API_Flash::openFile(File &openedFile, const char *mode,
                                 const char *path, uint8_t id, boolean createIfNotExists)
 {
 
-#ifdef DEBUG
-  this->Msg->printHeader(1, 0, 72, ESPAPP_MSG_HEADER_TYPE_DASH);
-#endif
-
   bool success = false;
 
 #ifdef DEBUG
-  this->Msg->printBulletPoint(F("Opening file: "));
-  this->Msg->printValue(path);
+  this->Debugger->printBulletPoint(F("Opening file: "));
+  this->Debugger->printValue(path);
 #endif
 
   success = fileExist(path);
@@ -238,8 +230,10 @@ bool ESPAPP_API_Flash::openFile(File &openedFile, const char *mode,
   success = openedFile ? true : false;
 
 #ifdef DEBUG
-  this->Msg->printBulletPoint(F("Opened: "));
-  this->Msg->printValue(success);
+  if (!success)
+  {
+    this->Debugger->printBulletPoint(F("Failed to open file: "), ESPAPP_DEBUGGER_MESSAGE_COLOR::RED);
+  }
 #endif
 
   return success;
@@ -291,16 +285,16 @@ bool ESPAPP_API_Flash::readFSElements(const char *directory, ESPAPP_FILE files[]
   sprintf(listedDirectory, "%s%s", FPSTR(path_root), directory);
 
 #ifdef DEBUG
-  this->Msg->printBulletPoint(F("Listing directory: "));
-  this->Msg->printValue(listedDirectory);
+  this->Debugger->printBulletPoint(F("Listing directory: "));
+  this->Debugger->printValue(listedDirectory);
 #endif
 
   File root = fileSystem.open(listedDirectory);
   if (!root || !root.isDirectory())
   {
 #ifdef DEBUG
-    this->Msg->printError(F("Failed to open directory: "), F("FS"));
-    this->Msg->printValue(listedDirectory);
+    this->Debugger->printBulletPoint(F("Failed to open directory: "), ESPAPP_DEBUGGER_MESSAGE_COLOR::RED);
+    this->Debugger->printValue(listedDirectory);
 #endif
     return false;
   }
@@ -339,10 +333,10 @@ bool ESPAPP_API_Flash::readFSElements(const char *directory, ESPAPP_FILE files[]
         count++;
 
 #ifdef DEBUG
-        this->Msg->printBulletPoint(F("Directory: "));
-        this->Msg->printValue(files[count - 1].name);
-        this->Msg->printValue(F(" - Files count: "));
-        this->Msg->printValue(files[count - 1].size);
+        this->Debugger->printBulletPoint(F("Directory: "));
+        this->Debugger->printValue(files[count - 1].name);
+        this->Debugger->printValue(F(" - Files count: "));
+        this->Debugger->printValue(files[count - 1].size);
 #endif
       }
       entry = root.openNextFile();
@@ -365,10 +359,10 @@ bool ESPAPP_API_Flash::readFSElements(const char *directory, ESPAPP_FILE files[]
         count++;
 
 #ifdef DEBUG
-        this->Msg->printBulletPoint(F("File: "));
-        this->Msg->printValue(files[count - 1].name);
-        this->Msg->printValue(F(" - Size: "));
-        this->Msg->printValue(files[count - 1].size);
+        this->Debugger->printBulletPoint(F("File: "));
+        this->Debugger->printValue(files[count - 1].name);
+        this->Debugger->printValue(F(" - Size: "));
+        this->Debugger->printValue(files[count - 1].size);
 #endif
       }
       entry = root.openNextFile();
@@ -383,13 +377,13 @@ bool ESPAPP_API_Flash::uploadFile(const char *directory, const char *filename, c
 {
 
 #ifdef DEBUG
-  this->Msg->printInformation(F("Uploading file"), F("uploadFile"));
-  this->Msg->printBulletPoint(F("Directory: "));
-  this->Msg->printValue(directory);
-  this->Msg->printBulletPoint(F("Filename: "));
-  this->Msg->printValue(filename);
-  this->Msg->printBulletPoint(F("Data length: "));
-  this->Msg->printValue(length);
+  this->Debugger->printInformation(F("Uploading file"), F("uploadFile"));
+  this->Debugger->printBulletPoint(F("Directory: "));
+  this->Debugger->printValue(directory);
+  this->Debugger->printBulletPoint(F("Filename: "));
+  this->Debugger->printValue(filename);
+  this->Debugger->printBulletPoint(F("Data length: "));
+  this->Debugger->printValue(length);
 #endif
 
   sprintf(this->fileName, "%s%s", FPSTR(path_root), directory);
@@ -399,32 +393,32 @@ bool ESPAPP_API_Flash::uploadFile(const char *directory, const char *filename, c
   {
     fileSystem.mkdir(this->fileName);
 #ifdef DEBUG
-    this->Msg->printBulletPoint(F("Directory created: "));
-    this->Msg->printValue(this->fileName);
+    this->Debugger->printBulletPoint(F("Directory created: "));
+    this->Debugger->printValue(this->fileName);
 #endif
   }
 
   this->getPathToFile(this->fileName, directory, filename);
 
 #ifdef DEBUG
-  this->Msg->printBulletPoint(F("Path: "));
-  this->Msg->printValue(this->fileName);
+  this->Debugger->printBulletPoint(F("Path: "));
+  this->Debugger->printValue(this->fileName);
 #endif
 
   File file = fileSystem.open(this->fileName, ESPAPP_OPEN_FILE_WRITING);
   if (!file)
   {
 #ifdef DEBUG
-    this->Msg->printError(F("File not saved: "), F("FS"));
-    this->Msg->printValue(this->fileName);
+    this->Debugger->printBulletPoint(F("File not saved: "), ESPAPP_DEBUGGER_MESSAGE_COLOR::RED);
+    this->Debugger->printValue(this->fileName);
 #endif
     return false;
   }
   file.write(data, length);
   file.close();
 #ifdef DEBUG
-  this->Msg->printBulletPoint(F("File saved: "));
-  this->Msg->printValue(this->fileName);
+  this->Debugger->printBulletPoint(F("File saved: "));
+  this->Debugger->printValue(this->fileName);
 #endif
   return true;
 }
@@ -434,8 +428,8 @@ bool ESPAPP_API_Flash::deleteFile(const char *directory, const char *path)
   this->getPathToFile(this->fileName, directory, path);
 
 #ifdef DEBUG
-  this->Msg->printBulletPoint(F("Deleting file: "));
-  this->Msg->printValue(this->fileName);
+  this->Debugger->printBulletPoint(F("Deleting file: "));
+  this->Debugger->printValue(this->fileName);
 #endif
   if (fileSystem.exists(this->fileName))
   {
@@ -460,19 +454,19 @@ bool ESPAPP_API_Flash::createFolder(const char *path)
 {
 
 #ifdef DEBUG
-  this->Msg->printBulletPoint(F("Creating folder: "));
-  this->Msg->printValue(path);
+  this->Debugger->printBulletPoint(F("Creating folder: "));
+  this->Debugger->printValue(path);
 #endif
   bool success = fileSystem.mkdir(path);
 #ifdef DEBUG
   if (success)
   {
-    this->Msg->printBulletPoint(F("Folder created successfully"));
+    this->Debugger->printBulletPoint(F("Folder created successfully"));
   }
   else
   {
-    this->Msg->printError(F("Failed to create folder: "), F("FS"));
-    this->Msg->printValue(path);
+    this->Debugger->printBulletPoint(F("Failed to create folder: "), ESPAPP_DEBUGGER_MESSAGE_COLOR::RED);
+    this->Debugger->printValue(path);
   }
 #endif
   return success;
@@ -484,8 +478,8 @@ bool ESPAPP_API_Flash::deleteFolder(const char *path)
   this->getPathToFile(this->fileName, "", path);
 
 #ifdef DEBUG
-  this->Msg->printBulletPoint(F("Deleting folder: "));
-  this->Msg->printValue(this->fileName);
+  this->Debugger->printBulletPoint(F("Deleting folder: "));
+  this->Debugger->printValue(this->fileName);
 #endif
 
   File dir = fileSystem.open(this->fileName);
@@ -510,18 +504,16 @@ bool ESPAPP_API_Flash::deleteFolder(const char *path)
 bool ESPAPP_API_Flash::deleteAllFilesInDirectory(const __FlashStringHelper *directory)
 {
 #ifdef DEBUG
-  this->Msg->printBulletPoint(F("Deleting all files in directory: "));
-  this->Msg->printValue(directory);
+  this->Debugger->printBulletPoint(F("Deleting all files in directory: "));
+  this->Debugger->printValue(directory);
 #endif
-  
-
 
   File dir = fileSystem.open(directory);
   if (!dir || !dir.isDirectory())
   {
 #ifdef DEBUG
-    this->Msg->printError(F("Failed to open directory: "), F("FS"));
-    this->Msg->printValue(directory);
+    this->Debugger->printBulletPoint(F("Failed to open directory: "), ESPAPP_DEBUGGER_MESSAGE_COLOR::RED);
+    this->Debugger->printValue(directory);
 #endif
     return false;
   }
@@ -529,14 +521,14 @@ bool ESPAPP_API_Flash::deleteAllFilesInDirectory(const __FlashStringHelper *dire
   char fileToDelete[ESPAPP_FILE_MAX_FILE_NAME_LENGTH];
   dir.rewindDirectory();
   File entry = dir.openNextFile();
-  
+
   while (entry)
   {
     if (!entry.isDirectory())
     {
       sprintf(fileToDelete, entry.name());
       entry.close();
-      this->deleteFile((PGM_P)directory, fileToDelete);       
+      this->deleteFile((PGM_P)directory, fileToDelete);
     }
     entry = dir.openNextFile();
   }

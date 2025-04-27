@@ -24,7 +24,7 @@ void ESPAPP_AccessToWAN::setDisconnected(void)
 bool ESPAPP_AccessToWAN::init(void)
 {
 #ifdef DEBUG
-    this->System->Msg->printInformation(F("Initializing WAN access configuration"), F("WAN"));
+    this->System->Debugger->printInformation(F("Initializing WAN access configuration"), F("WAN"));
 #endif
 
     bool success = this->readConfiguration();
@@ -32,7 +32,7 @@ bool ESPAPP_AccessToWAN::init(void)
     if (!success)
     {
 #ifdef DEBUG
-        this->System->Msg->printWarning(F("Failed to read WAN configuration, creating default"), F("WAN"));
+        this->System->Debugger->printWarning(F("Failed to read WAN configuration, creating default"), F("WAN"));
 #endif
         success = this->createDefaultConfiguration();
     }
@@ -54,7 +54,7 @@ bool ESPAPP_AccessToWAN::readConfiguration(void)
     bool success = false;
 
 #ifdef DEBUG
-    this->System->Msg->printInformation(F("Reading WAN configuration"), F("WAN"));
+    this->System->Debugger->printInformation(F("Reading WAN configuration"), F("WAN"));
 #endif
 
     StaticJsonDocument<256> doc;
@@ -70,14 +70,14 @@ bool ESPAPP_AccessToWAN::readConfiguration(void)
         this->configuration->autoCheck = doc["autoCheck"] | ESPAPP_WAN_DEFAULT_AUTO_CHECK;
 
 #ifdef DEBUG
-        this->System->Msg->printBulletPoint(F("IP Address: "));
-        this->System->Msg->printValue(this->configuration->ipAddress);
-        this->System->Msg->printBulletPoint(F("Ping Attempts: "));
-        this->System->Msg->printValue(this->configuration->pingAttempts);
-        this->System->Msg->printBulletPoint(F("Check Interval: "));
-        this->System->Msg->printValue(this->configuration->checkInterval, F(" seconds"));
-        this->System->Msg->printBulletPoint(F("Auto Check: "));
-        this->System->Msg->printValue(this->configuration->autoCheck);
+        this->System->Debugger->printBulletPoint(F("IP Address: "));
+        this->System->Debugger->printValue(this->configuration->ipAddress);
+        this->System->Debugger->printBulletPoint(F("Ping Attempts: "));
+        this->System->Debugger->printValue(this->configuration->pingAttempts);
+        this->System->Debugger->printBulletPoint(F("Check Interval: "));
+        this->System->Debugger->printValue(this->configuration->checkInterval, F(" seconds"));
+        this->System->Debugger->printBulletPoint(F("Auto Check: "));
+        this->System->Debugger->printValue(this->configuration->autoCheck);
 #endif
     }
 
@@ -87,7 +87,7 @@ bool ESPAPP_AccessToWAN::readConfiguration(void)
 bool ESPAPP_AccessToWAN::createDefaultConfiguration(void)
 {
 #ifdef DEBUG
-    this->System->Msg->printInformation(F("Creating default WAN configuration"), F("WAN"));
+    this->System->Debugger->printInformation(F("Creating default WAN configuration"), F("WAN"));
 #endif
 
     // Default values are already set in the structure definition
@@ -97,7 +97,7 @@ bool ESPAPP_AccessToWAN::createDefaultConfiguration(void)
 bool ESPAPP_AccessToWAN::saveConfiguration(void)
 {
 #ifdef DEBUG
-    this->System->Msg->printInformation(F("Saving WAN configuration"), F("WAN"));
+    this->System->Debugger->printInformation(F("Saving WAN configuration"), F("WAN"));
 #endif
 
     StaticJsonDocument<256> doc;
@@ -123,8 +123,8 @@ bool ESPAPP_AccessToWAN::autoCheck(void)
 void ESPAPP_AccessToWAN::checkAccessToWAN(void)
 {
 #ifdef DEBUG
-    this->System->Msg->printHeader(1, 0, 72, ESPAPP_MSG_HEADER_TYPE_DASH);
-    this->System->Msg->printInformation(F("Checking access to the Internet"), F("WAN"));
+    this->System->Debugger->printHeader(1, 0, 72, ESPAPP_DEBUGGER_MESSAGE_HEADER_TYPE::DASH);
+    this->System->Debugger->printInformation(F("Checking access to the Internet"), F("WAN"));
 #endif
     IPAddress ip;
     ip.fromString(this->configuration->ipAddress);
@@ -137,13 +137,13 @@ void ESPAPP_AccessToWAN::checkAccessToWAN(void)
 #ifdef DEBUG
     if (connectedToWAN)
     {
-        this->System->Msg->printInformation(F("Access to the Internet: "), F("WAN"));
+        this->System->Debugger->printInformation(F("Access to the Internet: "), F("WAN"));
     }
     else
     {
-        this->System->Msg->printWarning(F("No access to the Internet: "), F("WAN"));
+        this->System->Debugger->printWarning(F("No access to the Internet: "), F("WAN"));
     }
     Serial << (uint16_t)Ping->averageTime() << F(" msec");
-    this->System->Msg->printHeader(1, 0, 72, ESPAPP_MSG_HEADER_TYPE_DASH);
+    this->System->Debugger->printHeader(1, 0, 72, ESPAPP_DEBUGGER_MESSAGE_HEADER_TYPE::DASH);
 #endif
 }

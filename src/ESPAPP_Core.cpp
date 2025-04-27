@@ -4,8 +4,8 @@ ESPAPP_Core::ESPAPP_Core()
 {
 
 #ifdef DEBUG
-  this->Events = new ESPAPP_EventManager(this->Msg);
-  this->Time = new ESPAPP_Time(this->Flash, this->Msg);
+  this->Events = new ESPAPP_EventManager(this->Debugger);
+  this->Time = new ESPAPP_Time(this->Flash, this->Debugger);
 #else
   this->Time = new ESPAPP_Time(this->Flash);
 #endif
@@ -15,7 +15,7 @@ ESPAPP_Core::~ESPAPP_Core() {}
 bool ESPAPP_Core::init(void)
 {
 #ifdef DEBUG
-  this->Msg->printInformation(F("Initializing: firmware kernel"), F("CORE"));
+  this->Debugger->printInformation(F("Initializing: firmware kernel"), F("CORE"));
 #endif
 
   bool success = this->Flash->init();
@@ -42,9 +42,9 @@ void ESPAPP_Core::reboot()
 {
   yield();
 #ifdef DEBUG
-  this->Msg->printHeader(2);
-  this->Msg->printValue(F("Rebooting device"));
-  this->Msg->printHeader(1, 1);
+  this->Debugger->printHeader(2);
+  this->Debugger->printValue(F("Rebooting device"));
+  this->Debugger->printHeader(1, 1);
 #endif
   delay(100);
   ESP.restart();
@@ -58,15 +58,15 @@ ESPAPP_NETWORK_CONNECTION_MODE ESPAPP_Core::getConnectionMode(void)
 bool ESPAPP_Core::setConnectionMode(ESPAPP_NETWORK_CONNECTION_MODE mode)
 {
 #ifdef DEBUG
-  this->Msg->printInformation(F("Setting connection mode"), F("KERNEL"));
-  this->Msg->printBulletPoint(F("New mode: "));
-  this->Msg->printValue(mode);
+  this->Debugger->printInformation(F("Setting connection mode"), F("KERNEL"));
+  this->Debugger->printBulletPoint(F("New mode: "));
+  this->Debugger->printValue(mode);
 #endif
 
   if (*this->connectionMode == mode)
   {
 #ifdef DEBUG
-    this->Msg->printBulletPoint(F("Mode unchanged, skipping save"));
+    this->Debugger->printBulletPoint(F("Mode unchanged, skipping save"));
 #endif
     return true; // No change needed, return success
   }
@@ -83,15 +83,15 @@ ESPAPP_OPERATING_MODE ESPAPP_Core::getOperatingMode(void)
 bool ESPAPP_Core::setOperatingMode(ESPAPP_OPERATING_MODE mode)
 {
 #ifdef DEBUG
-  this->Msg->printInformation(F("Setting Operating mode"), F("KERNEL"));
-  this->Msg->printBulletPoint(F("New mode: "));
-  this->Msg->printValue(mode);
+  this->Debugger->printInformation(F("Setting Operating mode"), F("KERNEL"));
+  this->Debugger->printBulletPoint(F("New mode: "));
+  this->Debugger->printValue(mode);
 #endif
 
   if (*this->operatingMode == mode)
   {
 #ifdef DEBUG
-    this->Msg->printBulletPoint(F("Mode unchanged, skipping save"));
+    this->Debugger->printBulletPoint(F("Mode unchanged, skipping save"));
 #endif
     return true; // No change needed, return success
   }

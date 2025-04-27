@@ -4,82 +4,101 @@
 #ifdef ESPAPP_HARDWARE_I2C_INCLUDED
 
 ESPAPP_I2C_Scanner::ESPAPP_I2C_Scanner(ESPAPP_Core *_System)
- { this->System = _System; };
+{
+  this->System = _System;
+};
 
-
-void ESPAPP_I2C_Scanner::setWire(TwoWire *_Wire) {
+void ESPAPP_I2C_Scanner::setWire(TwoWire *_Wire)
+{
   portSet = true;
   WirePort = _Wire;
 }
 
 #ifdef DEBUG
-void ESPAPP_I2C_Scanner::scanAll(TwoWire *_Wire) {
+void ESPAPP_I2C_Scanner::scanAll(TwoWire *_Wire)
+{
   portSet = true;
   WirePort = _Wire;
   scanAll();
 }
 
-void ESPAPP_I2C_Scanner::scanAll() {
-  if (portSet) {
+void ESPAPP_I2C_Scanner::scanAll()
+{
+  if (portSet)
+  {
     uint8_t numberOfDeficesFound = 0;
     boolean searchStatus;
-    this->System->Msg->printHeader();
-
-    for (uint8_t address = 1; address < 127; address++) {
+    this->System->Debugger->printHeader(1, 0, 72, ESPAPP_DEBUGGER_MESSAGE_HEADER_TYPE::DASH);
+    for (uint8_t address = 1; address < 127; address++)
+    {
 
       searchStatus = scan(address);
       if (searchStatus)
         numberOfDeficesFound++;
     }
 
-    if (numberOfDeficesFound == 0) {
-      this->System->Msg->printValue(F("No I2C devices found"));
-    } else {
-      this->System->Msg->printValue(F("Scanning completed"));
+    if (numberOfDeficesFound == 0)
+    {
+      this->System->Debugger->printBulletPoint(F("No I2C devices found"), ESPAPP_DEBUGGER_MESSAGE_COLOR::BLUE);
     }
-
-    this->System->Msg->printHeader();
-  } else {
-    this->System->Msg->printError(F("Wire port has not been set"), F("I2C Scanner"));
+    else
+    {
+      this->System->Debugger->printBulletPoint(F("Scanning completed"));
+    }
+    this->System->Debugger->printHeader(1, 0, 72, ESPAPP_DEBUGGER_MESSAGE_HEADER_TYPE::DASH);
+  }
+  else
+  {
+    this->System->Debugger->printBulletPoint(F("Wire port has not been set"), ESPAPP_DEBUGGER_MESSAGE_COLOR::RED);
   }
 }
 #endif
 
-boolean ESPAPP_I2C_Scanner::scan(TwoWire *_Wire, byte address) {
+boolean ESPAPP_I2C_Scanner::scan(TwoWire *_Wire, byte address)
+{
   portSet = true;
   WirePort = _Wire;
   return scan(address);
 }
 
-boolean ESPAPP_I2C_Scanner::scan(byte address) {
+boolean ESPAPP_I2C_Scanner::scan(byte address)
+{
   boolean _ret = false;
-  if (portSet) {
+  if (portSet)
+  {
     byte status;
     WirePort->beginTransmission(address);
     status = WirePort->endTransmission();
-    if (status == 0) {
+    if (status == 0)
+    {
 #ifdef DEBUG
-      Serial << endl << F(" - Sensor Found [0x");
-      if (address < 16) {
+
+      this->System->Debugger->printBulletPoint(F("Sensor Found [0x"));
+      if (address < 16)
+      {
         Serial << F("0");
       }
       Serial << _HEX(address) << F("] : ") << getName(address);
 #endif
       _ret = true;
-    } else {
+    }
+    else
+    {
       _ret = false;
     }
   }
 #ifdef DEBUG
-  else {
-    this->System->Msg->printError(F("Wire port has not been set"), F("I2C Scanner"));
+  else
+  {
+    this->System->Debugger->printBulletPoint(F("Wire port has not been set"), ESPAPP_DEBUGGER_MESSAGE_COLOR::RED);
   }
 #endif
 
   return _ret;
 }
 
-const __FlashStringHelper *ESPAPP_I2C_Scanner::getName(byte deviceAddress) {
+const __FlashStringHelper *ESPAPP_I2C_Scanner::getName(byte deviceAddress)
+{
   /* WARN: Description can't be longer than 70chars, used by
    * addDeviceI2CAddressSelectionItem in ESPAPP-Site-Gnerator.h */
   if (deviceAddress == 0x00)

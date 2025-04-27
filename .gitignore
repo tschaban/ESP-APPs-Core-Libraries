@@ -32,5 +32,6 @@
 *.app
 
 doc/cfg
+.scannerwork
 *.code-workspace
 *.properties

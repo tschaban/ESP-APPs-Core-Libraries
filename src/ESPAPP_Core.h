@@ -14,9 +14,8 @@
 #include <ESP8266WiFi.h>
 #endif // ESP32/ESP8266
 
-
 #ifdef DEBUG
-#include <ESPAPP_SerialMessages.h>
+#include <ESPAPP_SerialDebugger.h>
 #endif
 
 struct CORE_CONFIGURATION
@@ -39,10 +38,10 @@ public:
     ESPAPP_Time *Time;
 
 #ifdef DEBUG
-    ESPAPP_SerialMessages *Msg = new ESPAPP_SerialMessages();
-    ESPAPP_API_Flash *Flash = new ESPAPP_API_Flash(Msg);
-    ESPAPP_API_Files *File = new ESPAPP_API_Files(Flash, Msg);
-    ESPAPP_Message *Message = new ESPAPP_Message(Flash, Msg);
+    ESPAPP_SerialDebugger *Debugger = new ESPAPP_SerialDebugger();
+    ESPAPP_API_Flash *Flash = new ESPAPP_API_Flash(Debugger);
+    ESPAPP_API_Files *File = new ESPAPP_API_Files(Flash, Debugger);
+    ESPAPP_Message *Message = new ESPAPP_Message(Flash, Debugger);
 #else
     ESPAPP_API_Flash *Flash = new ESPAPP_API_Flash();
     ESPAPP_API_Files *File = new ESPAPP_API_Files(Flash);
